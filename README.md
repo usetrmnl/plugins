@@ -4,7 +4,8 @@ this repo is a non-exhaustive collection of TRMNL plugin logic. the main idea in
 
 ## Featured plugins
 
-- [Hacker News](/lib/hacker_news)
 - [GitHub Commit Graph](/lib/github_commit_graph)
+- [Hacker News](/lib/hacker_news)
+- [Lunch Money](/lib/lunch_money)
 
 to be continued...

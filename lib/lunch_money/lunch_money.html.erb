@@ -1,0 +1,23 @@
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartkick@5.0.1/dist/chartkick.min.js"></script>
+
+<div class="screen">
+  <div class="layout layout--double dither">
+    <%= bar_chart budgets, adapter: :highcharts,
+          prefix: '$',
+          thousands: ',',
+          colors: ['black'],
+          library: {
+            chart: { height: 350 },
+            plotOptions: { series: { animation: false, pointWidth: 12 } },
+            yAxis: { labels: { style: { fontSize: '16px' } }, gridLineDashStyle: 'shortdot', gridLineWidth: 1, gridLineColor: '#000000', tickAmount: 5 },
+            xAxis: { type: 'daytime', labels: { style: { fontSize: '16px' } }, lineWidth: 0, gridLineDashStyle: 'dot', tickWidth: 1, tickLength: 0, gridLineWidth: 1, gridLineColor: '#000000', tickPixelInterval: 120 }
+          }
+    %>
+  </div>
+
+  <div class="title_bar">
+    <img class="image" src="<%= Rails.application.credentials.base_url %>/images/plugins/lunch_money.svg" />
+    <h1 class="title">Lunch Money</h1>
+  </div>
+</div>
