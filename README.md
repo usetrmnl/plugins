@@ -4,7 +4,7 @@ this repo is a non-exhaustive collection of TRMNL plugin logic. the main idea in
 
 ## Featured plugins
 
-- Hacker News
-- GitHub Commit Graph
+- [Hacker News](/lib/hacker_news)
+- [GitHub Commit Graph](/lib/github_commit_graph)
 
 to be continued...
