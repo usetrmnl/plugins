@@ -12,7 +12,7 @@ module Plugins
       budget_data.map do |budget|
         next if budget['is_income'] # show only expenses by default
 
-        [CGI.unescapeHTML(budget['category_name']), budget.dig('data', beginning_of_month, 'spending_to_base')]
+        [CGI.unescapeHTML(budget['category_name']), budget.dig('data', beginning_of_month, 'spending_to_base') || 0]
       end.compact.sort_by { |_, v| -v } # sort high to low by $ amount
     end
     # rubocop:enable Style/MultilineBlockChain
