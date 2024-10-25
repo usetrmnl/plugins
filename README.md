@@ -7,6 +7,7 @@ this repo is a non-exhaustive collection of TRMNL plugin logic. the main idea in
 - [GitHub Commit Graph](/lib/github_commit_graph)
 - [Hacker News](/lib/hacker_news)
 - [Lunch Money](/lib/lunch_money)
-- [(USA) Top 10 College Football Rankings](/lib/usa_college_football_rankings.md) via snarfulsolutions & Sitnik
+- [(USA) Top 10 College Football Rankings](/lib/usa_college_football_rankings.md) by @SnarfulSolutionsGroup & Sitnik
+- [xkcd comics](https://github.com/SnarfulSolutionsGroup/TRMNL-Plugins/blob/main/TRMNL_Comic.md) by @SnarfulSolutionsGroup
 
 to be featured here, join our developer-only Discord server (link inside TRMNL UI).
