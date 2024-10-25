@@ -1,5 +1,7 @@
 # College Football Top 10 Rankings Plugin on TRMNL
 
+<kbd>![usa-college-football-rankings-plugin](https://github.com/user-attachments/assets/5e2fc458-6fea-4c78-b8d2-3731db22b64b)</kbd>
+
 ## Step 1: Create a New Private Plugin
 Log in to your TRMNL dashboard.
 On the left-hand menu, click on the 'Go to Plugins' button.
@@ -22,40 +24,53 @@ Click the 'Edit Markup' button.
 Copy and paste the following code into the Markup box. This code will display the Top 10 college football teams along with their rank, last week’s rank, and current record.
 
 ```
-<div class="layout" style="text-align: center; font-size: 14px; font-family: Arial, sans-serif; margin-top: 15px;">
-  <div class="columns">
-    <div class="column">
-      <div class="markdown">
-        <span class="title" style="font-weight: bold; font-size: 18px; margin-bottom: 10px;">College Football Top 10 Rankings</span>
-        <table style="width: 100%; margin: 15px auto; border-collapse: collapse; text-align: center;">
+<style>
+  .trmnl .table tbody tr {
+    height: 38px;
+  }
+</style>
+<div class="view bg-white">
+  <div class="layout layout--col gap--space-between">
+    <div class="columns">
+      <div class="column">
+        <table class="table">
           <thead>
-            <tr style="background-color: #f2f2f2;">
-              <th style="padding: 6px; border: 1px solid #ddd;">Rank</th>
-              <th style="padding: 6px; border: 1px solid #ddd;">Team</th>
-              <th style="padding: 6px; border: 1px solid #ddd;">Last Week</th>
-              <th style="padding: 6px; border: 1px solid #ddd;">Record</th>
+            <tr>
+              <th><span class="title title--small">Rank</span></th>
+              <th><span class="title title--small">Team</span></th>
+              <th><span class="title title--small">Last</span></th>
+              <th><span class="title title--small">Record</span></th>
             </tr>
           </thead>
           <tbody>
             {% assign counter = 1 %}
             {% for rank in rankings[0].ranks %}
             {% if counter <= 10 %}
-            <tr>
-              <td style="padding: 6px; border: 1px solid #ddd;">{{ counter }}</td> <!-- Using counter for the rank -->
-              <td style="padding: 6px; border: 1px solid #ddd;">{{ rank.team.location }}</td> <!-- Only using location to avoid duplication -->
-              <td style="padding: 6px; border: 1px solid #ddd;">{{ rank.previous }}</td>
-              <td style="padding: 6px; border: 1px solid #ddd;">{{ rank.recordSummary }}</td>
-            </tr>
+              <tr>
+                <td><span class="title title--small">{{ counter }}</span></td> <!-- Using counter for the rank -->
+                <td>
+                  <div class="flex gap gap--small" style="align-items: center">
+                    <img style="max-height: 30px" class="image" src="{{ rank.team.logo }}" />
+                    <span class="title title--small">{{ rank.team.location }} {{ rank.team.name }}</span>
+                  </div>
+                </td> <!-- Only using location to avoid duplication -->
+                <td><span class="title title--small">{{ rank.previous }}</span></td>
+                <td><span class="title title--small">{{ rank.recordSummary }}</span></td>
+              </tr>
             {% assign counter = counter | plus: 1 %}
             {% endif %}
             {% endfor %}
           </tbody>
         </table>
       </div>
-    </div>
+  </div>
+  </div>
+  <div class="title_bar">
+    <img class="image" src="https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-football-college.png&h=160&w=160&scale=crop&cquality=40" />
+    <span class="title">College Football</span>
+    <span class="instance">Top 10 Rankings</span>
   </div>
 </div>
-
 ```
 
 ## Step 4: Save and Activate the Plugin
@@ -73,4 +88,3 @@ More Teams: If you want to display more than 10 teams, you can increase the limi
 ```
 {% if counter <= 10 %}
 ```
-Table Style: You can also modify the padding, borders, and colors of the table by changing the styles in the <th> and <td> elements.
