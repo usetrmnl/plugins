@@ -1,22 +1,60 @@
-<div class="screen">
-  <div class="layout">
-    <div class="columns">
-      <div class="column">
-        <div class="metrics">
-          <div class="metric">
-            <span class="value days_passed"><%= contributions[:total] %></span>
-            <span class="label label--underline">Contributions in last year</span>
+<div class="view view--full">
+  <div class="layout layout--col gap--space-between">
+    <div class="grid grid--cols-2">
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--xxxlarge"><%= contributions[:total] %></span>
+          <span class="label">Contributions in last year</span>
+        </div>
+      </div>
+      <div class="flex flex--col gap--medium">
+        <div class="grid grid--cols-2">
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value"><%= stats[:longest_streak] %></span>
+              <span class="label">Longest streak</span>
+            </div>
+          </div>
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value "><%= stats[:current_streak] %></span>
+              <span class="label">Current streak</span>
+            </div>
           </div>
         </div>
 
-        <div id="github_commit_graph">
-          <% contributions[:commits].each do |week_of_commits| %>
-            <% week_of_commits['contributionDays'].each do |day| %>
-              <span class="day <%= git_commit_grayscale(day['contributionCount']) %>"></span>
-            <% end %>
-          <% end %>
+        <div class="w-full b-h-gray-5"></div>
+
+        <div class="grid grid--cols-2">
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value "><%= stats[:max_contributions] %></span>
+              <span class="label">Most in a day</span>
+            </div>
+          </div>
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value "><%= stats[:average_contributions] %></span>
+              <span class="label">Average per day</span>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
+
+    <div class="w-full b-h-gray-5"></div>
+
+    <div id="github_commit_graph">
+      <% contributions[:commits].each do |week_of_commits| %>
+        <% week_of_commits['contributionDays'].each do |day| %>
+          <span class="day <%= git_commit_grayscale(day['contributionCount']) %>"></span>
+        <% end %>
+      <% end %>
     </div>
   </div>
 
@@ -27,44 +65,4 @@
   </div>
 </div>
 
-<style>
-  #github_commit_graph {
-    width: 758px;
-    height: 148px;
-    overflow: hidden;
-
-    padding-left: 17px;
-    margin-top: 19px;
-
-    column-count: auto;
-    column-fill: auto;
-    column-width: 13px;
-    column-gap: 0px;
-  }
-
-  #github_commit_graph .day {
-    width: 11px;
-    height: 19px;
-    float: left;
-    border-radius: 4px;
-    margin: 2px 2px 0 2px;
-
-    break-inside: avoid-column;
-  }
-
-  #github_commit_graph.widget {
-    width: 318px;
-    /* height: 133px; */
-    height: 63px;
-    column-width: 6px;
-    margin-top: 0;
-    padding-left: 0;
-    margin-left: 14px;
-  }
-
-  #github_commit_graph.widget .day {
-    width: 6px;
-    height: 9px;
-    margin: 0;
-  }
-</style>
+<%= render 'common' %>
