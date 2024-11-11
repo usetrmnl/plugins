@@ -10,5 +10,6 @@ this repo is a non-exhaustive collection of TRMNL plugin logic. the main idea in
 - [(USA) Top 10 College Football Rankings](/lib/usa_college_football_rankings.md) by @SnarfulSolutionsGroup & Sitnik
 - [xkcd comics](https://github.com/SnarfulSolutionsGroup/TRMNL-Plugins/blob/main/TRMNL_Comic.md) by @SnarfulSolutionsGroup
 - [Todoist](https://github.com/Nynir/trmnl-todoist) by @Nynir
+- [Surf reports](https://github.com/pcifaldi/surf_api) by @pcifaldi
 
 to be featured here, join our developer-only Discord server (link inside TRMNL UI).
