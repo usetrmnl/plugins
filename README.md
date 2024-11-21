@@ -7,9 +7,10 @@ this repo is a non-exhaustive collection of TRMNL plugin logic. the main idea in
 - [GitHub Commit Graph](/lib/github_commit_graph)
 - [Hacker News](/lib/hacker_news)
 - [Lunch Money](/lib/lunch_money)
-- [(USA) Top 10 College Football Rankings](/lib/usa_college_football_rankings.md) by @SnarfulSolutionsGroup & Sitnik
-- [xkcd comics](https://github.com/SnarfulSolutionsGroup/TRMNL-Plugins/blob/main/TRMNL_Comic.md) by @SnarfulSolutionsGroup
-- [Todoist](https://github.com/Nynir/trmnl-todoist) by @Nynir
-- [Surf reports](https://github.com/pcifaldi/surf_api) by @pcifaldi
+- [(USA) Top 10 College Football Rankings](/lib/usa_college_football_rankings.md) by [@SnarfulSolutionsGroup](https://github.com/SnarfulSolutionsGroup) & [@Sitnik](https://github.com/Sitnik)
+- [xkcd comics](https://github.com/SnarfulSolutionsGroup/TRMNL-Plugins/blob/main/TRMNL_Comic.md) by [@SnarfulSolutionsGroup](https://github.com/SnarfulSolutionsGroup)
+- [Todoist](https://github.com/Nynir/trmnl-todoist) by [@Nynir](https://github.com/Nynir)
+- [Surf reports](https://github.com/pcifaldi/surf_api) by [@pcifaldi](https://github.com/pcifaldi)
+- [On This Day (in history)](https://github.com/frethop/TRMNL-thisday) by [@frethop](https://github.com/frethop)
 
 to be featured here, join our developer-only Discord server (link inside TRMNL UI).
