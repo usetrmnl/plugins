@@ -13,5 +13,6 @@ this repo is a non-exhaustive collection of TRMNL plugin logic. the main idea in
 - [Surf reports](https://github.com/pcifaldi/surf_api) by [@pcifaldi](https://github.com/pcifaldi)
 - [On This Day (in history)](https://github.com/frethop/TRMNL-thisday) by [@frethop](https://github.com/frethop)
 - [Multi-column ICS calendar](https://github.com/jfsso/trmnl-calendar) by [@jfsso](https://github.com/jfsso)
+- [WooCommerce](https://github.com/yannicschuller/trmnl-woocommerce) by [@yannicschuller](https://github.com/yannicschuller)
 
 to be featured here, join our developer-only Discord server (link inside TRMNL UI).
