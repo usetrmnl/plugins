@@ -16,5 +16,6 @@ this repo is a non-exhaustive collection of TRMNL plugin logic. the main idea in
 - [WooCommerce](https://github.com/yannicschuller/trmnl-woocommerce) by [@yannicschuller](https://github.com/yannicschuller)
 - [Strava goals](https://github.com/vinayak-mehta/trmnl-strava-goals) by [@vinayak-mehta](https://github.com/vinayak-mehta)
 - [Valorant Tracker](https://github.com/MarkHopper24/Valorant-Tools) by [@MarkHopper24](https://github.com/MarkHopper24)
+- [NASA Deep Space Network](https://github.com/schrockwell/trmnl-dsn) by [@schrockwell](https://github.com/schrockwell)
 
 to be featured here, join our developer-only Discord server (link inside TRMNL UI).
