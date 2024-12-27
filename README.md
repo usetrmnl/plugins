@@ -17,5 +17,6 @@ this repo is a non-exhaustive collection of TRMNL plugin logic. the main idea in
 - [Strava goals](https://github.com/vinayak-mehta/trmnl-strava-goals) by [@vinayak-mehta](https://github.com/vinayak-mehta)
 - [Valorant Tracker](https://github.com/MarkHopper24/Valorant-Tools) by [@MarkHopper24](https://github.com/MarkHopper24)
 - [NASA Deep Space Network](https://github.com/schrockwell/trmnl-dsn) by [@schrockwell](https://github.com/schrockwell)
+- [Marvel Character of the Day](https://github.com/MarkHopper24/Marvel-Character-of-the-Day) by [@MarkHopper24](https://github.com/MarkHopper24)
 
 to be featured here, join our developer-only Discord server (link inside TRMNL UI).
