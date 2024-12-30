@@ -18,5 +18,8 @@ this repo is a non-exhaustive collection of TRMNL plugin logic. the main idea in
 - [Valorant Tracker](https://github.com/MarkHopper24/Valorant-Tools) by [@MarkHopper24](https://github.com/MarkHopper24)
 - [NASA Deep Space Network](https://github.com/schrockwell/trmnl-dsn) by [@schrockwell](https://github.com/schrockwell)
 - [Marvel Character of the Day](https://github.com/MarkHopper24/Marvel-Character-of-the-Day) by [@MarkHopper24](https://github.com/MarkHopper24)
+- [Remember The Milk](https://github.com/sejtenik/trmnl-rtm-plugin) by [@sejtenik](https://github.com/sejtenik)
+- [Habitify](https://github.com/sejtenik/trmnl-habitify-plugin) by [@sejtenik](https://github.com/sejtenik)
+- [Libra](https://github.com/sejtenik/trmnl-libra-cloud-plugin) by [@sejtenik](https://github.com/sejtenik)
 
 to be featured here, join our developer-only Discord server (link inside TRMNL UI).
