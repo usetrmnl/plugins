@@ -21,5 +21,6 @@ this repo is a non-exhaustive collection of TRMNL plugin logic. the main idea in
 - [Remember The Milk](https://github.com/sejtenik/trmnl-rtm-plugin) by [@sejtenik](https://github.com/sejtenik)
 - [Habitify](https://github.com/sejtenik/trmnl-habitify-plugin) by [@sejtenik](https://github.com/sejtenik)
 - [Libra](https://github.com/sejtenik/trmnl-libra-cloud-plugin) by [@sejtenik](https://github.com/sejtenik)
+- [This Day in History (Wikipedia)](https://github.com/jvivona/TRMNL-recipes/tree/main/thisdayinhistory) by [@jvivona](https://github.com/jvivona)
 
 to be featured here, join our developer-only Discord server (link inside TRMNL UI).
