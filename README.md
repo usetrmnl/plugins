@@ -23,5 +23,7 @@ this repo is a non-exhaustive collection of TRMNL plugin logic. the main idea in
 - [Libra](https://github.com/sejtenik/trmnl-libra-cloud-plugin) by [@sejtenik](https://github.com/sejtenik)
 - [This Day in History (Wikipedia)](https://github.com/jvivona/TRMNL-recipes/tree/main/thisdayinhistory) by [@jvivona](https://github.com/jvivona)
 - [Weekly Goal Tracker](https://github.com/azjgard/trmnl-weekly-goal-tracker) by [@azjgard](https://github.com/azjgard)
+- [METAR](https://github.com/schrockwell/trmnl-metar) by [@schrockwell](https://github.com/schrockwell)
+
 
 to be featured here, join our developer-only Discord server (link inside TRMNL UI).
