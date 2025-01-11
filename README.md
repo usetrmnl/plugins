@@ -1,12 +1,16 @@
 # TRMNL plugins
 
-this repo is a non-exhaustive collection of TRMNL plugin logic. the main idea in sharing these assets is to provide transparency in how TRMNL manages user data from 3rd party tools with which we integrate.
+non-exhaustive collection of TRMNL plugin logic. in sharing these assets we intend to provide transparency in how TRMNL manages user data with respect to 3rd party tools with which we integrate.
 
 ## Featured plugins
 
+**native**
 - [GitHub Commit Graph](/lib/github_commit_graph)
 - [Hacker News](/lib/hacker_news)
 - [Lunch Money](/lib/lunch_money)
+- [Stock Price](/lib/stock_price)
+
+**by the community**
 - [(USA) Top 10 College Football Rankings](/lib/usa_college_football_rankings.md) by [@SnarfulSolutionsGroup](https://github.com/SnarfulSolutionsGroup) & [@Sitnik](https://github.com/Sitnik)
 - [xkcd comics](https://github.com/SnarfulSolutionsGroup/TRMNL-Plugins/blob/main/TRMNL_Comic.md) by [@SnarfulSolutionsGroup](https://github.com/SnarfulSolutionsGroup)
 - [Todoist](https://github.com/Nynir/trmnl-todoist) by [@Nynir](https://github.com/Nynir)
