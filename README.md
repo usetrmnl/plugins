@@ -28,6 +28,6 @@ non-exhaustive collection of TRMNL plugin logic. in sharing these assets we inte
 - [This Day in History (Wikipedia)](https://github.com/jvivona/TRMNL-recipes/tree/main/thisdayinhistory) by [@jvivona](https://github.com/jvivona)
 - [Weekly Goal Tracker](https://github.com/azjgard/trmnl-weekly-goal-tracker) by [@azjgard](https://github.com/azjgard)
 - [METAR](https://github.com/schrockwell/trmnl-metar) by [@schrockwell](https://github.com/schrockwell)
-
+- [Block Clock](https://github.com/tyler-dot-earth/trmnl-notblockclock) by [@tyler-dot-earth](https://github.com/tyler-dot-earth)
 
 to be featured here, join our developer-only Discord server (link inside TRMNL UI).
