@@ -29,5 +29,6 @@ non-exhaustive collection of TRMNL plugin logic. in sharing these assets we inte
 - [Weekly Goal Tracker](https://github.com/azjgard/trmnl-weekly-goal-tracker) by [@azjgard](https://github.com/azjgard)
 - [METAR](https://github.com/schrockwell/trmnl-metar) by [@schrockwell](https://github.com/schrockwell)
 - [Block Clock](https://github.com/tyler-dot-earth/trmnl-notblockclock) by [@tyler-dot-earth](https://github.com/tyler-dot-earth)
+- [TickTick Calendar](https://github.com/frethop/TRMNL-ticktick) by [@frethop](https://github.com/frethop) 
 
 to be featured here, join our developer-only Discord server (link inside TRMNL UI).
