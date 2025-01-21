@@ -9,6 +9,7 @@ non-exhaustive collection of TRMNL plugin logic. in sharing these assets we inte
 - [Hacker News](/lib/hacker_news)
 - [Lunch Money](/lib/lunch_money)
 - [Stock Price](/lib/stock_price)
+- [Tempest Weather Station](/lib/tempest_weather_station)
 
 **by the community**
 - [(USA) Top 10 College Football Rankings](/lib/usa_college_football_rankings.md) by [@SnarfulSolutionsGroup](https://github.com/SnarfulSolutionsGroup) & [@Sitnik](https://github.com/Sitnik)
