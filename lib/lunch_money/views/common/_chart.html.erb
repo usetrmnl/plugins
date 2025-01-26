@@ -1,0 +1,17 @@
+<% chart_size ||= { height: 320 } %>
+<% series_point_width ||= 6 %>
+<% y_axis_labels ||= { style: { fontSize: '16px' } } %>
+<% tick_amount ||= 5 %>
+
+<% graph_items = items.sort_by { |_, amount| -amount }.first(graph_items_count) %>
+<%= bar_chart graph_items.to_h, adapter: :highcharts,
+      prefix: '$',
+      thousands: ',',
+      colors: ['black'],
+      library: {
+        chart: chart_size,
+        plotOptions: { series: { animation: false, pointWidth: series_point_width } },
+        yAxis: { labels: y_axis_labels, gridLineDashStyle: 'shortdot', gridLineWidth: 1, gridLineColor: '#000000', tickAmount: tick_amount },
+        xAxis: { type: 'daytime', labels: { style: { fontSize: '16px' } }, lineWidth: 0, gridLineDashStyle: 'dot', tickWidth: 1, tickLength: 0, gridLineWidth: 1, gridLineColor: '#000000', tickPixelInterval: 120 }
+      }
+%>

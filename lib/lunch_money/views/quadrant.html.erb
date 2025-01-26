@@ -1,0 +1,12 @@
+<div class="view view--quadrant">
+  <div class="layout layout--col gap--none">
+    <div class="grid grid--cols-2">
+      <%= render partial: 'plugins/lunch_money/common/headings', locals: local_assigns.merge(top_items_count: 2) %>
+    </div>
+
+    <% chart_opts = { graph_items_count: 5, chart_size: { height: 120 }, series_point_width: 5, y_axis_labels: { enabled: false } } %>
+    <%= render partial: 'plugins/lunch_money/common/chart', locals: local_assigns.merge(chart_opts) %>
+  </div>
+
+  <%= render 'plugins/lunch_money/common/title_bar', instance_name: instance_name %>
+</div>

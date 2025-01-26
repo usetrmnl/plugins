@@ -1,0 +1,11 @@
+<% top_items_count ||= 3 %>
+<% top_items = items.sort_by { |_, amount| -amount }.first(top_items_count) %>
+<% top_items.each do |item, amount| %>
+  <div class="item">
+    <div class="meta"></div>
+    <div class="content">
+      <span class="value value--small"><%= number_to_currency(amount, precision: 0) %></span>
+      <span class="label"><%= item %></span>
+    </div>
+  </div>
+<% end %>
