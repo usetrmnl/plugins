@@ -2,9 +2,8 @@
 
 non-exhaustive collection of TRMNL plugin logic. in sharing these assets we intend to provide transparency in how TRMNL manages user data with respect to 3rd party integrations.
 
-## Featured plugins
+## Native plugins
 
-**native**
 - [Calendar](/lib/calendar)
 - [GitHub Commit Graph](/lib/github_commit_graph)
 - [Hacker News](/lib/hacker_news)
@@ -21,7 +20,8 @@ native plugin structure:
 5. views prefixed with `_`, for example `_common`, are called "partials" (or 'components' in other frameworks)
 6. shared code is not intended to "just work" but to showcase which values, and how, are extracted from 3rd party apps for TRMNL screen generation
 
-**by the community**
+## Community plugins
+
 - [(USA) Top 10 College Football Rankings](/lib/usa_college_football_rankings.md) by [@SnarfulSolutionsGroup](https://github.com/SnarfulSolutionsGroup) & [@Sitnik](https://github.com/Sitnik)
 - [xkcd comics](https://github.com/SnarfulSolutionsGroup/TRMNL-Plugins/blob/main/TRMNL_Comic.md) by [@SnarfulSolutionsGroup](https://github.com/SnarfulSolutionsGroup)
 - [Todoist](https://github.com/Nynir/trmnl-todoist) by [@Nynir](https://github.com/Nynir)
@@ -42,4 +42,4 @@ native plugin structure:
 - [Block Clock](https://github.com/tyler-dot-earth/trmnl-notblockclock) by [@tyler-dot-earth](https://github.com/tyler-dot-earth)
 - [TickTick Calendar](https://github.com/frethop/TRMNL-ticktick) by [@frethop](https://github.com/frethop)
 
-to be featured here, join our developer-only Discord server (link inside TRMNL UI).
+to be featured here, open a PR or join the developer-only Discord server (link inside TRMNL UI).
