@@ -1,0 +1,34 @@
+<div class="view view--quadrant">
+  <% if tickers.size == 1 %>
+    <div class="layout layout--col gap--large">
+      <% tickers.each_with_index do |ticker, index| %>
+        <%= render 'lib/stock_price/views/shared/ticker_medium', ticker:, currency_symbol:, currency_separator: %>
+      <% end %>
+    </div>
+  <% elsif tickers.size == 2 %>
+    <div class="layout layout--col gap--space-between">
+      <% tickers_to_display = tickers.first(2) %>
+      <% tickers_to_display.each_with_index do |ticker, index| %>
+        <%= render 'lib/stock_price/views/shared/ticker_xsmall', ticker:, currency_symbol:, currency_separator: %>
+        <% if index < tickers_to_display.size - 1 %>
+          <div class="w-full b-h-gray-5"></div>
+        <% end %>
+      <% end %>
+    </div>
+  <% elsif tickers.size >= 3 %>
+    <div class="layout layout--col gap--space-between">
+      <% tickers_to_display = tickers.first(3) %>
+      <% tickers_to_display.each_with_index do |ticker, index| %>
+        <%= render 'lib/stock_price/views/shared/ticker_xxsmall', ticker:, currency_symbol:, currency_separator: %>
+        <% if index < tickers_to_display.size - 1 %>
+          <div class="w-full b-h-gray-5"></div>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="title_bar">
+    <img class="image" src="<%= Rails.application.credentials.base_url %>/images/plugins/stock_price--render.svg" />
+    <span class="title">Stock Prices</span>
+  </div>
+</div>

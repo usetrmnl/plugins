@@ -1,0 +1,7 @@
+<% if event_layout == 'week' %>
+  <%= render partial: 'plugins/calendars/full_week', locals: local_assigns %>
+<% elsif event_layout == 'month' %>
+  <%= render partial: 'plugins/calendars/full_month', locals: local_assigns %>
+<% else %>
+  <%= render partial: 'plugins/calendars/full_default', locals: local_assigns %>
+<% end %>

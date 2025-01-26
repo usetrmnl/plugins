@@ -1,0 +1,37 @@
+<%= render "plugins/calendars/common" %>
+
+<style media="screen">
+/* wraps event titles on new line if necessary */
+.fc-daygrid-event {
+  white-space: normal !important;
+}
+
+/* defaults 2em, which wastes a lot of space if no events exist for entire row of dates */
+.fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
+  min-height: 1em;
+}
+</style>
+
+<div id="calendar" style="height: 480px; width: 800px"></div>
+
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+
+<!-- TODO: a newer version is available, but some el classes have changed so our style overrides are not applied -->
+<!-- <script src='https://cdn.jsdelivr.net/npm/fullcalendar@7.0.0-beta.4/index.global.min.js'></script> -->
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      timeZone: new Date('<%= events.values.flatten.reject { |e| e[:all_day] }.first&.dig(:start_full) %>').getTimezoneOffset(),
+      headerToolbar: false,
+      initialView: 'dayGridMonth',
+      firstDay: <%= first_day %>,
+      events: <%== events.values.flatten.map {|e| { allDay: e[:all_day], title: e[:summary], description: e[:description], start: e[:start_full], end: e[:end_full] } }.to_json %>,
+      displayEventTime: false, // IDEA: make this a user-facing toggle
+      locale: '<%= locale %>',
+      schedulerLicenseKey: '<%= Rails.application.credentials.plugins.full_calendar.license_key %>'
+    });
+    calendar.render();
+  });
+</script>

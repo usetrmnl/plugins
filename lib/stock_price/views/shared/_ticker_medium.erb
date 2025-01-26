@@ -1,0 +1,24 @@
+<div class="grid grid--cols-1">
+  <div class="grid grid--cols-2">
+    <div class="item">
+      <div class="meta"></div>
+      <div class="content">
+        <span class="value"><%= ticker[:symbol].gsub(' ', '&nbsp;').html_safe %></span>
+        <span class="label"><%= ticker[:name] %></span>
+      </div>
+    </div>
+    <div class="item">
+      <div class="meta"></div>
+      <div class="content">
+        <span class="value value--small value--tnums"><%= ticker[:change] %></span>
+        <span class="label">Daily Change</span>
+      </div>
+    </div>
+  </div>
+  <div class="item">
+    <div class="meta"></div>
+    <div class="content">
+      <span class="value value--xlarge value--tnums"><%= number_to_currency(ticker[:price], unit: currency_symbol, separator: currency_separator) %></span>
+    </div>
+  </div>
+</div>

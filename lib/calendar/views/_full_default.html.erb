@@ -1,0 +1,56 @@
+<div class="view view--full">
+  <div class="layout">
+    <div class="columns">
+      <% events.first(3).to_h.each do |day_of_events| %>
+        <div class="column">
+          <div class="list">
+            <span class="label"><%= day_of_events[0] %></span>
+            <% max_event_count = include_description ? 4 : 7 %>
+            <% all_day_events = day_of_events[1].select { |e| e[:all_day] }[0..max_event_count] %>
+            <% visible_events = (day_of_events[1] - all_day_events)[0..(max_event_count-all_day_events.count)] %>
+            <% hidden_events_count = day_of_events[1].size - all_day_events.size - visible_events.size %>
+
+            <% all_day_events.each do |event| %>
+              <div class="item">
+                <div class="meta">
+                  <span class="index">#</span>
+                </div>
+                <div class="content">
+                  <span class="title title--small"><%= event[:summary] %></span>
+                  <% if include_description %><span class="description"><%= event[:description] %></span><% end %>
+                </div>
+              </div>
+            <% end %>
+
+            <% visible_events.each_with_index do |event, idx| %>
+              <div class="item">
+                <div class="meta">
+                  <span class="index"><%= idx + 1 %></span>
+                </div>
+                <div class="content">
+                  <span class="title title--small"><%= event[:summary] %></span>
+                  <% if include_description %><span class="description"><%= event[:description] %></span><% end %>
+                  <div class="flex gap--xsmall">
+                    <span class="label label--small label--underline"><%= "#{event[:start]}" %> - <%= event[:end] %></span>
+                    <!-- hiding status, as we only fetch events where status == 'confirmed' -->
+                    <!-- <span class="label label--small label--underline"><%= event[:status] %></span> -->
+                  </div>
+                </div>
+              </div>
+            <% end %>
+            <% if hidden_events_count > 0 %>
+              <div class="item">
+                <div class="meta"></div>
+                <div class="content">
+                  <span class="title title--small">And <%= hidden_events_count %> more</span>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%= render partial: "lib/calendar/views/title_bar", locals: local_assigns %>
+</div>

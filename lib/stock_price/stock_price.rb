@@ -12,9 +12,13 @@ module Plugins
     private
 
     def tickers
-      string_to_array(settings["symbol"], limit: STOCK_TICKER_LIMIT).map do |symbol|
+      ticker_data = string_to_array(settings["symbol"], limit: STOCK_TICKER_LIMIT).map do |symbol|
         ticker_price(symbol.upcase)
       end.compact
+
+      ticker_data.each do |stock|
+        stock[:price] = localized_price(stock[:price])
+      end
     end
 
     def invalid_symbol(symbol)
@@ -38,8 +42,8 @@ module Plugins
           {
             symbol: symbol.upcase,
             name: ticker_name(symbol.upcase),
-            price: localized_price(response.dig("last", 0)),
-            change: "#{(response.dig('changepct', 0) * 100)&.round(2)}%"
+            price: response.dig("last", 0),
+            change: "#{(response.dig('changepct', 0).to_f * 100)&.round(2)}%"
           }
         end
       end

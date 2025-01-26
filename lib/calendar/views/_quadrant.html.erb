@@ -1,0 +1,36 @@
+<div class="view view--quadrant">
+  <div class="layout layout--col" style="justify-content: <%= events.count > 1 ? 'flex-start' : 'center' %>">
+    <% events_sorted = events.values.flatten.sort_by { |e| e[:date_time] }.group_by { |e| e[:day] } %>
+    <% events_sorted.first(1).to_h.each do |day_of_events| %>
+
+      <div class="list">
+        <span class="label"><%= day_of_events[0] %></span>
+        <% visible_events = day_of_events[1][0..2] %>
+        <% hidden_events_count = day_of_events[1].size - visible_events.size %>
+        <% visible_events.each_with_index do |event, idx| %>
+          <div class="item">
+            <div class="meta">
+              <span class="index"><%= idx + 1 %></span>
+            </div>
+            <div class="content">
+              <span class="title title--small"><%= event[:summary] %></span>
+              <div class="flex gap--xsmall">
+                <span class="label label--small label--underline"><%= "#{event[:start]}" %> - <%= event[:end] %></span>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        <% if hidden_events_count > 0 %>
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="title title--small">And <%= hidden_events_count %> more</span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <%= render partial: "lib/calendar/views/title_bar", locals: local_assigns %>
+</div>

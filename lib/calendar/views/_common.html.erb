@@ -1,0 +1,149 @@
+<style media="screen">
+  #calendar {
+    -webkit-font-smoothing: none !important;
+  }
+
+  #calendar,
+  .fc {
+    --fc-event-bg-color: black;
+    --fc-event-border-color: black;
+    --fc-event-text-color: white;
+    --fc-today-bg-color: transparent;
+  }
+
+  .fc-v-event .fc-event-title {
+    font-size: 16px;
+    line-height: 12px;
+    overflow: visible;
+  }
+
+  .fc-col-header-cell {
+    font-family: 'NicoClean';
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+  }
+
+  .fc-v-event {
+    background-color: var(--fc-event-bg-color);
+    border: 1px solid var(--fc-event-border-color);
+    display: block;
+  }
+
+  table.fc-col-header {
+    width: 800px !important;
+  }
+
+  .fc-timegrid-divider {
+    background: none !important;
+  }
+
+  .fc-scrollgrid-section-header thead::before,
+  .fc-timegrid-divider::before {
+    content: " ";
+    position: absolute;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: repeat url(https://usetrmnl.com/images/borders/2.png);
+  }
+
+  .fc-timegrid-slot-label.fc-timegrid-slot-minor::before,
+  .fc-timegrid-slot-lane.fc-timegrid-slot-minor::before {
+    content: " ";
+    position: absolute;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: repeat url(https://usetrmnl.com/images/borders/5.png);
+  }
+
+  /* dashed vertical grid lines between dates (solid defaults don't appear / are white) */
+  .fc-timegrid-col::after,
+  .fc-daygrid-day::after {
+    content: " ";
+    position: absolute;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    bottom: 0;
+    left: -1px;
+    width: 1px;
+    height: 100%;
+    background: repeat url(https://usetrmnl.com/images/borders/5.png);
+  }
+
+  .fc-theme-standard td, .fc-theme-standard th {
+    border: 1px dashed;
+  }
+
+  .fc-timegrid-axis::after {
+    content: none;
+  }
+
+  .fc-day {
+    width: 108px;
+  }
+
+  /* in month view, next month's dates default 0.3 opacity which renders them invisible */
+  .fc .fc-day-other .fc-daygrid-day-top {
+    opacity: 1.0;
+  }
+
+  .fc .fc-col-header-cell {
+    border: none !important;
+  }
+
+  /* styles month view to outline current day */
+  .fc .fc-daygrid-day.fc-day-today {
+    background-color: transparent;
+    border: 2px solid black;
+    border-left: 3px solid black;
+    border-right: 3px solid black;
+  }
+
+  /* styles week view to outline current day */
+  th.fc-day-today .fc-scrollgrid-sync-inner {
+    border: 2px solid black;
+  }
+
+  .fc .fc-timegrid-slot {
+    height: 14px !important;
+  }
+
+  .fc-direction-ltr .fc-timegrid-col-events {
+    margin: 0px 2px 0px 2px;
+  }
+
+  .fc table,
+  .fc-daygrid-event {
+    font-size: 16px;
+    line-height: 12px;
+    font-family: 'NicoPups', sans-serif;
+  }
+
+  td.fc-timegrid-col.fc-timegrid-axis,
+  td.fc-timegrid-axis.fc-scrollgrid-shrink {
+    width: 46px;
+  }
+
+  .fc .fc-scrollgrid-section table {
+    height: auto;
+  }
+
+  .fc-direction-ltr .fc-timegrid-col-events {
+    margin: 0px 2px 0px 2px;
+  }
+  .fc .fc-timegrid-axis-cushion, .fc .fc-timegrid-slot-label-cushion {
+    padding: 0px 0px;
+    margin-right: 4px;
+  }
+</style>

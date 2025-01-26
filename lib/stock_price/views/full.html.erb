@@ -1,0 +1,131 @@
+<div class="view view--full">
+  <div class="layout layout--col gap--space-between">
+    <% if tickers.size == 1 %>
+      <%= render 'lib/stock_price/views/shared/ticker_xxlarge', ticker: tickers.first, currency_symbol:, currency_separator: %>
+    <% elsif tickers.size == 2 %>
+      <% tickers.each_with_index do |ticker, index| %>
+        <%= render 'lib/stock_price/views/shared/ticker_xlarge', ticker:, currency_symbol:, currency_separator: %>
+        <% if index == 0 %>
+          <div class="w-full b-h-gray-5"></div>
+        <% end %>
+      <% end %>
+    <% elsif tickers.size == 3 %>
+      <% tickers.each_with_index do |ticker, index| %>
+        <%= render 'lib/stock_price/views/shared/ticker_large', ticker:, currency_symbol:, currency_separator: %>
+        <% if index < 2 %>
+          <div class="w-full b-h-gray-5"></div>
+        <% end %>
+      <% end %>
+    <% elsif tickers.size == 4 %>
+      <div class="columns h-full">
+        <div class="column gap--space-between h-full">
+          <%= render 'lib/stock_price/views/shared/ticker_medium', ticker: tickers[0], currency_symbol:, currency_separator: %>
+          <div class="w-full b-h-gray-5"></div>
+          <%= render 'lib/stock_price/views/shared/ticker_medium', ticker: tickers[1], currency_symbol:, currency_separator: %>
+        </div>
+        <div class="column gap--space-between h-full">
+          <%= render 'lib/stock_price/views/shared/ticker_medium', ticker: tickers[2], currency_symbol:, currency_separator: %>
+          <div class="w-full b-h-gray-5"></div>
+          <%= render 'lib/stock_price/views/shared/ticker_medium', ticker: tickers[3], currency_symbol:, currency_separator: %>
+        </div>
+      </div>
+    <% elsif tickers.size >= 5 && tickers.size <= 6 %>
+      <div class="columns h-full">
+        <div class="column gap--space-between h-full">
+          <% [0, 1, 2].each do |i| %>
+            <% if tickers[i].present? %>
+              <%= render 'lib/stock_price/views/shared/ticker_small', ticker: tickers[i], currency_symbol:, currency_separator: %>
+              <% if i < 2 %>
+                <div class="w-full b-h-gray-5"></div>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+        <div class="column gap--space-between h-full">
+          <% [3, 4, 5].each do |i| %>
+            <% if tickers[i].present? %>
+              <%= render 'lib/stock_price/views/shared/ticker_small', ticker: tickers[i], currency_symbol:, currency_separator: %>
+              <% if i < 5 && tickers[i+1].present? %>
+                <div class="w-full b-h-gray-5"></div>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% elsif tickers.size >= 7 && tickers.size <= 8 %>
+      <div class="columns h-full">
+        <div class="column gap--space-between h-full">
+          <% [0, 1, 2, 3].each do |i| %>
+            <% if tickers[i].present? %>
+              <%= render 'lib/stock_price/views/shared/ticker_xsmall', ticker: tickers[i], currency_symbol:, currency_separator: %>
+              <% if i < 3 %>
+                <div class="w-full b-h-gray-5"></div>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+        <div class="column gap--space-between h-full">
+          <% [4, 5, 6, 7].each do |i| %>
+            <% if tickers[i].present? %>
+              <%= render 'lib/stock_price/views/shared/ticker_xsmall', ticker: tickers[i], currency_symbol:, currency_separator: %>
+              <% if i < 7 && tickers[i+1].present? %>
+                <div class="w-full b-h-gray-5"></div>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% elsif tickers.size >= 9 && tickers.size <= 10 %>
+      <div class="columns h-full">
+        <div class="column gap--space-between h-full">
+          <% [0, 1, 2, 3, 4].each do |i| %>
+            <% if tickers[i].present? %>
+              <%= render 'lib/stock_price/views/shared/ticker_xsmall', ticker: tickers[i], currency_symbol:, currency_separator: %>
+              <% if i < 4 %>
+                <div class="w-full b-h-gray-5"></div>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+        <div class="column gap--space-between h-full">
+          <% [5, 6, 7, 8, 9].each do |i| %>
+            <% if tickers[i].present? %>
+              <%= render 'lib/stock_price/views/shared/ticker_xsmall', ticker: tickers[i], currency_symbol:, currency_separator: %>
+              <% if i < 9 && tickers[i+1].present? %>
+                <div class="w-full b-h-gray-5"></div>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% elsif tickers.size >= 11 && tickers.size <= 12 %>
+      <div class="columns h-full">
+        <div class="column gap--space-between h-full">
+          <% [0, 1, 2, 3, 4, 5].each do |i| %>
+            <% if tickers[i].present? %>
+              <%= render 'lib/stock_price/views/shared/ticker_xsmall', ticker: tickers[i], currency_symbol:, currency_separator: %>
+              <% if i < 5 %>
+                <div class="w-full b-h-gray-5"></div>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+        <div class="column gap--space-between h-full">
+          <% [6, 7, 8, 9, 10, 11].each do |i| %>
+            <% if tickers[i].present? %>
+              <%= render 'lib/stock_price/views/shared/ticker_xsmall', ticker: tickers[i], currency_symbol:, currency_separator: %>
+              <% if i < 11 && tickers[i+1].present? %>
+                <div class="w-full b-h-gray-5"></div>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="title_bar">
+    <img class="image" src="<%= Rails.application.credentials.base_url %>/images/plugins/stock_price--render.svg" />
+    <span class="title">Stock Prices</span>
+  </div>
+</div>

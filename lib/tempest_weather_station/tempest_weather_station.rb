@@ -93,7 +93,7 @@ module Plugins
             mintemp: smart_round_in_desired_unit(tomorrow['air_temp_low']),
             maxtemp: smart_round_in_desired_unit(tomorrow['air_temp_high']),
             conditions: tomorrow['conditions'],
-            uv_index: data['forecast']['hourly'][12]['uv'] # get mid-day (12:00) tmrw; not avail in 'tomorrow' block
+            uv_index: data['forecast']['hourly'][12]['uv']&.to_i # unlike right_now['uv'] this val a float; retrieves mid-day (12:00) tmrw, not avail in 'tomorrow' block
           }
         }
       end

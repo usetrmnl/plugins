@@ -1,0 +1,15 @@
+<div class="grid">
+  <div class="item col--span-3">
+    <div class="meta"></div>
+    <div class="content">
+      <span class="value value--xsmall value--tnums"><%= ticker[:symbol].gsub(' ', '&nbsp;').html_safe %></span>
+      <span class="label"><%= ticker[:change] %></span>
+    </div>
+  </div>
+  <div class="item col--span-6">
+    <div class="meta"></div>
+    <div class="content">
+      <span class="value value--tnums"><%= number_to_currency(ticker[:price], unit: currency_symbol, separator: currency_separator) %></span>
+    </div>
+  </div>
+</div>

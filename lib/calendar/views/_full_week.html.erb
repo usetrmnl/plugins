@@ -1,0 +1,61 @@
+<%= render "plugins/calendars/common" %>
+
+<%# week-only styling, will break month view so not inside common %>
+<style media="screen">
+  tr[role="row"],
+  table[role="presentation"],
+  tbody[role="presentation"] {
+    display: flex;
+  }
+
+  .fc-timegrid-cols table[role="presentation"] {
+    display: flex;
+    height: 100%;
+  }
+
+  /* Remove all borders */
+  .fc-theme-standard .fc-scrollgrid,
+  .fc-theme-standard td,
+  .fc-theme-standard th,
+  .fc-theme-standard .fc-scrollgrid-section > td,
+  .fc-theme-standard .fc-scrollgrid-section > th,
+  .fc-theme-standard .fc-scrollgrid-section-liquid > td,
+  .fc-theme-standard .fc-scrollgrid-section-liquid > th,
+  .fc-theme-standard .fc-list,
+  .fc-theme-standard .fc-list-day-cushion {
+    border: none !important;
+  }
+
+  .fc .fc-timegrid-slot {
+    border-bottom: none !important;
+  }
+</style>
+
+<div id="calendar" style="height: 480px; width: 800px"></div>
+
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      timeZone: new Date('<%= events.values.flatten.reject { |e| e[:all_day] }.first&.dig(:start_full) %>').getTimezoneOffset(),
+      headerToolbar: false,
+      initialView: 'timeGridFourDay', // 'dayGridWeek' shows a week but does not show events as blocks with diff heights per time length
+      scrollTime: '<%= scroll_time %>', // without this, view begins at 12am (creating white space)
+      slotMinTime: '<%= scroll_time %>', // required in-addition to scrollTime, otherwise calendar lib will ignore scrollTime if events would be hidden
+      views: {
+        timeGridFourDay: {
+          type: 'timeGrid',
+          duration: { days: 7 }
+        }
+      },
+      locale: '<%= locale %>',
+      slotDuration: '00:30:00', // could potentially leverage this to show full 24h view (change slot duration to 1h)
+      events: <%== events.values.flatten.map {|e| { allDay: e[:all_day], title: e[:summary], description: e[:description], start: e[:start_full], end: e[:end_full] } }.to_json %>,
+      displayEventTime: false,
+      schedulerLicenseKey: '<%= Rails.application.credentials.plugins.full_calendar.license_key %>'
+    });
+    calendar.render();
+  });
+
+</script>
