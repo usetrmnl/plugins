@@ -41,5 +41,6 @@ native plugin structure:
 - [METAR](https://github.com/schrockwell/trmnl-metar) by [@schrockwell](https://github.com/schrockwell)
 - [Block Clock](https://github.com/tyler-dot-earth/trmnl-notblockclock) by [@tyler-dot-earth](https://github.com/tyler-dot-earth)
 - [TickTick Calendar](https://github.com/frethop/TRMNL-ticktick) by [@frethop](https://github.com/frethop)
+- [Transport for London (TfL) status messages](https://github.com/stevekennedyuk/trmnl-tfl-status) by [@stevekennedyuk](https://github.com/stevekennedyuk)
 
 to be featured here, open a PR or join the developer-only Discord server (link inside TRMNL UI).
