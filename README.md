@@ -42,5 +42,6 @@ native plugin structure:
 - [Block Clock](https://github.com/tyler-dot-earth/trmnl-notblockclock) by [@tyler-dot-earth](https://github.com/tyler-dot-earth)
 - [TickTick Calendar](https://github.com/frethop/TRMNL-ticktick) by [@frethop](https://github.com/frethop)
 - [Transport for London (TfL) status messages](https://github.com/stevekennedyuk/trmnl-tfl-status) by [@stevekennedyuk](https://github.com/stevekennedyuk)
+- [plugin generator [Laravel]](https://github.com/bnussbau/laravel-trmnl) by [@bnussbau](https://github.com/bnussbau)
 
-to be featured here, open a PR or join the developer-only Discord server (link inside TRMNL UI).
+to be featured here, add `trmnl` topic to your repo, then open a PR or join the developer-only Discord server (link inside TRMNL UI).
