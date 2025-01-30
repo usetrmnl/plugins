@@ -9,7 +9,14 @@
           <div class="meta"></div>
           <div class="content">
             <span class="value value--xxxlarge"><%= temperature&.round %>°</span>
-            <span class="label"><%= t('renders.weather.temperature', locale:) %></span>
+            <span class="label w--full">
+              <img style="max-height: 24px; vertical-align: middle" src="<%= Rails.application.credentials.base_url %>/images/weather/wi-sunrise.svg" />
+              <%= forecast[:right_now][:sunrise] %>
+            </span>
+            <span class="label w--full">
+              <img style="max-height: 24px; vertical-align: middle" src="https://tempestwx.com/images/Updated/wind-arrow-<%= forecast[:right_now][:wind][:direction_cardinal].downcase %>.svg" />
+              <%= forecast[:right_now][:wind][:gust] %> <%= forecast[:right_now][:wind][:units] %>
+            </span>
           </div>
         </div>
       </div>
@@ -53,91 +60,66 @@
 
     <div class="grid">
       <div class="col gap--large">
-        <div class="grid">
-          <div class="item col--span-3">
-            <div class="meta"></div>
-            <div class="icon">
-              <img class="weather-icon" style="filter: brightness(0.5) saturate(0%);" src="https://tempestwx.com/images/Updated/<%= today_weather_image %>.svg" />
-            </div>
-            <div class="content">
-              <span class="value value--xsmall"><%= forecast[:today][:conditions] %></span>
-              <span class="label"><%= t('renders.weather.today', locale:) %></span>
-            </div>
-          </div>
-
-          <div class="item col--span-3">
-            <div class="meta"></div>
-            <div class="icon">
-              <img class="weather-icon" src="<%= Rails.application.credentials.base_url %>/images/weather/wi-hot.svg" />
-            </div>
-            <div class="content">
-              <span class="value value--xsmall"><%= forecast[:today][:uv_index] %></span>
-              <span class="label"><%= t('renders.weather.uv', locale:) %></span>
-            </div>
-          </div>
-
-          <div class="row col--span-3">
-            <div class="item">
+        <% [:today, :tomorrow].each do |day| %>
+          <div class="grid">
+            <div class="item col--span-3">
               <div class="meta"></div>
               <div class="icon">
-                <img class="weather-icon" src="<%= Rails.application.credentials.base_url %>/images/weather/wi-thermometer.svg" />
+                <img class="weather-icon" style="filter: brightness(0.5) saturate(0%);" src="https://tempestwx.com/images/Updated/<%= local_assigns["#{day}_weather_image".to_sym] %>.svg" />
               </div>
-              <div class="row">
-                <div class="content w--medium">
-                  <span class="value value--small"><%= forecast[:today][:mintemp]&.round %>°</span>
-                  <span class="label"><%= t('renders.weather.low', locale:) %></span>
-                </div>
-                <div class="content w--medium">
-                  <span class="value value--small"><%= forecast[:today][:maxtemp]&.round %>°</span>
-                  <span class="label"><%= t('renders.weather.high', locale:) %></span>
-                </div>
+              <div class="content">
+                <span class="value value--xsmall"><%= forecast[day][:conditions] %></span>
+                <span class="label"><%= t("renders.weather.#{day.to_s}", locale:) %></span>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div class="grid">
-          <div class="item col--span-3">
-            <div class="meta"></div>
-            <div class="icon">
-              <img class="weather-icon" style="filter: brightness(0.5) saturate(0%);" src="https://tempestwx.com/images/Updated/<%= tomorrow_weather_image %>.svg" />
-            </div>
-            <div class="content">
-              <span class="value value--xsmall"><%= forecast[:tomorrow][:conditions] %></span>
-              <span class="label"><%= t('renders.weather.tomorrow', locale:) %></span>
-            </div>
-          </div>
+            <div class="row col--span-3">
+              <div class="item">
+                <div class="meta"></div>
 
-          <div class="item col--span-3">
-            <div class="meta"></div>
-            <div class="icon">
-              <img class="weather-icon" src="<%= Rails.application.credentials.base_url %>/images/weather/wi-hot.svg" />
-            </div>
-            <div class="content">
-              <span class="value value--xsmall"><%= forecast[:tomorrow][:uv_index] %></span>
-              <span class="label"><%= t('renders.weather.uv', locale:) %></span>
-            </div>
-          </div>
+                <div class="row">
+                  <div class="icon">
+                    <img class="weather-icon" src="<%= Rails.application.credentials.base_url %>/images/weather/wi-hot.svg" />
+                  </div>
 
-          <div class="row col--span-3">
-            <div class="item">
-              <div class="meta"></div>
-              <div class="icon">
-                <img class="weather-icon" src="<%= Rails.application.credentials.base_url %>/images/weather/wi-thermometer.svg" />
-              </div>
-              <div class="row">
-                <div class="content w--medium">
-                  <span class="value value--small"><%= forecast[:tomorrow][:mintemp]&.round %>°</span>
-                  <span class="label"><%= t('renders.weather.low', locale:) %></span>
-                </div>
-                <div class="content w--medium">
-                  <span class="value value--small"><%= forecast[:tomorrow][:maxtemp]&.round %>°</span>
-                  <span class="label"><%= t('renders.weather.high', locale:) %></span>
+                  <div class="content w--xsmall">
+                    <span class="value value--xsmall"><%= forecast[day][:uv_index] %></span>
+                    <span class="label"><%= t('renders.weather.uv', locale:) %></span>
+                  </div>
+
+                  <div class="icon" style="margin-top: auto; margin-bottom: auto;">
+                    <img class="weather-icon" style="max-height: 30px; filter: brightness(0.5) saturate(0%);" src="https://tempestwx.com/images/Updated/<%= forecast[day][:precip][:icon] %>.svg" />
+                  </div>
+
+                  <!-- justify-content is needed for 'tomorrow' precip amount/units, given they are always nil -->
+                  <div class="content w--xsmall" style="justify-content: center">
+                    <span class="value value--xsmall"><%= forecast[day][:precip][:probability] %>%</span>
+                    <span class="label"><%= forecast[day][:precip][:amount] %> <%= forecast[day][:precip][:units] %></span>
+                  </div>
                 </div>
               </div>
             </div>
+
+            <div class="row col--span-3">
+              <div class="item">
+                <div class="meta"></div>
+                <div class="icon">
+                  <img class="weather-icon" src="<%= Rails.application.credentials.base_url %>/images/weather/wi-thermometer.svg" />
+                </div>
+                <div class="row">
+                  <div class="content w--medium">
+                    <span class="value value--small"><%= forecast[day][:mintemp]&.round %>°</span>
+                    <span class="label"><%= t('renders.weather.low', locale:) %></span>
+                  </div>
+                  <div class="content w--medium">
+                    <span class="value value--small"><%= forecast[day][:maxtemp]&.round %>°</span>
+                    <span class="label"><%= t('renders.weather.high', locale:) %></span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        <% end %>
       </div>
     </div>
   </div>

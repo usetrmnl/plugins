@@ -61,7 +61,7 @@ module Plugins
 
     def forecast
       @forecast ||= begin
-        url = "#{BASE_URL}/better_forecast?station_id=#{station_id}&token=#{access_token}"
+        url = "#{BASE_URL}/better_forecast?station_id=#{station_id}&units_wind=#{units_wind}&units_precip=#{units_precip}&token=#{access_token}"
         resp = HTTParty.get(url)
         data = JSON.parse(resp.body)
 
@@ -79,21 +79,25 @@ module Plugins
             feels_like: smart_round_in_desired_unit(right_now['feels_like']),
             humidity: right_now['relative_humidity'],
             icon: right_now['icon'],
-            temperature: smart_round_in_desired_unit(right_now['air_temperature'])
+            temperature: smart_round_in_desired_unit(right_now['air_temperature']),
+            sunrise: Time.at(today['sunrise']).strftime("%H:%m"),
+            wind: { direction_cardinal: right_now['wind_direction_cardinal'], gust: right_now['wind_gust'], units: units_wind }
           },
           today: {
             icon: today['icon'],
             mintemp: smart_round_in_desired_unit(today['air_temp_low']),
             maxtemp: smart_round_in_desired_unit(today['air_temp_high']),
             conditions: today['conditions'],
-            uv_index: right_now['uv']
+            uv_index: right_now['uv'],
+            precip: { icon: today['precip_icon'], probability: today['precip_probability'], amount: right_now['precip_accum_local_day'], units: units_precip }
           },
           tomorrow: {
             icon: tomorrow['icon'],
             mintemp: smart_round_in_desired_unit(tomorrow['air_temp_low']),
             maxtemp: smart_round_in_desired_unit(tomorrow['air_temp_high']),
             conditions: tomorrow['conditions'],
-            uv_index: data['forecast']['hourly'][12]['uv']&.to_i # unlike right_now['uv'] this val a float; retrieves mid-day (12:00) tmrw, not avail in 'tomorrow' block
+            uv_index: data['forecast']['hourly'][12]['uv']&.to_i, # unlike right_now['uv'] this val a float; retrieves mid-day (12:00) tmrw, not avail in 'tomorrow' block
+            precip: { icon: tomorrow['precip_icon'], probability: tomorrow['precip_probability'] }
           }
         }
       end
@@ -153,9 +157,11 @@ module Plugins
       (temp * 9 / 5) + 32
     end
 
-    def units
-      settings['units'].downcase == 'metric' ? 'c' : 'f'
-    end
+    def units = settings['units'].downcase == 'metric' ? 'c' : 'f'
+
+    def units_wind = settings['units_wind']
+
+    def units_precip = settings['units_precip']
 
     def today_yyyy_mm_dd = Date.today.in_time_zone(user.tz).strftime("%Y-%m-%d")
 
@@ -163,7 +169,7 @@ module Plugins
 
     def tomorrow_day_number = (today_yyyy_mm_dd.to_date + 1.days).mday
 
-    # IDEA: allow multiple devices; easy to fetch + grab all data, not easy to layout in view
+    # IDEA: allow multiple devices; easy to fetch + grab all data, not easy to lay out however
     def device_id = settings['tempest_weather_station_devices'].to_s
 
     def access_token = settings['tempest_weather_station']['access_token']
