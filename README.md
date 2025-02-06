@@ -43,5 +43,6 @@ native plugin structure:
 - [TickTick Calendar](https://github.com/frethop/TRMNL-ticktick) by [@frethop](https://github.com/frethop)
 - [Transport for London (TfL) status messages](https://github.com/stevekennedyuk/trmnl-tfl-status) by [@stevekennedyuk](https://github.com/stevekennedyuk)
 - [plugin generator [Laravel]](https://github.com/bnussbau/laravel-trmnl) by [@bnussbau](https://github.com/bnussbau)
+- [Home Assistant - sensor data](https://github.com/gitstua/trmnl-plugin-dev/tree/main/home-assistant-trmnl#home-assistant-trmnl-plugin) by [@gitstua](https://github.com/gitstua)
 
 to be featured here, add `trmnl` topic to your repo, then open a PR or join the developer-only Discord server (link inside TRMNL UI).
