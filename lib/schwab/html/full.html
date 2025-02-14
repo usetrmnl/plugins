@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://usetrmnl.com/css/latest/plugins.css" />
+    <script src="https://cdn.jsdelivr.net/npm/highcharts@11.3.0/highcharts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartkick@5.0.1/dist/chartkick.min.js"></script>
+    <style>
+      .view--half_horizontal .layout--row {
+        height: calc(100% - 40px); /* Account for title bar */
+      }
+
+      .b-v-gray-5 {
+        width: 1px;
+        background: #e5e5e5;
+        height: 100%;
+        margin: 0 15px;
+      }
+
+      .view--half_horizontal .grid {
+        height: 100%;
+      }
+
+      /* Ensure consistent label sizes */
+      .label--small {
+        font-size: 12px;
+        line-height: 1.2;
+      }
+
+      /* Add hover effects to holdings */
+      .item:hover {
+        background: rgba(0, 0, 0, 0.02);
+      }
+      .value.positive {
+        color: #22c55e;
+      }
+      .value.negative {
+        color: #ef4444;
+      }
+
+      .chart-container {
+        width: 100%;
+        margin: 20px 0;
+      }
+
+      .view--full .chart-container {
+        height: 260px;
+      }
+
+      .view--half_horizontal .chart-container {
+        height: 175px;
+      }
+
+      .view--half_vertical .chart-container {
+        height: 340px;
+      }
+
+      .view--quadrant .chart-container {
+        height: 120px;
+      }
+
+      .holdings-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+      }
+
+      .holding-item {
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
+  </head>
+
+  <body class="environment trmnl">
+    <!-- Full Layout -->
+    <div class="view view--full">
+      <div class="layout layout--col gap--space-between">
+        <div class="grid grid--cols-3">
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value value--small">$250,432.18</span>
+              <span class="label">Total Value</span>
+            </div>
+          </div>
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value value--small">$5,432.19</span>
+              <span class="label">Cash Balance</span>
+            </div>
+          </div>
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value value--small positive">12.5%</span>
+              <span class="label">YTD Return</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full b-h-gray-5"></div>
+
+        <div id="chart-full" class="chart-container"></div>
+
+        <div class="holdings-grid">
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value value--small">AAPL</span>
+              <div class="flex gap--xsmall">
+                <span class="label label--small">$18,545.00</span>
+                <span class="label label--small positive">21.61%</span>
+              </div>
+            </div>
+          </div>
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value value--small">MSFT</span>
+              <div class="flex gap--xsmall">
+                <span class="label label--small">$30,384.00</span>
+                <span class="label label--small positive">35.04%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="title_bar">
+        <img
+          class="image"
+          src="https://developer.schwab.com/assets/schwab-logo.svg"
+        />
+        <span class="title">Charles Schwab</span>
+        <span class="instance">Portfolio</span>
+      </div>
+    </div>
+    
+    <script>
+      function createChart(elementId, height) {
+        const assetAllocationData = [
+          ["Equity", 65.5],
+          ["ETF", 25.2],
+          ["Fixed Income", 8.1],
+          ["Cash", 1.2],
+        ];
+
+        new Chartkick.PieChart(elementId, assetAllocationData, {
+          adapter: "highcharts",
+          colors: ["#000000", "#333333", "#666666", "#999999"],
+          library: {
+            chart: {
+              height: height,
+              style: {
+                fontFamily: "'NicoPups', sans-serif",
+              },
+            },
+            plotOptions: {
+              pie: {
+                animation: false,
+                borderWidth: 0,
+                dataLabels: {
+                  enabled: true,
+                  format: "{point.name}: {point.percentage:.1f}%",
+                  style: {
+                    fontSize: "14px",
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      function createHalfHorizontalChart() {
+        const assetAllocationData = [
+          ["Equity", 65.5],
+          ["ETF", 25.2],
+          ["Fixed Income", 8.1],
+          ["Cash", 1.2],
+        ];
+
+        new Chartkick.PieChart("chart-half-horizontal", assetAllocationData, {
+          adapter: "highcharts",
+          colors: ["#000000", "#333333", "#666666", "#999999"],
+          library: {
+            chart: {
+              height: 175,
+              style: {
+                fontFamily: "'NicoPups', sans-serif",
+              },
+            },
+            plotOptions: {
+              pie: {
+                animation: false,
+                borderWidth: 0,
+                size: "85%",
+                dataLabels: {
+                  enabled: true,
+                  format: "{point.name}: {point.percentage:.1f}%",
+                  style: {
+                    fontSize: "12px",
+                  },
+                  distance: 15,
+                },
+              },
+            },
+            tooltip: {
+              enabled: true,
+              formatter: function () {
+                return (
+                  "<b>" +
+                  this.point.name +
+                  "</b>: " +
+                  this.point.percentage.toFixed(1) +
+                  "%<br/>$" +
+                  (this.point.y * 2504.32).toLocaleString()
+                ); // Simulated dollar values
+              },
+            },
+          },
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        if ("Chartkick" in window) {
+          createChart("chart-full", 260);
+          createHalfHorizontalChart();
+          createChart("chart-half-vertical", 340);
+          createChart("chart-quadrant", 120);
+        }
+      });
+    </script>
+  </body>
+</html>
