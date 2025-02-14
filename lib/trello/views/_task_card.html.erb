@@ -1,0 +1,32 @@
+<div class="item">
+  <div class="meta">
+    <span class="index"><%= index + 1 %></span>
+  </div>
+  <div class="content">
+    <span class="title title--small"><%= task['title'] %></span>
+    <% unless hide_description %>
+      <% if task['description'] %>
+        <span class="description"><%= task['description'] %></span>
+      <% end %>
+    <% end %>
+    <div class="flex gap--xsmall">
+      <% if task['dueDate'] %>
+        <span class="label label--small label--underline">Due <%= task['dueDate'] %></span>
+      <% end %>
+      <% if task['completedDate'] %>
+        <span class="label label--small label--underline">Completed <%= task['completedDate'] %></span>
+      <% end %>
+      <% task['tags'].each do |tag| %>
+        <span class="label label--small" style="background-color: <%= tag_colors[tag] %>"><%= tag %></span>
+      <% end %>
+    </div>
+    <% unless hide_owner %>
+      <div class="card-owner">
+        <div class="flex gap--xsmall mt--small">
+          <img class="image" src="<%= task['owner']['avatar'] %>" />
+          <span class="label"><%= task['owner']['name'] %></span>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

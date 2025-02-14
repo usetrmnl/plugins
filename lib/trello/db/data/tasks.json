@@ -1,0 +1,73 @@
+{
+    "pendingTasks": [
+      {
+        "id": 1,
+        "title": "Create customer validation system",
+        "description": "Implement proper error handling for duplicate customers",
+        "dueDate": "2024-02-15",
+        "priority": "high",
+        "tags": ["Backend"],
+        "owner": {
+          "name": "John Doe",
+          "avatar": "https://this-person-does-not-exist.com/static/images/fake-2.jpg"
+        }
+      },
+      {
+        "id": 2, 
+        "title": "Documentation update",
+        "description": "Update API documentation with new endpoints",
+        "dueDate": "2024-02-20",
+        "tags": ["Documentation"],
+        "owner": {
+          "name": "Sarah Smith",
+          "avatar": "https://this-person-does-not-exist.com/static/images/fake-2.jpg"
+        }
+      }
+    ],
+    "inProgressTasks": [
+      {
+        "id": 3,
+        "title": "Implement OAuth2 authentication",
+        "description": "Set up OAuth2 flow for third-party integrations", 
+        "dueDate": "2024-02-18",
+        "tags": ["Backend", "Security"],
+        "owner": {
+          "name": "Mike Johnson",
+          "avatar": "https://this-person-does-not-exist.com/static/images/fake-2.jpg"
+        }
+      },
+      {
+        "id": 4,
+        "title": "Design new dashboard",
+        "description": "Create modern UI for analytics dashboard",
+        "dueDate": "2024-02-25", 
+        "tags": ["UI/UX"],
+        "owner": {
+          "name": "Emma Davis",
+          "avatar": "https://this-person-does-not-exist.com/static/images/fake-2.jpg"
+        }
+      }
+    ],
+    "completedTasks": [
+      {
+        "id": 5,
+        "title": "Set up CI/CD pipeline",
+        "tags": ["DevOps", "Infrastructure"],
+        "owner": {
+          "name": "Alex Wong",
+          "avatar": "https://this-person-does-not-exist.com/static/images/fake-2.jpg"
+        },
+        "completedDate": "2024-02-12"
+      },
+      {
+        "id": 6, 
+        "title": "Fix login page responsiveness",
+        "tags": ["UI/UX", "Fixed"],
+        "owner": {
+          "name": "Lisa Park",
+          "avatar": "https://this-person-does-not-exist.com/static/images/fake-2.jpg"
+        },
+        "completedDate": "2024-02-10"
+      }
+    ]
+  }

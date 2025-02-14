@@ -1,0 +1,102 @@
+<div class="view view--full">
+  <div class="layout layout--col gap--space-between">
+    <div class="columns gap--medium">
+      <!-- Pending Board -->
+      <div class="column">
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value">Pending</span>
+            <span class="label"><%= pending_tasks.size %> cards</span>
+          </div>
+        </div>
+        <div class="w-full b-h-gray-5"></div>
+
+        <div class="list">
+          <% pending_tasks.each_with_index do |task, index| %>
+            <div class="item">
+              <div class="meta">
+                <span class="index"><%= index + 1 %></span>
+              </div>
+              <div class="content">
+                <span class="title title--small"><%= task['title'] %></span>
+                <% unless hide_description %>
+                  <span class="description"><%= task['description'] %></span>
+                <% end %>
+                <div class="flex gap--xsmall">
+                  <% if task['dueDate'] %>
+                    <span class="label label--small label--underline">Due <%= task['dueDate'] %></span>
+                  <% end %>
+                  <% task['tags'].each do |tag| %>
+                    <span class="label label--small" style="background-color: <%= tag_colors[tag] %>"><%= tag %></span>
+                  <% end %>
+                </div>
+                <% unless hide_owner %>
+                  <div class="card-owner">
+                    <div class="flex gap--xsmall mt--small">
+                      <img class="image" src="<%= task['owner']['avatar'] %>" />
+                      <span class="label"><%= task['owner']['name'] %></span>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+            <% if index < pending_tasks.size - 1 %>
+              <div class="w-full b-h-gray-5"></div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- In Progress Board -->
+      <div class="column">
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value">In Progress</span>
+            <span class="label"><%= in_progress_tasks.size %> cards</span>
+          </div>
+        </div>
+        <div class="w-full b-h-gray-5"></div>
+
+        <div class="list">
+          <% in_progress_tasks.each_with_index do |task, index| %>
+            <%= render partial: 'task_card', locals: { task: task, index: index, hide_description: hide_description, hide_owner: hide_owner, tag_colors: tag_colors } %>
+            <% if index < in_progress_tasks.size - 1 %>
+              <div class="w-full b-h-gray-5"></div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Completed Board -->
+      <div class="column">
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value">Completed</span>
+            <span class="label"><%= completed_tasks.size %> cards</span>
+          </div>
+        </div>
+        <div class="w-full b-h-gray-5"></div>
+
+        <div class="list">
+          <% completed_tasks.each_with_index do |task, index| %>
+            <%= render partial: 'task_card', locals: { task: task, index: index, hide_description: hide_description, hide_owner: hide_owner, tag_colors: tag_colors } %>
+            <% if index < completed_tasks.size - 1 %>
+              <div class="w-full b-h-gray-5"></div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <img class="image" src="<%= Rails.application.credentials.base_url %>/images/plugins/project_board--render.svg" />
+    <span class="title">Project Board</span>
+    <span class="instance"><%= instance_name %></span>
+  </div>
+</div>
+
+<%= render 'common' %>

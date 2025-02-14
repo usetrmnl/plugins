@@ -1,0 +1,104 @@
+<div class="view view--half_vertical">
+  <div class="layout layout--col gap--small">
+    <!-- Pending Section -->
+    <div class="item">
+      <div class="meta"></div>
+      <div class="content">
+        <span class="value value--small">Pending (<%= pending_tasks.size %>)</span>
+      </div>
+    </div>
+    <div class="w-full b-h-gray-5"></div>
+    <div class="list">
+      <% pending_tasks.first(2).each_with_index do |task, index| %>
+        <div class="item">
+          <div class="meta">
+            <span class="index"><%= index + 1 %></span>
+          </div>
+          <div class="content">
+            <span class="title title--xsmall"><%= task['title'] %></span>
+            <div class="flex gap--xsmall">
+              <% task['tags'].each do |tag| %>
+                <span class="label label--small" style="background-color: <%= tag_colors[tag] %>">
+                  <%= tag %>
+                </span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <% if index < [pending_tasks.size, 2].min - 1 %>
+          <div class="w-full b-h-gray-5"></div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- In Progress Section -->
+    <div class="item">
+      <div class="meta"></div>
+      <div class="content">
+        <span class="value value--small">In Progress (<%= in_progress_tasks.size %>)</span>
+      </div>
+    </div>
+    <div class="w-full b-h-gray-5"></div>
+    <div class="list">
+      <% in_progress_tasks.first(2).each_with_index do |task, index| %>
+        <div class="item">
+          <div class="meta">
+            <span class="index"><%= index + 1 %></span>
+          </div>
+          <div class="content">
+            <span class="title title--xsmall"><%= task['title'] %></span>
+            <div class="flex gap--xsmall">
+              <% task['tags'].each do |tag| %>
+                <span class="label label--small" style="background-color: <%= tag_colors[tag] %>">
+                  <%= tag %>
+                </span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <% if index < [in_progress_tasks.size, 2].min - 1 %>
+          <div class="w-full b-h-gray-5"></div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Completed Section -->
+    <div class="item">
+      <div class="meta"></div>
+      <div class="content">
+        <span class="value value--small">Completed (<%= completed_tasks.size %>)</span>
+      </div>
+    </div>
+    <div class="w-full b-h-gray-5"></div>
+    <div class="list">
+      <% completed_tasks.first(2).each_with_index do |task, index| %>
+        <div class="item">
+          <div class="meta">
+            <span class="index"><%= index + 1 %></span>
+          </div>
+          <div class="content">
+            <span class="title title--xsmall"><%= task['title'] %></span>
+            <div class="flex gap--xsmall">
+              <% task['tags'].each do |tag| %>
+                <span class="label label--small" style="background-color: <%= tag_colors[tag] %>">
+                  <%= tag %>
+                </span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <% if index < [completed_tasks.size, 2].min - 1 %>
+          <div class="w-full b-h-gray-5"></div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <img class="image" src="<%= Rails.application.credentials.base_url %>/images/plugins/project_board--render.svg" />
+    <span class="title">Project Board</span>
+    <span class="instance"><%= instance_name %></span>
+  </div>
+</div>
+
+<%= render 'common' %>
