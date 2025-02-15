@@ -1,0 +1,46 @@
+<div class="view view--half_horizontal">
+  <div class="layout gap--space-between">
+     <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value"><%= origin %> → <%= destination %></span>
+        </div>
+      </div>
+
+    <div class="w-full b-h-gray-5"></div>
+
+    <div class="columns">
+      <% routes.each do |route| %>
+        <div class="column">
+        <div class="item <%= 'bg-gray-5' if route[:is_fastest] %>">
+          <div class="meta">
+            <% if route[:is_fastest] %>
+              <span class="index">★</span>
+            <% end %>
+          </div>
+          <div class="content">
+            <span class="title title--small"> <%= route[:name] %> (<%= route[:travel_mode] %>) </span>
+            <div class="flex gap--xsmall">
+              <span class="label label--small label--underline"><%= route[:duration] %></span>
+              <span class="label label--small"><%= route[:distance] %></span>
+            </div>
+             <% if route[:is_fastest] %>
+                 <span class="label label--small">Fastest Route</span>
+              <% else %>
+                <span class="label label--small">Alternative Route</span>
+            <% end %>  
+            
+          </div>
+        </div>
+        </div>
+          
+      <% end %>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <img class="image" src="<%= Rails.application.credentials.base_url %>/images/map-pin.svg" />
+    <span class="title">Daily Commute</span>
+    <span class="instance">Route Planner</span>
+  </div>
+</div>
