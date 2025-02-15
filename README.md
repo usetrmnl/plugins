@@ -45,5 +45,6 @@ native plugin structure:
 - [plugin generator [Laravel]](https://github.com/bnussbau/laravel-trmnl) by [@bnussbau](https://github.com/bnussbau)
 - [Home Assistant - sensor data](https://github.com/gitstua/trmnl-plugin-dev/tree/main/home-assistant-trmnl#home-assistant-trmnl-plugin) by [@gitstua](https://github.com/gitstua)
 - [Bring! Shopping List](https://github.com/yshrdbrn/trmnl-bring-plugin) by [@yshrdbrn](https://github.com/yshrdbrn)
+- [FLightBoard - airport activity](https://github.com/alexvarney/trmnl-flights) by [@alexvarney](https://github.com/alexvarney)
 
 to be featured here, add `trmnl` topic to your repo, then open a PR or join the developer-only Discord server (link inside TRMNL UI).
