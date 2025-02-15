@@ -20,6 +20,12 @@ native plugin structure:
 5. views prefixed with `_`, for example `_common`, are called "partials" (or 'components' in other frameworks)
 6. shared code is not intended to "just work" but to showcase which values, and how, are extracted from 3rd party apps for TRMNL screen generation
 
+## Plugin utilities
+
+- [trmnl_preview](https://github.com/schrockwell/trmnl_preview) by [@schrockwell](https://github.com/schrockwell)
+- [TRMNL plugin Dev Kit](https://github.com/sdjmchattie/trmnl-plugin-dev-kit) by [@sdjmchattie](https://github.com/sdjmchattie)
+- [plugin generator [Laravel]](https://github.com/bnussbau/laravel-trmnl) by [@bnussbau](https://github.com/bnussbau)
+
 ## Community plugins
 
 - [(USA) Top 10 College Football Rankings](/lib/usa_college_football_rankings.md) by [@SnarfulSolutionsGroup](https://github.com/SnarfulSolutionsGroup) & [@Sitnik](https://github.com/Sitnik)
@@ -42,7 +48,6 @@ native plugin structure:
 - [Block Clock](https://github.com/tyler-dot-earth/trmnl-notblockclock) by [@tyler-dot-earth](https://github.com/tyler-dot-earth)
 - [TickTick Calendar](https://github.com/frethop/TRMNL-ticktick) by [@frethop](https://github.com/frethop)
 - [Transport for London (TfL) status messages](https://github.com/stevekennedyuk/trmnl-tfl-status) by [@stevekennedyuk](https://github.com/stevekennedyuk)
-- [plugin generator [Laravel]](https://github.com/bnussbau/laravel-trmnl) by [@bnussbau](https://github.com/bnussbau)
 - [Home Assistant - sensor data](https://github.com/gitstua/trmnl-plugin-dev/tree/main/home-assistant-trmnl#home-assistant-trmnl-plugin) by [@gitstua](https://github.com/gitstua)
 - [Bring! Shopping List](https://github.com/yshrdbrn/trmnl-bring-plugin) by [@yshrdbrn](https://github.com/yshrdbrn)
 - [FLightBoard - airport activity](https://github.com/alexvarney/trmnl-flights) by [@alexvarney](https://github.com/alexvarney)
