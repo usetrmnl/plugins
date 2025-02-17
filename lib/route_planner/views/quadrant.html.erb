@@ -1,0 +1,35 @@
+<div class="view view--quadrant">
+  <div class="layout layout--col">
+      <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+             <span class="value"><%= origin %> → <%= destination %></span>   
+            </div>   
+          </div>
+
+    <div class="w-full b-h-gray-5"></div>
+  <% routes.each_with_index do |route, index| %>
+      <div class="item <%= 'bg-gray-5' if route[:is_fastest] %>">
+        <div class="meta">
+          <% if route[:is_fastest] %>
+            <span class="index">★</span>
+          <% end %>
+        </div>
+        <div class="content">
+          <span class="title title--small"> <%= route[:name] %> (<%= route[:travel_mode] %>)</span>
+          <div class="flex gap--xsmall">
+            <span class="label label--small label--underline"><%= route[:duration] %></span>
+            <span class="label label--small">(<%= route[:distance] %>)</span>
+          </div>
+        </div>
+      </div>
+    <% end %>
+    
+  </div>
+
+  <div class="title_bar">
+    <img class="image" src="<%= Rails.application.credentials.base_url %>/images/map-pin.svg" />
+    <span class="title">Daily Commute</span>
+    <span class="instance">Route Planner</span>
+  </div>
+</div>
