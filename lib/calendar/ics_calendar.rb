@@ -4,7 +4,7 @@ module Plugins
     include Ics::Calendar
 
     def locals
-      { events:, event_layout:, include_description:, first_day:, scroll_time:, today_in_tz: }
+      { events:, event_layout:, include_description:, first_day:, scroll_time:, hour_12_format:, today_in_tz: }
     end
   end
 end
@@ -175,12 +175,12 @@ module Ics
 
     def time_zone = user.tz || 'America/New_York'
 
+    def hour_12_format
+      settings['time_format'] == 'am/pm'
+    end
+
     def time_format
-      if settings['time_format'] == 'am/pm'
-        "%I:%M %p"
-      else
-        "%R"
-      end
+      hour_12_format ? "%I:%M %p" : "%R"
     end
 
     def event_should_be_ignored?(event)
