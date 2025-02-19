@@ -51,5 +51,6 @@ native plugin structure:
 - [Home Assistant - sensor data](https://github.com/gitstua/trmnl-plugin-dev/tree/main/home-assistant-trmnl#home-assistant-trmnl-plugin) by [@gitstua](https://github.com/gitstua)
 - [Bring! Shopping List](https://github.com/yshrdbrn/trmnl-bring-plugin) by [@yshrdbrn](https://github.com/yshrdbrn)
 - [FLightBoard - airport activity](https://github.com/alexvarney/trmnl-flights) by [@alexvarney](https://github.com/alexvarney)
+- [Netatmo + Tomorrow.io Weather API](https://github.com/simonjodet/weather_api?tab=readme-ov-file#trmnl-template-example) by [@simonjodet](https://github.com/simonjodet)
 
 to be featured here, add `trmnl` topic to your repo, then open a PR or join the developer-only Discord server (link inside TRMNL UI).
