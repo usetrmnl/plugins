@@ -52,5 +52,6 @@ native plugin structure:
 - [Bring! Shopping List](https://github.com/yshrdbrn/trmnl-bring-plugin) by [@yshrdbrn](https://github.com/yshrdbrn)
 - [FLightBoard - airport activity](https://github.com/alexvarney/trmnl-flights) by [@alexvarney](https://github.com/alexvarney)
 - [Netatmo + Tomorrow.io Weather API](https://github.com/simonjodet/weather_api?tab=readme-ov-file#trmnl-template-example) by [@simonjodet](https://github.com/simonjodet)
+- [ÖBB (Austria) Train Monitor](https://github.com/bnussbau/trmnl-train-monitor) by [@bnussbau](https://github.com/bnussbau)
 
 to be featured here, add `trmnl` topic to your repo, then open a PR or join the developer-only Discord server (link inside TRMNL UI).
