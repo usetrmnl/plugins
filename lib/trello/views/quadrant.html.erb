@@ -1,0 +1,55 @@
+<div class="view view--quadrant">
+  <div class="layout layout--col gap--xsmall">
+    <!-- Just show high priority items -->
+    <div class="item">
+      <div class="meta"></div>
+      <div class="content">
+        <span class="value value--xsmall">Priority Tasks</span>
+      </div>
+    </div>
+    <div class="w-full b-h-gray-5"></div>
+
+    <div class="list">
+      <% all_tasks = pending_tasks + in_progress_tasks + completed_tasks %>
+      <% priority_tasks = all_tasks.select { |t| t['tags'].include?('High Priority') }.first(3) %>
+      
+      <% priority_tasks.each_with_index do |task, index| %>
+        <div class="item">
+          <div class="meta">
+            <span class="index">
+              <% if task['title'].in?(pending_tasks.map { |t| t['title'] }) %>
+                P
+              <% elsif task['title'].in?(in_progress_tasks.map { |t| t['title'] }) %>
+                I
+              <% else %>
+                C
+              <% end %>
+            </span>
+          </div>
+          <div class="content">
+            <span class="title title--xsmall"><%= task['title'] %></span>
+            <div class="flex gap--xsmall">
+              <% task['tags'].each do |tag| %>
+                <span class="label label--small" style="background-color: <%= tag_colors[tag] %>">
+                  <%= tag %>
+                </span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <% if index < priority_tasks.size - 1 %>
+          <div class="w-full b-h-gray-5"></div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <img class="image" src="<%= Rails.application.credentials.base_url %>/images/plugins/project_board--render.svg" />
+    <span class="title">Project Board</span>
+    <span class="instance"><%= instance_name %></span>
+  </div>
+</div>
+
+<%= render 'common' %>

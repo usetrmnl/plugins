@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://usetrmnl.com/css/latest/plugins.css" />
+    <style>
+      /* Hide elements based on toggles */
+      [data-hide-description="true"] .description {
+        display: none;
+      }
+
+      [data-hide-owner="true"] .card-owner {
+        display: none;
+      }
+    </style>
+    <script src="https://usetrmnl.com/js/latest/plugins.js"></script>
+  </head>
+  <body class="environment trmnl">
+    <div
+      class="screen"
+      data-hide-description="false"
+      data-hide-owner="false"
+      data-hide-dates="false"
+      data-hide-bg="false"
+    >
+      <div class="view view--full">
+        <div class="layout layout--col gap--space-between">
+          <div class="columns gap--medium">
+            <!-- Pending Board -->
+            <div class="column">
+              <div class="item">
+                <div class="meta"></div>
+                <div class="content">
+                  <span class="value">Pending</span>
+                  <span class="label">5 cards</span>
+                </div>
+              </div>
+              <div class="w-full b-h-gray-5"></div>
+
+              <!-- Pending Cards -->
+              <div class="list">
+                <div class="item">
+                  <div class="meta">
+                    <span class="index">1</span>
+                  </div>
+                  <div class="content">
+                    <span class="title title--small"
+                      >Create customer validation system</span
+                    >
+                    <span class="description"
+                      >Implement proper error handling for duplicate
+                      customers</span
+                    >
+                    <div class="flex gap--xsmall">
+                      <span class="label label--small label--underline"
+                        >Due Feb 15</span
+                      >
+                      <span
+                        class="label label--small"
+                        style="background-color: #ef4444"
+                        >High Priority</span
+                      >
+                      <span
+                        class="label label--small"
+                        style="background-color: #3b82f6"
+                        >Backend</span
+                      >
+                    </div>
+                    <div class="card-owner">
+                      <div class="flex gap--xsmall mt--small">
+                        <img
+                          class="image"
+                          style="width: 24px; height: 24px; border-radius: 50%"
+                          src="https://this-person-does-not-exist.com/static/images/fake-2.jpg"
+                        />
+                        <span class="label">John Doe</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="w-full b-h-gray-5"></div>
+
+                <div class="item">
+                  <div class="meta">
+                    <span class="index">2</span>
+                  </div>
+                  <div class="content">
+                    <span class="title title--small">Documentation update</span>
+                    <span class="description"
+                      >Update API documentation with new endpoints</span
+                    >
+                    <div class="flex gap--xsmall">
+                      <span class="label label--small label--underline"
+                        >Due Feb 20</span
+                      >
+                      <span
+                        class="label label--small"
+                        style="background-color: #22c55e"
+                        >Documentation</span
+                      >
+                    </div>
+                    <div class="card-owner">
+                      <div class="flex gap--xsmall mt--small">
+                        <img
+                          class="image"
+                          style="width: 24px; height: 24px; border-radius: 50%"
+                          src="https://this-person-does-not-exist.com/static/images/fake-2.jpg"
+                        />
+                        <span class="label">Sarah Smith</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- In Progress Board -->
+            <div class="column">
+              <div class="item">
+                <div class="meta"></div>
+                <div class="content">
+                  <span class="value">In Progress</span>
+                  <span class="label">3 cards</span>
+                </div>
+              </div>
+              <div class="w-full b-h-gray-5"></div>
+
+              <div class="list">
+                <div class="item">
+                  <div class="meta">
+                    <span class="index">1</span>
+                  </div>
+                  <div class="content">
+                    <span class="title title--small"
+                      >Implement OAuth2 authentication</span
+                    >
+                    <span class="description"
+                      >Set up OAuth2 flow for third-party integrations</span
+                    >
+                    <div class="flex gap--xsmall">
+                      <span class="label label--small label--underline"
+                        >Due Feb 18</span
+                      >
+                      <span
+                        class="label label--small"
+                        style="background-color: #3b82f6"
+                        >Backend</span
+                      >
+                      <span
+                        class="label label--small"
+                        style="background-color: #f59e0b"
+                        >Security</span
+                      >
+                    </div>
+                    <div class="card-owner">
+                      <div class="flex gap--xsmall mt--small">
+                        <img
+                          class="image"
+                          style="width: 24px; height: 24px; border-radius: 50%"
+                          src="https://this-person-does-not-exist.com/static/images/fake-2.jpg"
+                        />
+                        <span class="label">Mike Johnson</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="w-full b-h-gray-5"></div>
+
+                <div class="item">
+                  <div class="meta">
+                    <span class="index">2</span>
+                  </div>
+                  <div class="content">
+                    <span class="title title--small">Design new dashboard</span>
+                    <span class="description"
+                      >Create modern UI for analytics dashboard</span
+                    >
+                    <div class="flex gap--xsmall">
+                      <span class="label label--small label--underline"
+                        >Due Feb 25</span
+                      >
+                      <span
+                        class="label label--small"
+                        style="background-color: #8b5cf6"
+                        >UI/UX</span
+                      >
+                    </div>
+                    <div class="card-owner">
+                      <div class="flex gap--xsmall mt--small">
+                        <img
+                          class="image"
+                          style="width: 24px; height: 24px; border-radius: 50%"
+                          src="https://this-person-does-not-exist.com/static/images/fake-2.jpg"
+                        />
+                        <span class="label">Emma Davis</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Completed Board -->
+            <div class="column">
+              <div class="item">
+                <div class="meta"></div>
+                <div class="content">
+                  <span class="value">Completed</span>
+                  <span class="label">4 cards</span>
+                </div>
+              </div>
+              <div class="w-full b-h-gray-5"></div>
+
+              <div class="list">
+                <div class="item">
+                  <div class="meta">
+                    <span class="index">1</span>
+                  </div>
+                  <div class="content">
+                    <span class="title title--small"
+                      >Set up CI/CD pipeline</span
+                    >
+                    <div class="flex gap--xsmall">
+                      <span
+                        class="label label--small"
+                        style="background-color: #0d9488"
+                        >DevOps</span
+                      >
+                      <span
+                        class="label label--small"
+                        style="background-color: #4c1d95"
+                        >Infrastructure</span
+                      >
+                    </div>
+                    <div class="card-owner">
+                      <div class="flex gap--xsmall mt--small">
+                        <img
+                          class="image"
+                          style="width: 24px; height: 24px; border-radius: 50%"
+                          src="https://this-person-does-not-exist.com/static/images/fake-2.jpg"
+                        />
+                        <span class="label">Alex Wong</span>
+                      </div>
+                      <span class="label label--small">Completed Feb 12</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="w-full b-h-gray-5"></div>
+
+                <div class="item">
+                  <div class="meta">
+                    <span class="index">2</span>
+                  </div>
+                  <div class="content">
+                    <span class="title title--small"
+                      >Fix login page responsiveness</span
+                    >
+                    <div class="flex gap--xsmall">
+                      <span
+                        class="label label--small"
+                        style="background-color: #8b5cf6"
+                        >UI/UX</span
+                      >
+                      <span
+                        class="label label--small"
+                        style="background-color: #059669"
+                        >Fixed</span
+                      >
+                    </div>
+                    <div class="card-owner">
+                      <div class="flex gap--xsmall mt--small">
+                        <img
+                          class="image"
+                          style="width: 24px; height: 24px; border-radius: 50%"
+                          src="https://this-person-does-not-exist.com/static/images/fake-2.jpg"
+                        />
+                        <span class="label">Lisa Park</span>
+                      </div>
+                      <span class="label label--small">Completed Feb 10</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="title_bar">
+          <img
+            class="image image-small"
+            src="https://trello-backgrounds.s3.amazonaws.com/5191197f9433cf5507006338/140x100/d8f0aff6bbcb45773e31970c85137ee6/BlackWithPattern.jpg"
+            alt="Board Background"
+          />
+          <span class="title">Development Board</span>
+          <span class="instance">Sprint 23</span>
+
+          <div class="toggle-control flex gap--small">
+            <label for="toggle-description">
+              <input
+                type="checkbox"
+                id="toggle-description"
+                onchange="toggleFeature('Description', this.checked)"
+              />
+              Hide Descriptions
+            </label>
+          </div>
+
+          <div class="toggle-control flex gap--small">
+            <label for="toggle-owner">
+              <input
+                type="checkbox"
+                id="toggle-owner"
+                onchange="toggleFeature('Owner', this.checked)"
+              />
+              Hide Owners
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      function toggleFeature(feature, hide) {
+        const board = document.querySelector(".screen");
+        board.dataset[`hide${feature}`] = hide;
+      }
+
+      function initializeToggles() {
+        const urlParams = new URLSearchParams(window.location.search);
+        ["Description", "Owner"].forEach((feature) => {
+          const param = urlParams.get(`hide${feature}`);
+          if (param !== null) {
+            const checkbox = document.getElementById(
+              `toggle-${feature.toLowerCase()}`
+            );
+            checkbox.checked = param === "true";
+            toggleFeature(feature, checkbox.checked);
+          }
+        });
+      }
+
+      // Initialize on load
+      document.addEventListener("DOMContentLoaded", initializeToggles);
+    </script>
+  </body>
+</html>
