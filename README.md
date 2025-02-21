@@ -54,5 +54,7 @@ native plugin structure:
 - [Netatmo + Tomorrow.io Weather API](https://github.com/simonjodet/weather_api?tab=readme-ov-file#trmnl-template-example) by [@simonjodet](https://github.com/simonjodet)
 - [ÖBB (Austria) Train Monitor](https://github.com/bnussbau/trmnl-train-monitor) by [@bnussbau](https://github.com/bnussbau)
 - [Buienradar](https://github.com/Akisame-AI/TRMNL_buienradar/) by [@Akisame-AI](https://github.com/Akisame-AI)
+- [Random Steam Deals of the Day](https://github.com/subtype-space/trmnl-steam-deals) by [@asubowo / subtype](https://github.com/subtype-space)
+
 
 to be featured here, add `trmnl` topic to your repo, then open a PR or join the developer-only Discord server (link inside TRMNL UI).
