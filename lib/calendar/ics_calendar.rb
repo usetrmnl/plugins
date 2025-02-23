@@ -19,7 +19,7 @@ module Ics
     def prepare_events
       all_events = []
       calendars.each do |cal|
-        calendar_events = cal.events.sort_by(&:dtstart).select { |m| m.dtstart >= now_in_tz.beginning_of_day }
+        calendar_events = cal.events.sort_by(&:dtstart).select { |m| m.dtstart.in_time_zone(time_zone) >= cutoff_time }
         calendar_events.each do |event|
           next unless event
 
