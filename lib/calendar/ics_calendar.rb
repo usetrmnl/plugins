@@ -184,7 +184,7 @@ module Ics
     end
 
     def event_should_be_ignored?(event)
-      includes_ignored_phrases?(event) || ignore_based_on_status?(event)
+      includes_ignored_phrases?(event) || ignore_based_on_status?(event) || ignore_based_on_time?(event)
     end
 
     def ignore_based_on_status?(event)
@@ -193,6 +193,10 @@ module Ics
       # include non-confirmed events if user prefers to see them (received requests for both options)
       # if this branch is reached, event.status == [nil, 'rejected'] etc
       settings['event_status_filter'] == 'confirmed_only'
+    end
+
+    def ignore_based_on_time?(event)
+      event.dtend.in_time_zone(time_zone) < cutoff_time
     end
 
     def includes_ignored_phrases?(event)
@@ -256,6 +260,10 @@ module Ics
       return settings['scroll_time'] if settings['scroll_time'].present?
 
       events.values.flatten.reject { |e| e[:all_day] }.map { |e| e[:start_full].to_time.strftime("%H:00:00") }.min || '08:00:00'
+    end
+
+    def cutoff_time
+      settings['include_past_events'] == 'yes' ? now_in_tz.beginning_of_day : now_in_tz
     end
   end
 end
