@@ -33,6 +33,22 @@ module Plugins
           }
         }
       end
+
+      def list_calendar(credentials)
+        client = Signet::OAuth2::Client.new(Plugins::GoogleCalendar.client_options)
+        client.update!(credentials["google_calendar"])
+        service = Google::Apis::CalendarV3::CalendarService.new
+        begin
+          service.authorization = client
+          service.list_calendar_lists.items.map { |m| { m.summary => m.id } }
+        rescue Google::Apis::AuthorizationError
+          client.refresh!
+          retry
+        rescue Google::Apis::ClientError # PERMISSION_DENIED: Request had insufficient authentication scopes
+          # in this case, it's possible the user only has 1 calendar, so our 'AUTH_CALENDAR_READONLY' scope is ignored
+          [{ 'primary' => 'primary' }]
+        end
+      end
     end
 
     def events
