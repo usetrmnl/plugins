@@ -1,8 +1,14 @@
 # TRMNL plugins
 
-non-exhaustive collection of TRMNL plugin logic. in sharing these assets we intend to provide transparency in how TRMNL manages user data with respect to 3rd party integrations.
+non-exhaustive collection of open source TRMNL plugins. in sharing these assets we intend to provide transparency in how TRMNL manages user data with respect to 3rd party integrations.
 
-## Native plugins
+native plugin preview images and configuration options:
+[https://usetrmnl.com/integrations](https://usetrmnl.com/integrations)
+
+community Recipes:
+[https://usetrmnl.com/recipes](https://usetrmnl.com/recipes)
+
+## Native plugin examples
 
 - [Calendar](/lib/calendar)
 - [GitHub Commit Graph](/lib/github_commit_graph)
@@ -25,6 +31,7 @@ native plugin structure:
 - [trmnl_preview](https://github.com/schrockwell/trmnl_preview) by [@schrockwell](https://github.com/schrockwell)
 - [TRMNL plugin Dev Kit](https://github.com/sdjmchattie/trmnl-plugin-dev-kit) by [@sdjmchattie](https://github.com/sdjmchattie)
 - [plugin generator [Laravel]](https://github.com/bnussbau/laravel-trmnl) by [@bnussbau](https://github.com/bnussbau)
+- [TRMNL api simulator](https://github.com/deisterhold/trmnl-simulator) by [@deisterhold](https://github.com/deisterhold)
 
 ## Community plugins
 
