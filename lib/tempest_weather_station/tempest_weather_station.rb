@@ -59,6 +59,7 @@ module Plugins
       end
     end
 
+    # rubocop:disable Metrics/AbcSize
     def forecast
       @forecast ||= begin
         url = "#{BASE_URL}/better_forecast?station_id=#{station_id}&units_wind=#{units_wind}&units_precip=#{units_precip}&token=#{access_token}"
@@ -80,13 +81,14 @@ module Plugins
             humidity: right_now['relative_humidity'],
             icon: right_now['icon'],
             temperature: smart_round_in_desired_unit(right_now['air_temperature']),
-            sunrise: Time.at(today['sunrise']).strftime("%H:%m"),
+            sunrise: Time.at(today['sunrise']).in_time_zone(user.tz).strftime("%H:%m"),
             wind: { direction_cardinal: right_now['wind_direction_cardinal'], gust: right_now['wind_gust'], units: units_wind }
           },
           today: {
             icon: today['icon'],
             mintemp: smart_round_in_desired_unit(today['air_temp_low']),
             maxtemp: smart_round_in_desired_unit(today['air_temp_high']),
+            day_override: forecast_day_override('today'),
             conditions: today['conditions'],
             uv_index: right_now['uv'],
             precip: { icon: today['precip_icon'], probability: today['precip_probability'], amount: right_now['precip_accum_local_day'], units: units_precip }
@@ -95,6 +97,7 @@ module Plugins
             icon: tomorrow['icon'],
             mintemp: smart_round_in_desired_unit(tomorrow['air_temp_low']),
             maxtemp: smart_round_in_desired_unit(tomorrow['air_temp_high']),
+            day_override: forecast_day_override('tomorrow'),
             conditions: tomorrow['conditions'],
             uv_index: data['forecast']['hourly'][12]['uv']&.to_i, # unlike right_now['uv'] this val a float; retrieves mid-day (12:00) tmrw, not avail in 'tomorrow' block
             precip: { icon: tomorrow['precip_icon'], probability: tomorrow['precip_probability'] }
@@ -102,6 +105,7 @@ module Plugins
         }
       end
     end
+    # rubocop:enable Metrics/AbcSize
 
     def station_id
       @station_id ||= begin
@@ -115,6 +119,19 @@ module Plugins
         end
 
         station_for_device_id
+      end
+    end
+
+    def forecast_day_override(day)
+      return nil unless forecast_headings == 'absolute_date'
+
+      today = Date.today.in_time_zone(user.tz || 'America/New_York')
+
+      case day
+      when 'today'
+        today.strftime("%b %d")
+      when 'tomorrow'
+        (today + 1.day).strftime("%b %d")
       end
     end
 
@@ -156,6 +173,8 @@ module Plugins
     def to_fahrenheit(temp)
       (temp * 9 / 5) + 32
     end
+
+    def forecast_headings = settings['forecast_headings']
 
     def units = settings['units'].downcase == 'metric' ? 'c' : 'f'
 

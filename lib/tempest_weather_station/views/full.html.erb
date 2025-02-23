@@ -8,7 +8,7 @@
         <div class="item h--full">
           <div class="meta"></div>
           <div class="content">
-            <span class="value value--xxxlarge"><%= temperature&.round %>°</span>
+            <span class="value value--xxxlarge" data-fit-value="true"><%= temperature&.round %>°</span>
             <span class="label w--full">
               <img style="max-height: 24px; vertical-align: middle" src="<%= Rails.application.credentials.base_url %>/images/weather/wi-sunrise.svg" />
               <%= forecast[:right_now][:sunrise] %>
@@ -69,7 +69,7 @@
               </div>
               <div class="content">
                 <span class="value value--xsmall"><%= forecast[day][:conditions] %></span>
-                <span class="label"><%= t("renders.weather.#{day.to_s}", locale:) %></span>
+                <span class="label"><%= forecast[day][:day_override] || t("renders.weather.#{day.to_s}", locale:) %></span>
               </div>
             </div>
 
@@ -82,7 +82,7 @@
                     <img class="weather-icon" src="<%= Rails.application.credentials.base_url %>/images/weather/wi-hot.svg" />
                   </div>
 
-                  <div class="content w--xsmall">
+                  <div class="content w--14">
                     <span class="value value--xsmall"><%= forecast[day][:uv_index] %></span>
                     <span class="label"><%= t('renders.weather.uv', locale:) %></span>
                   </div>
@@ -92,7 +92,7 @@
                   </div>
 
                   <!-- justify-content is needed for 'tomorrow' precip amount/units, given they are always nil -->
-                  <div class="content w--xsmall" style="justify-content: center">
+                  <div class="content w--14" style="<%= 'justify-content: center' if day == :tomorrow %>">
                     <span class="value value--xsmall"><%= forecast[day][:precip][:probability] %>%</span>
                     <span class="label"><%= forecast[day][:precip][:amount] %> <%= forecast[day][:precip][:units] %></span>
                   </div>
@@ -107,11 +107,11 @@
                   <img class="weather-icon" src="<%= Rails.application.credentials.base_url %>/images/weather/wi-thermometer.svg" />
                 </div>
                 <div class="row">
-                  <div class="content w--medium">
+                  <div class="content w--20">
                     <span class="value value--small"><%= forecast[day][:mintemp]&.round %>°</span>
                     <span class="label"><%= t('renders.weather.low', locale:) %></span>
                   </div>
-                  <div class="content w--medium">
+                  <div class="content w--20">
                     <span class="value value--small"><%= forecast[day][:maxtemp]&.round %>°</span>
                     <span class="label"><%= t('renders.weather.high', locale:) %></span>
                   </div>
