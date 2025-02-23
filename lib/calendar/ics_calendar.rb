@@ -123,7 +123,7 @@ module Ics
         evt.dtstart = recurrence.start_time.in_time_zone(time_zone)
         evt.dtend = recurrence.end_time.in_time_zone(time_zone)
 
-        evt
+        evt if evt.dtstart >= cutoff_time
       end
     end
 
