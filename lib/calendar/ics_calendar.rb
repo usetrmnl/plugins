@@ -19,7 +19,13 @@ module Ics
     def prepare_events
       all_events = []
       calendars.each do |cal|
-        calendar_events = cal.events.sort_by(&:dtstart).select { |m| m.dtstart >= DateTime.now - 1.days }
+        calendar_events = cal.events.sort_by(&:dtstart).select do |event|
+          if event.dtstart.instance_of?(Icalendar::Values::Date)
+            event.dtstart >= now_in_tz.to_date && event.dtstart <= time_max.to_date
+          else
+            event.dtstart >= now_in_tz && event.dtstart <= time_max
+          end
+        end
         calendar_events.each do |event|
           next unless event
 
@@ -38,6 +44,9 @@ module Ics
       end
 
       all_events.compact.sort_by { |e| e[:date_time] }.group_by { |e| e[:day] }
+    rescue Plugins::Helpers::Errors::InvalidURL
+      handle_erroring_state("ics_url is invalid")
+      {}
     rescue ArgumentError => e
       handle_erroring_state(e.message) if e.message.include?("DNS name: nil")
       {}
@@ -160,11 +169,12 @@ module Ics
     end
 
     def calendars
-      cal_urls = line_separated_string_to_array(settings['ics_url'])
+      cal_urls = line_separated_string_to_array(settings['ics_url']).map { it.gsub('webcal', 'https') }
 
       cals = []
       cal_urls.each do |url|
         response = fetch(url)
+        raise Plugins::Helpers::Errors::InvalidURL if response.code == 404
         raise Plugins::Helpers::Errors::DataFetchError if response.nil?
 
         cals << Icalendar::Calendar.parse(response&.body).first # is array but should just have 1
@@ -220,7 +230,7 @@ module Ics
                      7
                    end
 
-      (now_in_tz + days_ahead.days).iso8601
+      (now_in_tz + days_ahead.days)
     end
 
     def now_in_tz
