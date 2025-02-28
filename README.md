@@ -62,6 +62,11 @@ native plugin structure:
 - [ÖBB (Austria) Train Monitor](https://github.com/bnussbau/trmnl-train-monitor) by [@bnussbau](https://github.com/bnussbau)
 - [Buienradar](https://github.com/Akisame-AI/TRMNL_buienradar/) by [@Akisame-AI](https://github.com/Akisame-AI)
 - [Random Steam Deals of the Day](https://github.com/subtype-space/trmnl-steam-deals) by [@asubowo / subtype](https://github.com/subtype-space)
-
+- [Countdown plugin](https://github.com/jvdmeij/trmnl-countdown) by [@jvdmeij](https://github.com/jvdmei)
+- [Crypto Fear & Greed](https://github.com/jvdmeij/trmnl-crypto-fear-and-greed) by [@jvdmeij](https://github.com/jvdmei)
+- [Your Life in Weeks](https://github.com/jvdmeij/trmnl-your-life-in-weeks) by [@jvdmeij](https://github.com/jvdmei)
+- [Magic 8-Ball](https://github.com/jvdmeij/trmnl-magic-8-ball) by [@jvdmeij](https://github.com/jvdmei)
+- [Winnie the Pooh quote](https://github.com/jvdmeij/trmnl-winnie-the-pooh) by [@jvdmeij](https://github.com/jvdmei)
+- [Word Clock](https://github.com/jvdmeij/trmnl-word-clock) by [@jvdmeij](https://github.com/jvdmei)
 
 to be featured here, add `trmnl` topic to your repo, then open a PR or join the developer-only Discord server (link inside TRMNL UI).
