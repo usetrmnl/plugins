@@ -69,5 +69,6 @@ native plugin structure:
 - [Winnie the Pooh quote](https://github.com/jvdmeij/trmnl-winnie-the-pooh) by [@jvdmeij](https://github.com/jvdmei)
 - [Word Clock](https://github.com/jvdmeij/trmnl-word-clock) by [@jvdmeij](https://github.com/jvdmei)
 - [LastFM](https://github.com/monsieurm/trmnl-lastfm) by [@monsieurm](https://github.com/monsieurm)
+- [Year In Progress](https://github.com/monsieurm/trmnl-yearinprogress) by [@monsieurm](https://github.com/monsieurm)
 
 to be featured here, add `trmnl` topic to your repo, then open a PR or join the developer-only Discord server (link inside TRMNL UI).
