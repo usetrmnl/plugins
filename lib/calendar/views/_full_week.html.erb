@@ -43,6 +43,12 @@
       initialView: 'timeGridFourDay', // 'dayGridWeek' shows a week but does not show events as blocks with diff heights per time length
       scrollTime: '<%= scroll_time %>', // without this, view begins at 12am (creating white space)
       slotMinTime: '<%= scroll_time %>', // required in-addition to scrollTime, otherwise calendar lib will ignore scrollTime if events would be hidden
+      slotLabelFormat: {
+        hour: 'numeric',
+        minute: '2-digit',
+        omitZeroMinute: <%= hour_12_format %>,
+        hour12: <%= hour_12_format %>
+      },
       views: {
         timeGridFourDay: {
           type: 'timeGrid',
