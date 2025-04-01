@@ -1,12 +1,17 @@
 <div class="view view--half_vertical">
-  <div class="layout">
-    <div class="column" data-list-limit="true" data-list-max-height="340">
-      <% events_sorted = events.values.flatten.sort_by { |e| e[:date_time] }.group_by { |e| e[:day] } %>
-      <% events_sorted.first(2).to_h.each do |day_of_events| %>
+  <div class="layout" style="flex-flow: wrap;">
+    <div class="column">
+      <% events.sort_by { |k,_v| Date.parse(k.to_s) }.first(4).to_h.each do |day_of_events| %>
+        <% all_day_events = day_of_events[1].select { |e| e[:all_day] } %>
+        <% visible_events = (day_of_events[1] - all_day_events) %>
         <div class="list">
           <span class="label"><%= day_of_events[0] %></span>
 
-          <% day_of_events[1].each_with_index do |event, idx| %>
+          <% all_day_events.each do |event| %>
+            <%= render partial: 'plugins/calendars/all_day_event', locals: { event: event, include_description: } %>
+          <% end %>
+
+          <% visible_events.each_with_index do |event, idx| %>
             <div class="item">
               <div class="meta">
                 <span class="index"><%= idx + 1 %></span>
@@ -25,5 +30,5 @@
     </div>
   </div>
 
-  <%= render partial: "lib/calendar/views/title_bar", locals: local_assigns %>
+  <%= render partial: "plugins/calendars/title_bar", locals: local_assigns %>
 </div>

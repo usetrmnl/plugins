@@ -1,0 +1,11 @@
+<div class="item">
+  <div class="meta">
+    <span class="index">#</span>
+  </div>
+  <div class="content">
+    <span class="title title--small"><%= event[:summary] %></span>
+    <% if include_description %>
+      <span class="description"><%= event[:description] %></span>
+    <% end %>
+  </div>
+</div>
