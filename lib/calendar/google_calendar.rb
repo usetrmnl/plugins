@@ -137,7 +137,7 @@ module Plugins
 
     def time_format
       if settings['time_format'] == 'am/pm'
-        "%I:%M %p"
+        "%-I:%M %p"
       else
         "%R"
       end

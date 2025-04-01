@@ -17,6 +17,10 @@
     overflow: visible;
   }
 
+  .fc-daygrid-dot-event .fc-event-title {
+    font-weight: 400;
+  }
+
   .fc-col-header-cell {
     font-family: 'NicoClean';
     font-size: 16px;
@@ -32,6 +36,10 @@
 
   table.fc-col-header {
     width: 800px !important;
+  }
+
+  table.fc-col-header col {
+    width: 52px !important; /* defaults 41px, mis-aligns date headings */
   }
 
   .fc-timegrid-divider {
@@ -90,7 +98,7 @@
   }
 
   .fc-day {
-    width: 108px;
+    width: 104px;
   }
 
   /* in month view, next month's dates default 0.3 opacity which renders them invisible */

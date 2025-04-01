@@ -19,17 +19,9 @@ module Ics
     def prepare_events
       all_events = []
       calendars.each do |cal|
-        calendar_events = cal.events.sort_by(&:dtstart).select do |event|
-          if event.dtstart.instance_of?(Icalendar::Values::Date)
-            event.dtstart >= now_in_tz.to_date && event.dtstart <= time_max.to_date
-          else
-            event.dtstart >= now_in_tz && event.dtstart <= time_max
-          end
-        end
-        calendar_events.each do |event|
+        cal.events.each do |event|
           next unless event
 
-          # process recently created recurring events
           if event.rrule.present?
             occurences(event).each { |recurring_event| all_events << prepare_event(recurring_event) }
           else
@@ -38,12 +30,11 @@ module Ics
           end
         end
       end
-
-      cached_recurring_events.each do |event|
-        occurences(event).each { |recurring_event| all_events << prepare_event(recurring_event) }
-      end
-
-      all_events.compact.sort_by { |e| e[:date_time] }.group_by { |e| e[:day] }
+      all_events
+        .compact
+        .select { it[:date_time] >= now_in_tz && it[:date_time] <= time_max }
+        .sort_by { |e| e[:date_time] }
+        .group_by { |e| e[:day] }
     rescue Plugins::Helpers::Errors::InvalidURL
       handle_erroring_state("ics_url is invalid")
       {}
@@ -55,65 +46,23 @@ module Ics
       {}
     end
 
-    def sync_recurring_events
-      recurring_events = []
-      calendars.each do |cal|
-        calendar_events = cal.events.sort_by(&:dtstart).select { |m| m.dtstart >= DateTime.now - 5.years }
-        calendar_events.each do |event|
-          next unless event && event.rrule.present?
-
-          recurring_events << {
-            summary: event.summary,
-            description: event.description,
-            status: event.status,
-            dtstart: event.dtstart,
-            dtend: event.dtend,
-            rrule: event.rrule.map(&:value_ical) # => ["FREQ=WEEKLY;UNTIL=20250617T120000Z;INTERVAL=1;BYDAY=TU;WKST=SU"]
-          }
-        end
-      end
-
-      plugin_settings.persistence_data['recurring_events'] = recurring_events
-      plugin_settings.save
-    end
-
-    def cached_recurring_events
-      r_events = plugin_settings.persistence_data['recurring_events'] || []
-
-      r_events.map do |re|
-        ie = Icalendar::Event.new
-
-        ie.summary = re['summary']
-        ie.description = re['description']
-        ie.status = re['status']
-        ie.dtstart = re['dtstart']&.to_datetime
-        ie.dtend = re['dtend']&.to_datetime
-
-        re['rrule'].each do |rule|
-          ie.append_rrule Icalendar::Values::Recur.new(rule)
-        end
-
-        ie
-      end
-    end
-
     def prepare_event(event)
       return if event_should_be_ignored?(event)
 
       # some params below are only needed for 1 or more event_layout options but not all
       # however all must be included as user may set event_layout==week, then create a mashup with event_layout==default
       layout_params = {
-        start_full: event.dtstart,
-        end_full: event.dtend,
+        start_full: event.dtstart&.in_time_zone(time_zone),
+        end_full: event.dtend&.in_time_zone(time_zone),
         start: event.dtstart&.strftime(time_format),
         end: event.dtend&.strftime(time_format)
       }
 
       {
-        summary: event.summary || 'Busy', # likely a private event that doesn't share full details with connected calendar
+        summary: event.summary.to_s || 'Busy', # likely a private event that doesn't share full details with connected calendar
         description: sanitize_description(event.description),
-        status: event.status,
-        date_time: event.dtstart,
+        status: event.status.to_s,
+        date_time: event.dtstart.in_time_zone(time_zone),
         day: event.dtstart.in_time_zone(time_zone).strftime('%B %d'),
         all_day: all_day_event?(event)
       }.merge(layout_params)
@@ -121,17 +70,29 @@ module Ics
 
     def sanitize_description(description)
       description = description.join(', ') if description.is_a?(Icalendar::Values::Helpers::Array)
-      Rails::Html::FullSanitizer.new.sanitize(description) || 'No description'
+      return 'No description' if description.nil?
+
+      Rails::Html::FullSanitizer.new.sanitize(description.strip.split("\n").first&.strip || 'No description')
     end
 
     def occurences(event)
+      if event.dtstart.is_a?(Icalendar::Values::Date)
+        event.dtstart = event.dtstart.in_time_zone(time_zone)
+        event.dtend = event.dtend.in_time_zone(time_zone)
+      end
+
       recurrences = event.occurrences_between(recurring_event_start_date, recurring_event_end_date)
 
       recurrences.map do |recurrence|
         evt = event.dup
-        evt.dtstart = recurrence.start_time.in_time_zone(time_zone)
-        evt.dtend = recurrence.end_time.in_time_zone(time_zone)
-
+        evt.dtstart = recurrence.start_time.in_time_zone(time_zone).change(
+          hour: event.dtstart.hour,
+          min: event.dtstart.min
+        )
+        evt.dtend = recurrence.end_time.in_time_zone(time_zone).change(
+          hour: event.dtend.hour,
+          min: event.dtend.min
+        )
         evt
       end
     end
@@ -159,13 +120,15 @@ module Ics
     end
 
     def all_day_event?(event)
-      if event.rrule.present?
-        (event.dtend.to_date - event.dtstart.to_date).to_i >= 1 # 24+ hours long, ex: 00:00 - 00:00 (next day)
-      else
-        # this check only works for regular events
-        # cached_recurring_events lose data type artifacts
-        event.dtstart.instance_of?(Icalendar::Values::Date)
+      return true if event.dtstart.to_datetime.hour.zero? && event.dtstart.to_datetime.min.zero?
+      return true if event.dtstart.instance_of?(Icalendar::Values::Date)
+
+      if event.rrule.present? && event.dtend
+        # 24+ hours long, ex: 00:00 - 00:00 (next day)
+        return (event.dtend.to_date - event.dtstart.to_date).to_i >= 1
       end
+
+      false
     end
 
     def calendars
@@ -173,9 +136,9 @@ module Ics
 
       cals = []
       cal_urls.each do |url|
-        response = fetch(url)
-        raise Plugins::Helpers::Errors::InvalidURL if response.code == 404
+        response = HTTParty.get(url, headers:, verify: false) ## Not using fetch, as fetch has a timeout of 10s with 3 retries so 30s in total
         raise Plugins::Helpers::Errors::DataFetchError if response.nil?
+        raise Plugins::Helpers::Errors::InvalidURL if response.code == 404
 
         cals << Icalendar::Calendar.parse(response&.body).first # is array but should just have 1
       end
@@ -187,13 +150,15 @@ module Ics
 
     def time_format
       if settings['time_format'] == 'am/pm'
-        "%I:%M %p"
+        "%-I:%M %p"
       else
         "%R"
       end
     end
 
     def event_should_be_ignored?(event)
+      return false if event.instance_of?(Icalendar::Recurrence::Occurrence)
+
       includes_ignored_phrases?(event) || ignore_based_on_status?(event)
     end
 
@@ -230,7 +195,7 @@ module Ics
                      7
                    end
 
-      (now_in_tz + days_ahead.days)
+      (now_in_tz.end_of_day + days_ahead.days)
     end
 
     def now_in_tz
@@ -240,10 +205,6 @@ module Ics
     # required to ensure locals data has a 'diff' at least 1x per day
     # given week/month view 'highlight' current day
     # without this local, previous day will be highlighted if events dont change
-
-    def today
-      Date.today
-    end
 
     def today_in_tz
       now_in_tz.to_date.to_s
@@ -257,6 +218,12 @@ module Ics
 
     def first_day
       Date.strptime(settings['first_day'], '%a').wday
+    end
+
+    def headers
+      return {} unless settings['headers']
+
+      string_to_hash(settings['headers'])
     end
 
     # ability to hard-code each day's first time slot in event_layout=week mode

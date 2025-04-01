@@ -38,6 +38,7 @@
   document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
+      now: '<%= today_in_tz %>',
       timeZone: new Date('<%= events.values.flatten.reject { |e| e[:all_day] }.first&.dig(:start_full) %>').getTimezoneOffset(),
       headerToolbar: false,
       initialView: 'timeGridFourDay', // 'dayGridWeek' shows a week but does not show events as blocks with diff heights per time length
