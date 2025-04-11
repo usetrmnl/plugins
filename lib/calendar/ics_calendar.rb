@@ -30,9 +30,10 @@ module Ics
           end
         end
       end
+
       all_events
         .compact
-        .select { it[:date_time] >= now_in_tz && it[:date_time] <= time_max }
+        .select { it[:all_day] ? it[:date_time].between?(beginning_of_day, time_max) : it[:date_time].between?(now_in_tz, time_max) }
         .sort_by { |e| e[:date_time] }
         .group_by { |e| e[:day] }
     rescue Plugins::Helpers::Errors::InvalidURL
@@ -78,7 +79,7 @@ module Ics
     def occurences(event)
       if event.dtstart.is_a?(Icalendar::Values::Date)
         event.dtstart = event.dtstart.in_time_zone(time_zone)
-        event.dtend = event.dtend.in_time_zone(time_zone)
+        event.dtend = (event.dtend || event.dtstart).in_time_zone(time_zone)
       end
 
       recurrences = event.occurrences_between(recurring_event_start_date, recurring_event_end_date)
@@ -86,12 +87,12 @@ module Ics
       recurrences.map do |recurrence|
         evt = event.dup
         evt.dtstart = recurrence.start_time.in_time_zone(time_zone).change(
-          hour: event.dtstart.hour,
-          min: event.dtstart.min
+          hour: event.dtstart.in_time_zone(time_zone).hour,
+          min: event.dtstart.in_time_zone(time_zone).min
         )
         evt.dtend = recurrence.end_time.in_time_zone(time_zone).change(
-          hour: event.dtend.hour,
-          min: event.dtend.min
+          hour: event.dtend.in_time_zone(time_zone).hour,
+          min: event.dtend.in_time_zone(time_zone).min
         )
         evt
       end
@@ -137,11 +138,11 @@ module Ics
       cals = []
       cal_urls.each do |url|
         response = HTTParty.get(url, headers:, verify: false) ## Not using fetch, as fetch has a timeout of 10s with 3 retries so 30s in total
-        raise Plugins::Helpers::Errors::DataFetchError if response.nil?
-        raise Plugins::Helpers::Errors::InvalidURL if response.code == 404
 
-        cals << Icalendar::Calendar.parse(response&.body).first # is array but should just have 1
+        cals << Icalendar::Calendar.parse(response&.body).first unless response.nil?
       end
+
+      raise Plugins::Helpers::Errors::DataFetchError if cals.empty?
 
       cals.uniq.compact
     end
@@ -208,6 +209,10 @@ module Ics
 
     def today_in_tz
       now_in_tz.to_date.to_s
+    end
+
+    def beginning_of_day
+      now_in_tz.beginning_of_day
     end
 
     def include_description
