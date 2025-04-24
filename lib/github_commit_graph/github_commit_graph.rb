@@ -79,7 +79,7 @@ module Plugins
       streak = 0
       
       # The current day can count towards the streak but it shouldn't break the streak
-      streak += 1 if days.last['contributionCount'].positive?
+      streak += 1 if days.last[:contributionCount].positive?
       
       days[0..-2].reverse_each do |day|
         break if (day['contributionCount']).zero?
