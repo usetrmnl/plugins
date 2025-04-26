@@ -4,7 +4,7 @@ module Plugins
     include Ics::Calendar
 
     def locals
-      { events:, event_layout:, include_description:, first_day:, scroll_time:, today_in_tz: }
+      { events:, event_layout:, include_description:, include_event_time:, first_day:, scroll_time:, today_in_tz: }
     end
   end
 end
@@ -220,9 +220,15 @@ module Ics
     end
 
     def include_description
-      return true unless settings['include_description'] # optional field, default value
+      return true unless settings['include_description'] # backward compatible default value
 
       settings['include_description'] == 'yes'
+    end
+
+    def include_event_time
+      return false unless settings['include_event_time'] # backward compatible default value
+
+      settings['include_event_time'] == 'yes'
     end
 
     def first_day

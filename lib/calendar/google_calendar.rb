@@ -1,7 +1,7 @@
 module Plugins
   class GoogleCalendar < Base
     def locals
-      { events:, event_layout:, include_description:, first_day:, scroll_time:, today_in_tz: }
+      { events:, event_layout:, include_description:, include_event_time:, first_day:, scroll_time:, today_in_tz: }
     end
 
     class << self
@@ -113,7 +113,7 @@ module Plugins
 
       {
         summary: event.summary,
-        description: sanitize(event.description) || 'No description',
+        description: sanitize(event.description) || '',
         status: event.status,
         date_time: start_date,
         day: start_date.in_time_zone(time_zone).strftime('%B %d'),
@@ -212,9 +212,15 @@ module Plugins
     end
 
     def include_description
-      return true unless settings['include_description'] # optional field, default value
+      return true unless settings['include_description'] # backward compatible default value
 
       settings['include_description'] == 'yes'
+    end
+
+    def include_event_time
+      return false unless settings['include_event_time'] # backward compatible default value
+
+      settings['include_event_time'] == 'yes'
     end
 
     def first_day

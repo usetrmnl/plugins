@@ -29,7 +29,7 @@
       initialView: 'dayGridMonth',
       firstDay: <%= first_day %>,
       events: <%== events.values.flatten.map {|e| { allDay: e[:all_day], title: e[:summary], description: e[:description], start: e[:start_full], end: e[:end_full] } }.to_json %>,
-      displayEventTime: false, // IDEA: make this a user-facing toggle
+      displayEventTime: <%= include_event_time %>,
       locale: '<%= locale %>',
       schedulerLicenseKey: '<%= Rails.application.credentials.plugins.full_calendar.license_key %>'
     });
