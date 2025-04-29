@@ -73,5 +73,6 @@ native plugin structure:
 - [Year In Progress](https://github.com/monsieurm/trmnl-yearinprogress) by [@monsieurm](https://github.com/monsieurm)
 - [Who's That Pokémon?](https://github.com/sriniketh/trmnl-plugin-whos-that-pokemon) by [@sriniketh](https://github.com/sriniketh)
 - [Canvas](https://github.com/JoshuaBrest/canvas-trmnl) by [@JoshuaBrest](https://github.com/JoshuaBrest)
+- [Anime of the Day](https://github.com/Saious119/trmnl-anime-of-the-day/) by [@Saious119](https://github.com/Saious119)
 
 to be featured here, add `trmnl` topic to your repo, then open a PR or join the developer-only Discord server (link inside TRMNL UI).
