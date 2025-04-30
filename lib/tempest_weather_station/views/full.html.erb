@@ -10,8 +10,13 @@
           <div class="content">
             <span class="value value--xxxlarge" data-fit-value="true"><%= temperature&.round %>°</span>
             <span class="label w--full">
-              <img style="max-height: 24px; vertical-align: middle" src="<%= Rails.application.credentials.base_url %>/images/weather/wi-sunrise.svg" />
-              <%= forecast[:right_now][:sunrise] %>
+               <% if Time.now > forecast[:right_now][:sunrise_unix] %>
+                 <img style="max-height: 24px; vertical-align: middle" src="<%= Rails.application.credentials.base_url %>/images/weather/wi-sunset.svg" />
+                 <%= forecast[:right_now][:sunset] %>
+               <% else %>
+                 <img style="max-height: 24px; vertical-align: middle" src="<%= Rails.application.credentials.base_url %>/images/weather/wi-sunrise.svg" />
+                 <%= forecast[:right_now][:sunrise] %>                
+               <% end %>
             </span>
             <span class="label w--full">
               <img style="max-height: 24px; vertical-align: middle" src="https://tempestwx.com/images/Updated/wind-arrow-<%= forecast[:right_now][:wind][:direction_cardinal].downcase %>.svg" />
