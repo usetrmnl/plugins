@@ -82,6 +82,9 @@ module Plugins
             icon: right_now['icon'],
             temperature: smart_round_in_desired_unit(right_now['air_temperature']),
             sunrise: Time.at(today['sunrise']).in_time_zone(user.tz).strftime("%H:%m"),
+            sunset: Time.at(today['sunset']).in_time_zone(user.tz).strftime("%H:%m"),
+            sunrise_unix: Time.at(today['sunrise']),
+            sunset_unix: Time.at(today['sunset']),
             wind: { direction_cardinal: right_now['wind_direction_cardinal'], gust: right_now['wind_gust'], units: units_wind }
           },
           today: {
