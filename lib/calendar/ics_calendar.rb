@@ -4,7 +4,7 @@ module Plugins
     include Ics::Calendar
 
     def locals
-      { events:, event_layout:, include_description:, first_day:, scroll_time:, today_in_tz: }
+      { events:, event_layout:, include_description:, include_event_time:, first_day:, scroll_time:, today_in_tz: }
     end
   end
 end
@@ -31,11 +31,15 @@ module Ics
         end
       end
 
-      all_events
-        .compact
-        .select { it[:all_day] ? it[:date_time].between?(beginning_of_day, time_max) : it[:date_time].between?(now_in_tz, time_max) }
-        .sort_by { |e| e[:date_time] }
-        .group_by { |e| e[:day] }
+      filtered_events = all_events.compact.select do |event|
+        if event[:all_day]
+          event[:date_time].between?(beginning_of_day, time_max)
+        else
+          event[:date_time].between?(now_in_tz, time_max) || event[:end_full]&.between?(now_in_tz, time_max)
+        end
+      end
+
+      filtered_events.sort_by { |e| e[:date_time] }.group_by { |e| e[:day] }
     rescue Plugins::Helpers::Errors::InvalidURL
       handle_erroring_state("ics_url is invalid")
       {}
@@ -55,8 +59,8 @@ module Ics
       layout_params = {
         start_full: event.dtstart&.in_time_zone(time_zone),
         end_full: event.dtend&.in_time_zone(time_zone),
-        start: event.dtstart&.strftime(time_format),
-        end: event.dtend&.strftime(time_format)
+        start: event.dtstart&.in_time_zone(time_zone)&.strftime(time_format),
+        end: event.dtend&.in_time_zone(time_zone)&.strftime(time_format)
       }
 
       {
@@ -71,9 +75,9 @@ module Ics
 
     def sanitize_description(description)
       description = description.join(', ') if description.is_a?(Icalendar::Values::Helpers::Array)
-      return 'No description' if description.nil?
+      return '' if description.nil?
 
-      Rails::Html::FullSanitizer.new.sanitize(description.strip.split("\n").first&.strip || 'No description')
+      Rails::Html::FullSanitizer.new.sanitize(description.strip.split("\n").first&.strip || '')
     end
 
     def occurences(event)
@@ -142,7 +146,7 @@ module Ics
         cals << Icalendar::Calendar.parse(response&.body).first unless response.nil?
       end
 
-      raise Plugins::Helpers::Errors::DataFetchError if cals.empty?
+      raise Plugins::Helpers::Errors::DataFetchError if cals.compact.empty?
 
       cals.uniq.compact
     end
@@ -216,9 +220,15 @@ module Ics
     end
 
     def include_description
-      return true unless settings['include_description'] # optional field, default value
+      return true unless settings['include_description'] # backward compatible default value
 
       settings['include_description'] == 'yes'
+    end
+
+    def include_event_time
+      return false unless settings['include_event_time'] # backward compatible default value
+
+      settings['include_event_time'] == 'yes'
     end
 
     def first_day
