@@ -74,5 +74,6 @@ native plugin structure:
 - [Who's That Pokémon?](https://github.com/sriniketh/trmnl-plugin-whos-that-pokemon) by [@sriniketh](https://github.com/sriniketh)
 - [Canvas](https://github.com/JoshuaBrest/canvas-trmnl) by [@JoshuaBrest](https://github.com/JoshuaBrest)
 - [Anime of the Day](https://github.com/Saious119/trmnl-anime-of-the-day/) by [@Saious119](https://github.com/Saious119)
+- [BVG (Berlin) Public Transport](https://github.com/danmunoz/trmnl-bvg-transit) by [@Danmunoz](https://github.com/danmunoz)
 
 to be featured here, add `trmnl` topic to your repo, then open a PR or join the developer-only Discord server (link inside TRMNL UI).
