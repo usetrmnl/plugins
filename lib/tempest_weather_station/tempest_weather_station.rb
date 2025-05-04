@@ -81,7 +81,10 @@ module Plugins
             humidity: right_now['relative_humidity'],
             icon: right_now['icon'],
             temperature: smart_round_in_desired_unit(right_now['air_temperature']),
-            sunrise: Time.at(today['sunrise']).in_time_zone(user.tz).strftime("%H:%m"),
+            sunrise: today['sunrise'] ? Time.at(today['sunrise']).in_time_zone(user.tz).strftime("%H:%m") : '',
+            sunset: today['sunset'] ? Time.at(today['sunset']).in_time_zone(user.tz).strftime("%H:%m") : '',
+            sunrise_unix: Time.at(today['sunrise']).to_i,
+            sunset_unix: Time.at(today['sunset']).to_i,
             wind: { direction_cardinal: right_now['wind_direction_cardinal'], gust: right_now['wind_gust'], units: units_wind }
           },
           today: {
@@ -125,7 +128,7 @@ module Plugins
     def forecast_day_override(day)
       return nil unless forecast_headings == 'absolute_date'
 
-      today = Date.today.in_time_zone(user.tz || 'America/New_York')
+      today = DateTime.now.in_time_zone(user.tz || 'America/New_York')
 
       case day
       when 'today'
@@ -182,7 +185,7 @@ module Plugins
 
     def units_precip = settings['units_precip']
 
-    def today_yyyy_mm_dd = Date.today.in_time_zone(user.tz).strftime("%Y-%m-%d")
+    def today_yyyy_mm_dd = DateTime.now.in_time_zone(user.tz || 'America/New_York').strftime("%Y-%m-%d")
 
     def today_day_number = today_yyyy_mm_dd.to_date.mday
 
