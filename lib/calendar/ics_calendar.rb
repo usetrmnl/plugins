@@ -31,7 +31,7 @@ module Ics
         end
       end
 
-      filtered_events = all_events.compact.select do |event|
+      filtered_events = all_events.compact.uniq.select do |event|
         if event[:all_day]
           event[:date_time].between?(beginning_of_day, time_max)
         else
@@ -69,7 +69,8 @@ module Ics
         status: event.status.to_s,
         date_time: event.dtstart.in_time_zone(time_zone),
         day: event.dtstart.in_time_zone(time_zone).strftime('%B %d'),
-        all_day: all_day_event?(event)
+        all_day: all_day_event?(event),
+        calname: calname(event)
       }.merge(layout_params)
     end
 
@@ -78,6 +79,10 @@ module Ics
       return '' if description.nil?
 
       Rails::Html::FullSanitizer.new.sanitize(description.strip.split("\n").first&.strip || '')
+    end
+
+    def calname(event)
+      event.parent.custom_properties.dig('x_wr_calname', 0)
     end
 
     def occurences(event)

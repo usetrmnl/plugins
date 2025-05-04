@@ -117,13 +117,20 @@ module Plugins
         status: event.status,
         date_time: start_date,
         day: start_date.in_time_zone(time_zone).strftime('%B %d'),
-        all_day: (event.start.date_time || event.end.date_time).nil?
+        all_day: (event.start.date_time || event.end.date_time).nil?,
+        calname: calname(event)
       }.merge(layout_params)
     end
 
     def calendars
       # 'flatten()' ensures back/forward compatibility btwn single vs multi-select dropdown
       [settings['calendar']].flatten.uniq
+    end
+
+    # event object doesn't have a calendar/parent type attr like ICS event.parent
+    # rather than pass calendar_email into prepare_event(), simply look up which attendee is 'me' (self)
+    def calname(event)
+      event&.attendees&.find(&:self)&.email
     end
 
     def client
