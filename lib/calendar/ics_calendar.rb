@@ -39,7 +39,10 @@ module Ics
         end
       end
 
-      filtered_events.sort_by { |e| e[:date_time] }.group_by { |e| e[:day] }
+      # de-duplicates events if every param (except calname) matches -- helpful for family calendars where multiple entries otherwise exist for same event
+      unique_events = filtered_events.uniq { |evt| evt.values_at(:summary, :description, :status, :date_time, :day, :all_day, :start_full, :end_full, :start, :end) }
+
+      unique_events.sort_by { |e| e[:date_time] }.group_by { |e| e[:day] }
     rescue Plugins::Helpers::Errors::InvalidURL
       handle_erroring_state("ics_url is invalid")
       {}

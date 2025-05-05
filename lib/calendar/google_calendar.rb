@@ -77,7 +77,10 @@ module Plugins
           retry
         end
 
-        all_events.compact.sort_by { |e| e[:date_time] }.group_by { |e| e[:day] } # G Cal doesn't allow native sorting
+        # de-duplicates events if every param (except calname) matches -- helpful for family calendars where multiple entries otherwise exist for same event
+        unique_events = all_events.uniq { |evt| evt.values_at(:summary, :description, :status, :date_time, :day, :all_day, :start_full, :end_full, :start, :end) }
+
+        unique_events.compact.sort_by { |e| e[:date_time] }.group_by { |e| e[:day] } # G Cal doesn't allow native sorting
       rescue Google::Apis::AuthorizationError
         refresh!
         retry_count += 1
