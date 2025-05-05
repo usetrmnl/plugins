@@ -1,7 +1,7 @@
 module Plugins
   class GoogleCalendar < Base
     def locals
-      { events:, event_layout:, include_description:, include_event_time:, first_day:, scroll_time:, today_in_tz: }
+      { events:, event_layout:, include_description:, include_event_time:, first_day:, scroll_time:, time_format:, today_in_tz: }
     end
 
     class << self
@@ -107,8 +107,8 @@ module Plugins
       layout_params = {
         start_full: event.start.date_time&.in_time_zone(time_zone) || event.start.date,
         end_full: event.end.date_time&.in_time_zone(time_zone) || event.end.date,
-        start: event.start.date_time&.in_time_zone(time_zone)&.strftime(time_format) || event.start.date,
-        end: event.end.date_time&.in_time_zone(time_zone)&.strftime(time_format) || event.end.date
+        start: event.start.date_time&.in_time_zone(time_zone)&.strftime(formatted_time) || event.start.date,
+        end: event.end.date_time&.in_time_zone(time_zone)&.strftime(formatted_time) || event.end.date
       }
 
       {
@@ -142,12 +142,14 @@ module Plugins
 
     def time_zone = user.tz || 'America/New_York'
 
+    def formatted_time
+      return "%-I:%M %p" if time_format == 'am/pm'
+
+      "%R"
+    end
+
     def time_format
-      if settings['time_format'] == 'am/pm'
-        "%-I:%M %p"
-      else
-        "%R"
-      end
+      settings['time_format'] || 'am/pm'
     end
 
     def event_should_be_ignored?(event, calendar_email)
