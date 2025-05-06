@@ -1,0 +1,34 @@
+<div class="view view--half_vertical">
+  <div class="layout layout--col">
+    <img class="weather-image" src="<%= Rails.application.credentials.base_url %>/images/weather/<%= weather_image %>.svg" />
+
+    <div class="grid grid--cols-2">
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--large" data-fit-value="true"><%= temperature&.round %>°</span>
+          <span class="label"><%= conditions %></span>
+          <span class="label"><%= forecast[:today][:mintemp] %>° - <%= forecast[:today][:maxtemp] %>°</span>
+          <span class="label">UV <%= forecast[:today][:uv_index] %></span>
+        </div>
+      </div>
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content gap">
+          <span class="label label--inverted"><%= forecast[:tomorrow][:day_override] || t('renders.weather.tomorrow') %></span>
+          <span class="label"><%= forecast[:tomorrow][:conditions] %></span>
+          <span class="label">[L/H] <%= forecast[:tomorrow][:mintemp] %>° - <%= forecast[:tomorrow][:maxtemp] %>°</span>
+          <span class="label">[UV] <%= forecast[:tomorrow][:uv_index] %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <img class="image" src="<%= Rails.application.credentials.base_url %>/images/plugins/weather--render.svg" />
+    <h1 class="title"><%= t('renders.weather.title') %></h1>
+    <span class="instance"><%= instance_name %></span>
+  </div>
+</div>
+
+<%= render 'plugins/weather/common' %>

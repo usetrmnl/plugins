@@ -16,6 +16,7 @@ community Recipes:
 - [Lunch Money](/lib/lunch_money)
 - [Stock Price](/lib/stock_price)
 - [Tempest Weather Station](/lib/tempest_weather_station)
+- [Weather (generic)](/lib/weather)
 
 native plugin structure:
 
