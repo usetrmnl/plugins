@@ -4,7 +4,7 @@ module Plugins
     STOCK_TICKER_LIMIT = 12.freeze
 
     SUPPORTED_INDEX = [
-      'VIX', 'MXACW', 'XWLD', 'MXUSA', 'MXEF', 'MXEA', 'DJI', 'RUI', 'RUT', 'OEX', 'OEX', 'SPX', 'XSP', 'XSP', 'SPESG', 'XND'
+      'VIX', 'MXACW', 'XWLD', 'MXUSA', 'MXEF', 'MXEA', 'DJI', 'RUI', 'RUT', 'OEX', 'OEX', 'SPX', 'XSP', 'XSP', 'SPESG', 'XND', 'IXIC'
     ].freeze
 
     def locals = { tickers:, currency_symbol:, currency_separator: }
@@ -33,7 +33,7 @@ module Plugins
     def ticker_name(symbol) = TICKER_NAME_DATA[symbol]
 
     def ticker_price(symbol)
-      Rails.cache.fetch "STOCK_PRICE_#{symbol}_v1", expire_in: 1.hour, skip_nil: true do
+      Rails.cache.fetch "STOCK_PRICE_#{symbol}_extended_#{extended_hours?}_v1", expire_in: 1.hour, skip_nil: true do
         response = SUPPORTED_INDEX.include?(symbol) ? fetch(index_url(symbol), headers:) : fetch(stock_url(symbol), headers:)
 
         if %w[error no_data].include?(response['s'])
@@ -93,9 +93,13 @@ module Plugins
       plugin.account_fields.find { |af| af['keyname'] == 'currency' }&.dig('options')
     end
 
-    def stock_url(symbol) = "https://api.marketdata.app/v1/stocks/quotes/#{CGI.escape(symbol)}/"
+    def extended_hours?
+      settings['extended_hours'] == 'yes'
+    end
 
-    def index_url(symbol) = "https://api.marketdata.app/v1/indices/quotes/#{CGI.escape(symbol)}/"
+    def stock_url(symbol) = "https://api.marketdata.app/v1/stocks/quotes/#{CGI.escape(symbol)}/?extended=#{extended_hours?}"
+
+    def index_url(symbol) = "https://api.marketdata.app/v1/indices/quotes/#{CGI.escape(symbol)}/?extended=#{extended_hours?}"
 
     def currency_conversion_url = "https://api.currencyapi.com/v3/latest?apikey=#{Rails.application.credentials.plugins.currency_api}&currencies=#{supported_currencies.join('%2C')}"
 
