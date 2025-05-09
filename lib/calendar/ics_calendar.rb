@@ -17,32 +17,7 @@ module Ics
     end
 
     def prepare_events
-      all_events = []
-      calendars.each do |cal|
-        cal.events.each do |event|
-          next unless event
-
-          if event.rrule.present?
-            occurences(event).each { |recurring_event| all_events << prepare_event(recurring_event) }
-          else
-            # process regular upcoming events
-            all_events << prepare_event(event)
-          end
-        end
-      end
-
-      filtered_events = all_events.compact.uniq.select do |event|
-        if event[:all_day]
-          event[:date_time].between?(beginning_of_day, time_max)
-        else
-          event[:date_time].between?(now_in_tz, time_max) || event[:end_full]&.between?(now_in_tz, time_max)
-        end
-      end
-
-      # de-duplicates events if every param (except calname) matches -- helpful for family calendars where multiple entries otherwise exist for same event
-      unique_events = filtered_events.uniq { |evt| evt.values_at(:summary, :description, :status, :date_time, :day, :all_day, :start_full, :end_full, :start, :end) }
-
-      unique_events.sort_by { |e| e[:date_time] }.group_by { |e| e[:day] }
+      filtered_events.sort_by { |e| e[:date_time] }.group_by { |e| e[:day] }
     rescue Plugins::Helpers::Errors::InvalidURL
       handle_erroring_state("ics_url is invalid")
       {}
@@ -52,6 +27,31 @@ module Ics
     rescue Icalendar::Parser::ParseError => e
       handle_erroring_state(e.message)
       {}
+    end
+
+    def all_events
+      @all_events ||= begin
+        all_evts = []
+        calendars.each do |cal|
+          cal.events.each do |event|
+            next unless event
+
+            if event.rrule.present?
+              occurences(event).each { |recurring_event| all_evts << prepare_event(recurring_event) }
+            else
+              # process regular upcoming events
+              all_evts << prepare_event(event)
+            end
+          end
+        end
+
+        all_evts
+      end
+    end
+
+    # de-duplicates events where every param (except calname) matches -- helpful for family calendars where multiple entries otherwise exist for same event
+    def filtered_events
+      all_events.compact.uniq { |evt| evt.values_at(:summary, :description, :status, :date_time, :day, :all_day, :start_full, :end_full, :start, :end) }
     end
 
     def prepare_event(event)
@@ -174,7 +174,7 @@ module Ics
     def event_should_be_ignored?(event)
       return false if event.instance_of?(Icalendar::Recurrence::Occurrence)
 
-      includes_ignored_phrases?(event) || ignore_based_on_status?(event)
+      includes_ignored_phrases?(event) || ignore_based_on_status?(event) || ignore_based_on_time?(event)
     end
 
     def ignore_based_on_status?(event)
@@ -192,6 +192,20 @@ module Ics
       summary_includes || description_includes
     end
 
+    # consider changing this to use 'start' vs 'end'
+    def ignore_based_on_time?(event)
+      end_time = event.dtend&.in_time_zone(time_zone)
+      return false if end_time.nil?
+
+      end_time < cutoff_time
+    end
+
+    # some users prefer to maintain 'state' and see already-passed events
+    # default is to ignore events already completed on this same day
+    def cutoff_time
+      settings['include_past_events'] == 'yes' ? time_min : now_in_tz
+    end
+
     def ignored_phrases
       return [] unless settings['ignore_phrases']
 
@@ -200,6 +214,17 @@ module Ics
 
     def event_layout
       settings['event_layout']
+    end
+
+    def time_min
+      days_behind = case event_layout
+                    when 'month'
+                      30 # don't simply get remainder of month; FullCalendar 'previews' next month near the end
+                    else
+                      7
+                    end
+
+      (beginning_of_day - days_behind.days)
     end
 
     def time_max
