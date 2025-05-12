@@ -1,31 +1,32 @@
 <div class="view view--quadrant">
-  <div class="layout layout--col" style="justify-content: <%= events.count > 1 ? 'flex-start' : 'center' %>">
-    <% events.sort_by { |k,_v| Date.parse(k.to_s) }.first(2).to_h.each do |day_of_events| %>
-      <% all_day_events = day_of_events[1].select { |e| e[:all_day] } %>
-      <% visible_events = (day_of_events[1] - all_day_events) %>
-
+  <div class="layout" style="flex-flow: wrap;">
+    <div class="column" data-list-limit="true" data-list-max-height="140" data-list-hidden-count="true">
       <div class="list">
-        <span class="label"><%= day_of_events[0] %></span>
+        <% events.sort_by { |k,_v| Date.parse(k.to_s) }.first(2).to_h.each do |day_of_events| %>
+          <% all_day_events = day_of_events[1].select { |e| e[:all_day] } %>
+          <% regular_events = (day_of_events[1] - all_day_events) %>
+            <span class="label"><%= day_of_events[0] %></span>
 
-        <% all_day_events.each do |event| %>
-          <%= render partial: 'plugins/calendars/all_day_event', locals: { event: event, include_description: } %>
-        <% end %>
+            <% all_day_events.each do |event| %>
+              <%= render partial: 'plugins/calendars/all_day_event', locals: { event: event, include_description: } %>
+            <% end %>
 
-        <% visible_events.each_with_index do |event, idx| %>
-          <div class="item">
-            <div class="meta">
-              <span class="index"><%= idx + 1 %></span>
-            </div>
-            <div class="content">
-              <span class="title title--small"><%= event[:summary] %></span>
-              <div class="flex gap--xsmall">
-                <span class="label label--small label--underline"><%= "#{event[:start]}" %> - <%= event[:end] %></span>
+            <% regular_events.each_with_index do |event, idx| %>
+              <div class="item">
+                <div class="meta">
+                  <span class="index"><%= idx + 1 %></span>
+                </div>
+                <div class="content">
+                  <span class="title title--small"><%= event[:summary] %></span>
+                  <div class="flex gap--xsmall">
+                    <span class="label label--small label--underline"><%= "#{event[:start]}" %> - <%= event[:end] %></span>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            <% end %>
         <% end %>
       </div>
-    <% end %>
+    </div>
   </div>
 
   <%= render partial: "plugins/calendars/title_bar", locals: local_assigns %>

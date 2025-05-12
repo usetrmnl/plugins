@@ -1,17 +1,18 @@
 <div class="view view--half_vertical">
   <div class="layout" style="flex-flow: wrap;">
-    <div class="column">
-      <% events.sort_by { |k,_v| Date.parse(k.to_s) }.first(4).to_h.each do |day_of_events| %>
+    <div class="column" data-list-limit="true" data-list-max-height="340" data-list-hidden-count="true">
+      <div class="list">
+      <% events.sort_by { |k,_v| Date.parse(k.to_s) }.first(3).to_h.each do |day_of_events| %>
         <% all_day_events = day_of_events[1].select { |e| e[:all_day] } %>
-        <% visible_events = (day_of_events[1] - all_day_events) %>
-        <div class="list">
+        <% regular_events = (day_of_events[1] - all_day_events) %>
+
           <span class="label"><%= day_of_events[0] %></span>
 
           <% all_day_events.each do |event| %>
             <%= render partial: 'plugins/calendars/all_day_event', locals: { event: event, include_description: } %>
           <% end %>
 
-          <% visible_events.each_with_index do |event, idx| %>
+          <% regular_events.each_with_index do |event, idx| %>
             <div class="item">
               <div class="meta">
                 <span class="index"><%= idx + 1 %></span>
@@ -25,8 +26,8 @@
               </div>
             </div>
           <% end %>
-        </div>
       <% end %>
+      </div>
     </div>
   </div>
 

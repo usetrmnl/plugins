@@ -11,13 +11,14 @@ end
 
 # module below is included in all ICS calendars (ex: Apple, Outlook, Fastmail, Nextcloud, etc)
 module Ics
+  # rubocop:disable Metrics/ModuleLength
   module Calendar
     def events
       @prepare_events ||= prepare_events
     end
 
     def prepare_events
-      filtered_events.sort_by { |e| e[:date_time] }.group_by { |e| e[:day] }
+      unique_events.sort_by { |e| e[:date_time] }.group_by { |e| e[:day] }
     rescue Plugins::Helpers::Errors::InvalidURL
       handle_erroring_state("ics_url is invalid")
       {}
@@ -49,9 +50,19 @@ module Ics
       end
     end
 
-    # de-duplicates events where every param (except calname) matches -- helpful for family calendars where multiple entries otherwise exist for same event
     def filtered_events
-      all_events.compact.uniq { |evt| evt.values_at(:summary, :description, :status, :date_time, :day, :all_day, :start_full, :end_full, :start, :end) }
+      all_events.compact.uniq.select do |event|
+        if event[:all_day]
+          event[:date_time].between?(time_min, time_max)
+        else
+          event[:date_time].between?(time_min, time_max) || event[:end_full]&.between?(time_min, time_max)
+        end
+      end
+    end
+
+    # de-duplicates events where every param (except calname) matches -- helpful for family calendars where multiple entries otherwise exist for same event
+    def unique_events
+      filtered_events.compact.uniq { |evt| evt.values_at(:summary, :description, :status, :date_time, :day, :all_day, :start_full, :end_full, :start, :end) }
     end
 
     def prepare_event(event)
@@ -71,7 +82,7 @@ module Ics
         description: sanitize_description(event.description),
         status: event.status.to_s,
         date_time: event.dtstart.in_time_zone(time_zone),
-        day: event.dtstart.in_time_zone(time_zone).strftime('%B %d'),
+        day: formatted_day(event),
         all_day: all_day_event?(event),
         calname: calname(event)
       }.merge(layout_params)
@@ -130,6 +141,10 @@ module Ics
       when 'month'
         today_in_tz.to_date.end_of_month
       end
+    end
+
+    def formatted_day(event)
+      event.dtstart.in_time_zone(time_zone).strftime('%A, %B %-d')
     end
 
     def all_day_event?(event)
@@ -285,4 +300,5 @@ module Ics
       events.values.flatten.reject { |e| e[:all_day] }.map { |e| e[:start_full].to_time.strftime("%H:00:00") }.min || '08:00:00'
     end
   end
+  # rubocop:enable Metrics/ModuleLength
 end

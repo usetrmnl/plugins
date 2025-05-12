@@ -14,10 +14,7 @@
 
 <div id="calendar" style="height: 480px; width: 800px"></div>
 
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
-
-<!-- TODO: a newer version is available, but some el classes have changed so our style overrides are not applied -->
-<!-- <script src='https://cdn.jsdelivr.net/npm/fullcalendar@7.0.0-beta.4/index.global.min.js'></script> -->
+<script src='https://usetrmnl.com/fullcalendar/index.global.min.js'></script>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -26,8 +23,13 @@
       now: '<%= today_in_tz %>',
       timeZone: new Date('<%= events.values.flatten.reject { |e| e[:all_day] }.first&.dig(:start_full) %>').getTimezoneOffset(),
       headerToolbar: false,
+      contentHeight: 'auto', // removes scrollbar that can appear in top right
       initialView: 'dayGridMonth',
       firstDay: <%= first_day %>,
+      eventTimeFormat: {
+        hour: 'numeric', // required for 0-24 number to appear at all
+        hour12: <%= time_format == 'am/pm' %> // if true: 1-12; if false: 0-23
+      },
       events: <%== events.values.flatten.map {|e| { allDay: e[:all_day], title: e[:summary], description: e[:description], start: e[:start_full], end: e[:end_full] } }.to_json %>,
       displayEventTime: <%= include_event_time %>,
       locale: '<%= locale %>',
