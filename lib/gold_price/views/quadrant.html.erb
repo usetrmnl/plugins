@@ -1,0 +1,30 @@
+<div class="view view--quadrant">
+  <div class="layout layout--col">
+    <div class="item">
+      <div class="meta"></div>
+      <div class="content">
+        <span class="value"><%= price[:formatted] %></span>
+        <span class="label">Gold (<%= price[:currency] %>/oz)</span>
+      </div>
+    </div>
+
+    <div class="w-full b-h-gray-5"></div>
+
+    <div class="item">
+      <div class="meta"></div>
+      <div class="content">
+        <span class="title title--small">Performance</span>
+        <div class="flex gap--xsmall">
+          <span class="label label--small label--underline">7d: <%= performance_7d[:formatted_percentage] %></span>
+          <span class="label label--small label--underline">90d: <%= performance_90d[:formatted_percentage] %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <img class="image" src="https://usetrmnl.com/images/plugins/simple-analytics--render.svg" />
+    <span class="title">Gold Price</span>
+    <span class="instance">Live Tracker</span>
+  </div>
+</div>
