@@ -7,14 +7,14 @@
             <span class="label"><%= day_of_events[0] %></span>
             <% max_event_count = include_description ? 4 : 7 %>
             <% all_day_events = day_of_events[1].select { |e| e[:all_day] }[0..max_event_count] %>
-            <% visible_events = (day_of_events[1] - all_day_events)[0..(max_event_count-all_day_events.count)] %>
-            <% hidden_events_count = day_of_events[1].size - all_day_events.size - visible_events.size %>
+            <% regular_events = (day_of_events[1] - all_day_events)[0..(max_event_count-all_day_events.count)] %>
+            <% hidden_events_count = day_of_events[1].size - all_day_events.size - regular_events.size %>
 
             <% all_day_events.each do |event| %>
               <%= render partial: 'plugins/calendars/all_day_event', locals: { event: event, include_description: } %>
             <% end %>
 
-            <% visible_events.each do |event| %>
+            <% regular_events.each do |event| %>
               <div class="item">
                 <div class="meta">
                   <span class="index"></span>

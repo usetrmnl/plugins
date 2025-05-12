@@ -66,7 +66,7 @@ module Plugins
         calendars.each do |calendar_email|
           # TODO: investigate, maybe Google Cal does support ordering by start Time? mixed reports:
           # https://github.com/googleapis/google-api-ruby-client/blob/main/samples/cli/lib/samples/calendar.rb#L65
-          events = service.list_events(calendar_email, single_events: true, time_min: now_in_tz.beginning_of_day.iso8601, time_max: time_max).items
+          events = service.list_events(calendar_email, single_events: true, time_min: time_min.iso8601, time_max: time_max).items
           events.each do |event|
             all_events << prepare_event(event, calendar_email)
           end
@@ -119,7 +119,7 @@ module Plugins
         description: sanitize(event.description) || '',
         status: event.status,
         date_time: start_date,
-        day: start_date.in_time_zone(time_zone).strftime('%B %d'),
+        day: formatted_day(start_date),
         all_day: (event.start.date_time || event.end.date_time).nil?,
         calname: calname(event)
       }.merge(layout_params)
@@ -151,6 +151,10 @@ module Plugins
       "%R"
     end
 
+    def formatted_day(start_date)
+      start_date.in_time_zone(time_zone).strftime('%A, %B %-d')
+    end
+
     def time_format
       settings['time_format'] || 'am/pm'
     end
@@ -166,10 +170,9 @@ module Plugins
       !attendees.find { |a| a.email == calendar_email }&.response_status == 'accepted'
     end
 
-    # consider changing this to use 'start' vs 'end'
     def ignore_based_on_time?(event)
       end_date = event.end.date_time || event.end.date
-      end_date.in_time_zone(time_zone) < cutoff_time
+      end_date.in_time_zone(time_zone) <= cutoff_time # <= handles events that were yesterday, but all-day, and thus end today at 00:00 (should be ignored)
     end
 
     def ignore_based_on_status?(event)
@@ -184,21 +187,39 @@ module Plugins
       summary_includes = ignored_phrases.any? { |phrase| event.summary.include?(phrase) }
       description_includes = ignored_phrases.any? { |phrase| (event.description || '').include?(phrase) }
 
-      summary_includes || description_includes
+      summary_is = ignored_phrases_exact_match.any? { |phrase| event.summary&.strip == phrase }
+      description_is = ignored_phrases_exact_match.any? { |phrase| event.description&.strip == phrase }
+
+      summary_includes || description_includes || summary_is || description_is
     end
 
     def ignored_phrases
       settings['ignore_phrases']&.gsub("\n", "")&.gsub("\r", "")&.split(',')&.map(&:squish) || []
     end
 
+    def ignored_phrases_exact_match
+      line_separated_string_to_array(settings['ignore_phrases_exact_match'] || '')
+    end
+
     def event_layout
       settings['event_layout']
     end
 
-    # some users prefer to maintain 'state' and see already-passed events
-    # default is to ignore events already completed on this same day
     def cutoff_time
-      settings['include_past_events'] == 'yes' ? now_in_tz.beginning_of_day : now_in_tz
+      return beginning_of_day if event_layout == 'default'
+
+      settings['include_past_events'] == 'yes' ? time_min : beginning_of_day
+    end
+
+    def time_min
+      days_behind = case event_layout
+                    when 'month'
+                      30 # don't simply get remainder of month; FullCalendar 'previews' next month near the end
+                    else
+                      7
+                    end
+
+      (beginning_of_day - days_behind.days)
     end
 
     def time_max
@@ -212,15 +233,17 @@ module Plugins
       (now_in_tz + days_ahead.days).iso8601
     end
 
-    def now_in_tz
-      DateTime.now.in_time_zone(time_zone)
-    end
+    def now_in_tz = user.datetime_now
 
     # required to ensure locals data has a 'diff' at least 1x per day
     # given week/month view 'highlight' current day
     # without this local, previous day will be highlighted if events dont change
     def today_in_tz
       now_in_tz.to_date.to_s
+    end
+
+    def beginning_of_day
+      now_in_tz.beginning_of_day
     end
 
     def include_description
