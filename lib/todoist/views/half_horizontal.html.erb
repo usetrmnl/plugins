@@ -1,0 +1,23 @@
+<div class="view view--half_horizontal">
+  <div class="layout layout--row">
+    <% todos.reverse.each_with_index do |doing_and_done, list_index| %>
+      <div class="grid grid--cols-1">
+        <span class="label <%= 'label--gray-out' if list_index == 0 %>"><%= doing_and_done[:label].titleize %></span>
+        <div class="list" data-list-limit="true" data-list-hidden-count="true" data-list-max-height="140">
+          <% doing_and_done[:items].each_with_index do |item, idx| %>
+            <div class="item">
+              <div class="meta">
+                <span class="index"><%= idx + 1 %></span>
+              </div>
+              <div class="content">
+                <span class="label truncate-none <%= 'label--gray-out' if list_index == 0 %>"><%= item %></span>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%= render 'plugins/todo_list/shared/title_bar', instance_name: instance_name %>
+</div>

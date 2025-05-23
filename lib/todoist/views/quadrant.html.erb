@@ -1,0 +1,19 @@
+<div class="view view--quadrant">
+  <div class="layout layout--col">
+    <div class="list" data-list-limit="true" data-list-hidden-count="true" data-list-max-height="150">
+      <% todos = todos.first %>
+      <% todos[:items].each_with_index do |item, idx| %>
+        <div class="item">
+          <div class="meta">
+            <span class="index"><%= idx + 1 %></span>
+          </div>
+          <div class="content">
+            <span class="label truncate-none"><%= item %></span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%= render 'plugins/todo_list/shared/title_bar', instance_name: instance_name %>
+</div>

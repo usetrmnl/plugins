@@ -1,0 +1,25 @@
+<div class="view view--half_vertical">
+  <div class="layout layout--col gap--space-between">
+    <% todos.each_with_index do |doing_and_done, list_index| %>
+      <div class="list" data-list-limit="true" data-list-hidden-count="true" data-list-max-height="160">
+        <span class="label <%= 'label--gray-out' if list_index == 1 %>"><%= doing_and_done[:label].titleize %></span>
+        <% doing_and_done[:items].each_with_index do |item, idx| %>
+          <div class="item">
+            <div class="meta">
+              <span class="index"><%= idx + 1 %></span>
+            </div>
+            <div class="content">
+              <span class="label truncate-none <%= 'label--gray-out' if list_index == 1 %>"><%= item %></span>
+            </div>
+          </div>
+        <% end %>
+        <% hidden_items_count = doing_and_done[:items].size - 3 %>
+      </div>
+      <% if list_index == 0 %>
+        <div class="w-full b-h-gray-5"></div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%= render 'plugins/todo_list/shared/title_bar', instance_name: instance_name %>
+</div>
