@@ -23,6 +23,61 @@ module Plugins
       no_deadline:  'no deadline'
     }
 
+    TaskDue = Struct.new(
+      :date,
+      :is_recurring,
+      :datetime,
+      :string,
+      :timezone,
+      keyword_init: true
+    ) do
+      def initialize(*args)
+        super
+        self.date     = Date.parse(date) if date
+        self.datetime = DateTime.parse(datetime) if datetime
+      end
+    end
+
+    TaskDeadline = Struct.new(
+      :date,
+      keyword_init: true
+    ) do
+      def initialize(*args)
+        super
+        self.date = Date.parse(date) if date
+      end
+    end
+
+    Task = Struct.new(
+      :creator_id,
+      :created_at,
+      :assignee_id,
+      :assigner_id,
+      :comment_count,
+      :is_completed,
+      :content,
+      :description,
+      :due,
+      :deadline,
+      :duration,
+      :id,
+      :labels,
+      :order,
+      :priority,
+      :project_id,
+      :section_id,
+      :parent_id,
+      :url,
+      keyword_init: true
+    ) do
+      def initialize(*args)
+        super
+        self.due        = TaskDue.new(due) if due
+        self.deadline   = TaskDeadline.new(deadline) if deadline
+        self.created_at = DateTime.parse(created_at) if created_at
+      end
+    end
+
     def locals
       { tasks: }
     end
@@ -70,12 +125,13 @@ module Plugins
     def access_token = settings.dig('todoist', 'access_token')
 
     def tasks
-      tasks = fetch(TASKS_URL, query:, headers: Plugins::Todoist.headers(access_token))
+      response = fetch(TASKS_URL, query:, headers: Plugins::Todoist.headers(access_token))
+
+      tasks = response.map { Task.new(it) }
       tasks = tasks_sort(tasks)
+      tasks = tasks_group(tasks)
 
-      # @todo Add Grouping Support
-
-      tasks.map { task_extract(task) }
+      tasks_format(tasks)
     end
 
     def query
@@ -166,57 +222,154 @@ module Plugins
     end
 
     def tasks_sort_by_manual(tasks)
-      tasks.sort_by do |task|
-        task['order']
-      end
+      tasks.sort_by(&:order)
     end
 
     def tasks_sort_by_name(tasks)
       tasks.sort_by do |task|
-        task['content'].downcase
+        task.content.downcase
       end
     end
 
     def tasks_sort_by_date(tasks)
       tasks.sort_by do |task|
-        if task['due']
-          Date.parse(task['due']['date'])
-        else
-          Date::Infinity.new
-        end
+        task.due&.date || Date::Infinity.new
       end
     end
 
     def tasks_sort_by_date_added(tasks)
-      tasks.sort_by do |task|
-        DateTime.parse(task['created_at'])
-      end
+      tasks.sort_by(&:created_at)
     end
 
     def tasks_sort_by_deadline(tasks)
       tasks.sort_by do |task|
-        if task['deadline']
-          Date.parse(task['deadline']['date'])
-        else
-          Date::Infinity.new
-        end
+        task.deadline&.date || Date::Infinity.new
       end
     end
 
     def tasks_sort_by_priority(tasks)
-      tasks.sort_by do |task|
-        task['priority'] || 5 # Default to 5 if no priority is set
+      tasks.sort_by(&:priority)
+    end
+
+    def tasks_group(tasks)
+      case settings['todoist__group__grouping']
+      when 'date'
+        tasks_group_by_date(tasks)
+      when 'date_added'
+        tasks_group_by_date_added(tasks)
+      when 'deadline'
+        tasks_group_by_deadline(tasks)
+      when 'priority'
+        tasks_group_by_priority(tasks)
+      when 'labels'
+        tasks_group_by_labels(tasks)
+      else
+        tasks
       end
     end
 
-    def task_extract(task)
+    # Overdue
+    # May 25 ‧ Today ‧ Sunday
+    # Jun 6 ‧ Friday
+    # No date
+    def tasks_group_by_date(tasks)
+      tasks.group_by do |task|
+        tasks_group_format_date_title(task.due&.date, none: 'No date')
+      end
+    end
+
+    # May 25 ‧ Today ‧ Sunday
+    # Jun 6 ‧ Friday
+    def tasks_group_by_date_added(tasks)
+      groups = tasks.group_by do |task|
+        tasks_group_format_date(task.created_at)
+      end
+    end
+
+    # Overdue
+    # May 25 ‧ Today ‧ Sunday
+    # Jun 6 ‧ Friday
+    # No deadline
+    def tasks_group_by_deadline(tasks)
+      tasks.group_by do |task|
+        tasks_group_format_date_title(task.deadline&.date, none: 'No deadline')
+      end
+    end
+
+    # Priority 1
+    # Priority 2
+    # Priority 3
+    # Priority 4
+    def tasks_group_by_priority(tasks)
+      tasks.group_by do |task|
+        "Priority #{task.priority}"
+      end
+    end
+
+    # {Label}
+    # No label
+    def tasks_group_by_labels(tasks)
+      groups = {}
+
+      tasks.each do |task|
+        if task.labels.blank?
+          groups['No label'] ||= []
+          groups['No label'] << task
+        else
+          task.labels&.each do |label|
+            groups[label] ||= []
+            groups[label] << task
+          end
+        end
+      end
+
+      groups
+    end
+
+    # Overdue
+    # May 25 ‧ Today ‧ Sunday
+    # Jun 6 ‧ Friday
+    # {No date}
+    def tasks_group_format_date_title(date, none:)
+      if date.nil?
+        none
+      elsif date < today
+        'Overdue'
+      else
+        tasks_group_format_date(date)
+      end
+    end
+
+    def tasks_group_format_date(date)
+      segments = [date.strftime('%b %d'), 'Today', date.strftime('%A')]
+
+      segments.delete_at(1) if date == today
+
+      segments.join(' ‧ ')
+    end
+
+
+    def tasks_format(data)
+      case data
+      when Array
+        data.map { tasks_extract(it) }
+      when Hash
+        data.transform_values do |tasks|
+          tasks.map { tasks_extract(it) }
+        end
+      else
+        fail "Invalid tasks format: #{tasks.class}"
+      end
+    end
+
+    def tasks_extract(task)
       {
-        is_completed:     task['is_completed'],
-        content:          task['content'],
-        description:      task['description'],
-        due_date:         task.dig('due', 'date'),
-        due_is_recurring: task.dig('due', 'is_recurring'),
-        dateline_date:    task.dig('deadline', 'date'),
+        is_completed:     task.is_completed,
+        content:          task.content,
+        description:      task.description,
+        due_date:         task.due&.date,
+        due_is_recurring: task.due&.is_recurring,
+        dateline_date:    task.deadline&.date,
       }
     end
   end
