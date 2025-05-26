@@ -46,6 +46,7 @@ native plugin structure:
 - [WooCommerce](https://github.com/yannicschuller/trmnl-woocommerce) by [@yannicschuller](https://github.com/yannicschuller)
 - [Strava goals](https://github.com/vinayak-mehta/trmnl-strava-goals) by [@vinayak-mehta](https://github.com/vinayak-mehta)
 - [Valorant Tracker](https://github.com/MarkHopper24/Valorant-Tools) by [@MarkHopper24](https://github.com/MarkHopper24)
+- [Marvel Rivals Stat Tracker](https://github.com/MarkHopper24/Marvel-Rivals-TRMNL-Tracker) by [@MarkHopper24](https://github.com/MarkHopper24)
 - [NASA Deep Space Network](https://github.com/schrockwell/trmnl-dsn) by [@schrockwell](https://github.com/schrockwell)
 - [Marvel Character of the Day](https://github.com/MarkHopper24/Marvel-Character-of-the-Day) by [@MarkHopper24](https://github.com/MarkHopper24)
 - [Remember The Milk](https://github.com/sejtenik/trmnl-rtm-plugin) by [@sejtenik](https://github.com/sejtenik)
