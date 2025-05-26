@@ -80,6 +80,8 @@ module Plugins
         today = today_forecast_idx ? daily_forecasts[today_forecast_idx] : today_stats
         tomorrow = daily_forecasts[tmrw_forecast_idx]
 
+        today_uv, tomorrow_uv = max_uvs
+
         {
           right_now: {
             feels_like: smart_round_in_desired_unit(right_now['feels_like']),
@@ -98,7 +100,7 @@ module Plugins
             maxtemp: smart_round_in_desired_unit(today['air_temp_high']),
             day_override: forecast_day_override('today'),
             conditions: today['conditions'],
-            uv_index: right_now['uv'],
+            uv_index: today_uv,
             precip: { icon: today['precip_icon'], probability: today['precip_probability'], amount: right_now['precip_accum_local_day'], units: units_precip }
           },
           tomorrow: {
@@ -107,7 +109,7 @@ module Plugins
             maxtemp: smart_round_in_desired_unit(tomorrow['air_temp_high']),
             day_override: forecast_day_override('tomorrow'),
             conditions: tomorrow['conditions'],
-            uv_index: hourly_forecasts[12]['uv']&.to_i, # unlike right_now['uv'] this val a float; retrieves mid-day (12:00) tmrw, not avail in 'tomorrow' block
+            uv_index: tomorrrow_uv,
             precip: { icon: tomorrow['precip_icon'], probability: tomorrow['precip_probability'] }
           }
         }
@@ -230,6 +232,34 @@ module Plugins
     def today_yyyy_mm_dd = today.strftime("%Y-%m-%d")
 
     def tomorrow_yyyy_mm_dd = (today + 1.day).strftime("%Y-%m-%d")
+
+    # Returns the maximum UV index for today and tomorrow, as pulled from the
+    # hourly forecasts
+    def max_uvs
+      today, tomorrow = 0, 0
+      return today, tomorrow unless hourly_forecasts
+
+      current_day = hourly_forecasts[0]['local_day']
+      # If the first hourly forecast is at 0, that means currently it's 11:00 PM
+      # to 12:00 PM today, so the entire hourly is actually for tomorrow.
+      on_tomorrow = hourly_forecasts[0]['local_hour'] == 0
+
+      hourly_forecasts.each do |hour|
+        if current_day != hour['local_day']
+          break if on_tomorrow
+          current_day = hour['local_day']
+          on_tomorrow = true
+        end
+
+        if not on_tomorrow
+          today = {today, hour['uv'].to_i}.max
+        else
+          tomorrow = {tomorrow, hour['uv'].to_i}.max
+        end
+      end
+
+      today, tomorrow
+    end
 
     # IDEA: allow multiple devices; easy to fetch + grab all data, not easy to lay out however
     def device_id = settings['tempest_weather_station_devices'].to_s
