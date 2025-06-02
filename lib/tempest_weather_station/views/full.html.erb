@@ -10,11 +10,11 @@
           <div class="content">
             <span class="value value--xxxlarge" data-fit-value="true"><%= temperature&.round %>°</span>
             <span class="label w--full">
-              <div class="content">
+              <div class="content" style="display: inline;">
                 <img style="max-height: 24px; vertical-align: middle" src="<%= Rails.application.credentials.base_url %>/images/plugins/weather/wi-sunrise.svg" />
                 <%= forecast[:right_now][:sunrise] %>
               </div>
-              <div class="content">
+              <div class="content" style="display: inline;">
                 <img style="max-height: 24px; vertical-align: middle" src="<%= Rails.application.credentials.base_url %>/images/plugins/weather/wi-sunset.svg" />
                 <%= forecast[:right_now][:sunset] %>
               </div>
