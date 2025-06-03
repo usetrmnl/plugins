@@ -1,0 +1,33 @@
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartkick@5.0.1/dist/chartkick.min.js"></script>
+
+<div class="view view--half_vertical">
+  <div class="layout layout--col">
+    <div class="grid grid--cols-2">
+      <% metrics.each do |metric, value| %>
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value value--small"><%= format_number(value) %></span>
+            <span class="label label--small"><%= metric.to_s.titleize %></span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <% formatted_data = histogram.map { |period| [period[:date], period[:pageviews]] } %>
+    <%= line_chart formatted_data, adapter: :highcharts, prefix: "", thousands: ",", points: false, colors: ["black"], curve: true,
+                   library: {
+                      chart: { height: 280 },
+                      plotOptions: { series: { animation: false, lineWidth: 4 } },
+                      yAxis: { labels: { style: { fontSize: '16px', color: '#000000' } }, gridLineDashStyle: 'shortdot', gridLineWidth: 1, gridLineColor: '#000000', tickAmount: 5 },
+                      xAxis: { type: 'daytime', labels: { style: { fontSize: '16px', color: '#000000' } }, lineWidth: 0, gridLineDashStyle: 'dot', tickWidth: 1, tickLength: 0, gridLineWidth: 1, gridLineColor: '#000000', tickPixelInterval: 120 }}
+    %>
+  </div>
+
+  <div class="title_bar title_bar--small">
+    <img class="image" src="<%= Rails.application.credentials.base_url %>/images/plugins/google-analytics--render.svg" />
+    <span class="title">Google Analytics</span>
+    <span class="instance"><%= instance_name %></span>
+  </div>
+</div>
