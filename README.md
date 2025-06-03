@@ -12,6 +12,7 @@ community Recipes:
 
 - [Calendar](/lib/calendar)
 - [GitHub Commit Graph](/lib/github_commit_graph)
+- [Google Analytics](/lib/google_analytics)
 - [Hacker News](/lib/hacker_news)
 - [Lunch Money](/lib/lunch_money)
 - [Stock Price](/lib/stock_price)
