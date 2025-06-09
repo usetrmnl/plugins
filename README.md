@@ -61,6 +61,7 @@ native plugin structure:
 - [Transport for London (TfL) status messages](https://github.com/stevekennedyuk/trmnl-tfl-status) by [@stevekennedyuk](https://github.com/stevekennedyuk)
 - [Home Assistant - sensor data](https://github.com/gitstua/trmnl-plugin-dev/tree/main/home-assistant-trmnl#home-assistant-trmnl-plugin) by [@gitstua](https://github.com/gitstua)
 - [Home Assistant - TRMNL data](https://github.com/Beat2er/homeassistant-trmnl-battery) by [@Beat2er](https://github.com/Beat2er)
+- [Home Assistant - Weather Station](https://github.com/TilmanGriesel/ha_trmnl_weather_station) by [@TilmanGriesel](https://github.com/TilmanGriesel)
 - [Bring! Shopping List](https://github.com/yshrdbrn/trmnl-bring-plugin) by [@yshrdbrn](https://github.com/yshrdbrn)
 - [FLightBoard - airport activity](https://github.com/alexvarney/trmnl-flights) by [@alexvarney](https://github.com/alexvarney)
 - [Netatmo + Tomorrow.io Weather API](https://github.com/simonjodet/weather_api?tab=readme-ov-file#trmnl-template-example) by [@simonjodet](https://github.com/simonjodet)
