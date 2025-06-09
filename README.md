@@ -18,6 +18,7 @@ community Recipes:
 - [Stock Price](/lib/stock_price)
 - [Tempest Weather Station](/lib/tempest_weather_station)
 - [Weather (generic)](/lib/weather)
+- [Days Left Until](/lib/days_left_until)
 
 native plugin structure:
 

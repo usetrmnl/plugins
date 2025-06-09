@@ -1,0 +1,37 @@
+<div class="view view--half_vertical days-left-container">
+  <div class="layout layout--col gap--large">
+
+    <% if show_days_left || show_days_passed %>
+      <div class="list days-stats">
+        <% if show_days_left %>
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value value--xxxlarge" data-value-type="number"><%= days_left %></span>
+              <span class="label"><%= t('renders.days_left_year.days_left') %></span>
+            </div>
+          </div>
+        <% end %>
+
+        <% if show_days_passed %>
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value value--xlarge days_passed" data-value-type="number"><%= days_passed %></span>
+              <span class="label"><%= t('renders.days_left_year.days_passed') %></span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%= render 'plugins/days_left_until/progress_bar', percent_passed: percent_passed %>
+    <span class="days-message title text--center" style="display: none;"><%= message %></span>
+  </div>
+
+  <div class="title_bar">
+    <img class="image" src="<%= Rails.application.credentials.base_url %>/images/plugins/days_left_until--render.svg" />
+    <span class="title">Days Left Until...</span>
+    <span class="instance"><%= instance_name %></span>
+  </div>
+</div>
