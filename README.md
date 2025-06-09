@@ -79,5 +79,6 @@ native plugin structure:
 - [Canvas](https://github.com/JoshuaBrest/canvas-trmnl) by [@JoshuaBrest](https://github.com/JoshuaBrest)
 - [Anime of the Day](https://github.com/Saious119/trmnl-anime-of-the-day/) by [@Saious119](https://github.com/Saious119)
 - [BVG (Berlin) Public Transport](https://github.com/danmunoz/trmnl-bvg-transit) by [@Danmunoz](https://github.com/danmunoz)
+- [Bluesky](https://github.com/solimaniac/trmnl-bsky) by [@solimaniac](https://github.com/solimaniac)
 
 to be featured here, add `trmnl` topic to your repo, then open a PR or join the developer-only Discord server (link inside TRMNL UI).
