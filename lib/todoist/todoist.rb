@@ -1,6 +1,11 @@
 module Plugins
-  class TodoistV2 < Base
+  class Todoist < Base
+
     TASKS_URL = 'https://api.todoist.com/rest/v2/tasks'.freeze
+
+    def locals
+      { tasks: }
+    end
 
     # Extracted from Todoist Web App API Calls to `https://app.todoist.com/api/v9.223/sync`
     FILTER_DATE_OPTIONS_MAP = {
@@ -23,17 +28,13 @@ module Plugins
       no_deadline: 'no deadline'
     }.with_indifferent_access
 
-    def locals
-      { tasks: }
-    end
-
     class << self
       def redirect_url
         query = {
           response_type: 'code',
-          client_id: Rails.application.credentials.plugins[:todoist_v2][:client_id],
+          client_id: Rails.application.credentials.plugins[:todoist][:client_id],
           scope: 'data:read',
-          redirect_uri: "#{Rails.application.credentials.base_url}/plugin_settings/todoist_v2/redirect"
+          redirect_uri: "#{Rails.application.credentials.base_url}/plugin_settings/todoist/redirect"
         }.to_query
         "https://todoist.com/oauth/authorize?#{query}"
       end
@@ -41,9 +42,9 @@ module Plugins
       def fetch_access_token(code)
         body = {
           grant_type: "authorization_code",
-          client_id: Rails.application.credentials.plugins[:todoist_v2][:client_id],
-          client_secret: Rails.application.credentials.plugins[:todoist_v2][:client_secret],
-          redirect_uri: "#{Rails.application.credentials.base_url}/plugin_settings/todoist_v2/redirect",
+          client_id: Rails.application.credentials.plugins[:todoist][:client_id],
+          client_secret: Rails.application.credentials.plugins[:todoist][:client_secret],
+          redirect_uri: "#{Rails.application.credentials.base_url}/plugin_settings/todoist/redirect",
           code: code
         }
         response = HTTParty.post("https://todoist.com/oauth/access_token", body:)
@@ -67,18 +68,23 @@ module Plugins
 
     private
 
-    def access_token
-      settings.dig('todoist_v2', 'access_token')
+    def tasks
+      if filters_present?
+        response = fetch(TASKS_URL, query:, headers: Plugins::Todoist.headers(access_token))
+        tasks = response.parsed_response
+
+        tasks = tasks_sort(tasks)
+        tasks = tasks_group(tasks)
+
+        tasks_format(tasks)
+      else
+        tasks_legacy
+      end
     end
 
-    def tasks
-      response = fetch(TASKS_URL, query:, headers: Plugins::Todoist.headers(access_token))
-      tasks = response.parsed_response
-
-      tasks = tasks_sort(tasks)
-      tasks = tasks_group(tasks)
-
-      tasks_format(tasks)
+    # non-exhaustive list that helps determine if user has set up refactored version of this plugin (2025-06-10 onwards)
+    def filters_present?
+      settings['filter_date'].present? && settings['sort_grouping'].present? && settings['sort_direction'].present?
     end
 
     def query
@@ -88,7 +94,7 @@ module Plugins
               }
             else
               {
-                project_id: settings['todoist_v2_project_id'],
+                project_id: settings['todoist_project_id'],
                 filter: tasks_filter_project
               }
             end
@@ -97,8 +103,19 @@ module Plugins
       qry
     end
 
-    def today_view? = settings['todoist_v2_project_id'] == 'today'
-    def today = user.datetime_now.end_of_day
+    def tasks_legacy
+      fetch(TASKS_URL, query: query_legacy, headers: Plugins::Todoist.headers(access_token))
+        .sort_by { Date.parse(it.dig('due', 'date') || (Date.today + 100.days).to_s) }
+        .reject { today_view? ? (it.dig('due', 'date').blank? || Date.parse(it.dig('due', 'date')) > today) : false }
+        .map do |it|
+          {
+            content: it['content'],
+            due: it.dig('due', 'date').present? ? Date.parse(it.dig('due', 'date')).strftime("%d %b") : it.dig('due', 'string')
+          }
+        end
+    end
+
+    def query_legacy = today_view? ? {} : { project_id: settings['todoist_project_id'] }
 
     # @note The internal Todoist API wraps the "Today" view, so this is a best guess
     #   to match the behavior of the Todoist Web App.
@@ -322,5 +339,11 @@ module Plugins
         dateline_date: task.dig('deadline', 'date')
       }
     end
+
+    def access_token = settings.dig('todoist', 'access_token')
+
+    def today_view? = settings['todoist_project_id'] == 'today'
+
+    def today = user.datetime_now.end_of_day
   end
 end
