@@ -343,7 +343,7 @@ module Plugins
     def tasks_group_format_date(date)
       segments = [date.strftime('%b %d'), 'Today', date.strftime('%A')]
 
-      segments.delete_at(1) if date == today
+      segments.delete_at(1) if date != today
 
       segments.join(' ‧ ')
     end
