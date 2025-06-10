@@ -1,4 +1,4 @@
-- keyname: todoist_v2_project_id
+- keyname: todoist_project_id
   field_type: xhrSelect
   name: Todoist Project
   description: Select Todoist Project
