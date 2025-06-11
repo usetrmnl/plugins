@@ -1,6 +1,16 @@
 <%= render "plugins/calendars/common" %>
 
 <style media="screen">
+#calendar-full-month {
+  -webkit-font-smoothing: none !important;
+}
+
+#calendar-full-month, .fc {
+  --fc-event-bg-color: black;
+  --fc-event-border-color: black;
+  --fc-event-text-color: white;
+  --fc-today-bg-color: transparent;
+}
 /* wraps event titles on new line if necessary */
 .fc-daygrid-event {
   white-space: normal !important;
@@ -10,27 +20,40 @@
 .fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
   min-height: 1em;
 }
+
+/* puts event time + title on separate line breaks */
+.fc-event {
+  display: block;
+}
+
+/* makes event time heading more prominent */
+.fc-event-time {
+  text-decoration: underline;
+}
 </style>
 
-<div id="calendar" style="height: 480px; width: 800px"></div>
+<div id="calendar-full-month" style="height: 480px; width: 800px"></div>
 
 <script src='https://usetrmnl.com/fullcalendar/index.global.min.js'></script>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
+    var calendarEl = document.getElementById('calendar-full-month');
     var calendar = new FullCalendar.Calendar(calendarEl, {
-      now: '<%= today_in_tz %>',
-      timeZone: new Date('<%= events.values.flatten.reject { |e| e[:all_day] }.first&.dig(:start_full) %>').getTimezoneOffset(),
+      now: '<%= today_in_tz.to_date %>',
+      timeZone: new Date('<%= events.reject { |e| e[:all_day] }.first&.dig(:start_full) %>').getTimezoneOffset(),
       headerToolbar: false,
-      contentHeight: 'auto', // removes scrollbar that can appear in top right
-      initialView: 'dayGridMonth',
+      contentHeight: 'auto', // removes scrollbar that can appear in top right; if set to 800px, /plugins/:calendar preview will look better, but scrollbar will appear
+      initialView: '<%= event_layout == 'rolling_month' ? 'rollingMonth' : 'dayGridMonth' %>',
+      initialDate: new Date('<%= today_in_tz.to_date %>'),
       firstDay: <%= first_day %>,
-      eventTimeFormat: {
-        hour: 'numeric', // required for 0-24 number to appear at all
-        hour12: <%= time_format == 'am/pm' %> // if true: 1-12; if false: 0-23
+      views: {
+        rollingMonth: {
+          type: "dayGridMonth",
+          duration: { weeks: 4 }
+        }
       },
-      events: <%== events.values.flatten.map {|e| { allDay: e[:all_day], title: e[:summary], description: e[:description], start: e[:start_full], end: e[:end_full] } }.to_json %>,
+      events: <%== events.map {|e| { allDay: e[:all_day], title: e[:summary], description: e[:description], start: e[:start_full], end: e[:end_full] } }.to_json %>,
       displayEventTime: <%= include_event_time %>,
       locale: '<%= locale %>',
       schedulerLicenseKey: '<%= Rails.application.credentials.plugins.full_calendar.license_key %>'

@@ -2,6 +2,18 @@
 
 <%# week-only styling, will break month view so not inside common %>
 <style media="screen">
+  #calendar-full-week {
+    -webkit-font-smoothing: none !important;
+  }
+
+  #calendar-full-week,
+  .fc {
+    --fc-event-bg-color: black;
+    --fc-event-border-color: black;
+    --fc-event-text-color: white;
+    --fc-today-bg-color: transparent;
+  }
+
   tr[role="row"],
   table[role="presentation"],
   tbody[role="presentation"] {
@@ -31,21 +43,23 @@
   }
 </style>
 
-<div id="calendar" style="height: 480px; width: 800px"></div>
+<div id="calendar-full-week" style="height: 480px; width: 800px"></div>
 
 <script src='https://usetrmnl.com/fullcalendar/index.global.min.js'></script>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
+    var calendarEl = document.getElementById('calendar-full-week');
     var calendar = new FullCalendar.Calendar(calendarEl, {
-      now: '<%= today_in_tz %>',
-      timeZone: new Date('<%= events.values.flatten.reject { |e| e[:all_day] }.first&.dig(:start_full) %>').getTimezoneOffset(),
+      now: '<%= today_in_tz.to_date %>',
+      timeZone: new Date('<%= today_in_tz %>').getTimezoneOffset(),
       headerToolbar: false,
-      contentHeight: 'auto', // removes scrollbar that can appear in top right
+      contentHeight: '100%', // removes scrollbar that can appear in top right
       initialView: 'timeGridFourDay', // 'dayGridWeek' shows a week but does not show events as blocks with diff heights per time length
       scrollTime: '<%= scroll_time %>', // without this, view begins at 12am (creating white space)
       slotMinTime: '<%= scroll_time %>', // required in-addition to scrollTime, otherwise calendar lib will ignore scrollTime if events would be hidden
+      slotMaxTime: '<%= scroll_time_end %>', // works with expandRows (true) and contentHeight (100%) to show a full heigh grid with larger/smaller slots
+      expandRows: true, // makes each grid row taller in case slotMinTime/slotMaxTime are fewer than ~12 hours apart
       views: {
         timeGridFourDay: {
           type: 'timeGrid',
@@ -60,7 +74,7 @@
       },
       locale: '<%= locale %>',
       slotDuration: '00:30:00', // could potentially leverage this to show full 24h view (change slot duration to 1h)
-      events: <%== events.values.flatten.map {|e| { allDay: e[:all_day], title: e[:summary], description: e[:description], start: e[:start_full], end: e[:end_full] } }.to_json %>,
+      events: <%== events.map {|e| { allDay: e[:all_day], title: e[:summary], description: e[:description], start: e[:start_full], end: e[:end_full] } }.to_json %>,
       displayEventTime: false,
       schedulerLicenseKey: '<%= Rails.application.credentials.plugins.full_calendar.license_key %>'
     });

@@ -1,40 +1,45 @@
+<% zoom_mode ||= false %>
+
+<% days_to_show = event_layout == 'today_only' ? 1 : 3 %>
+<% max_event_reduction = zoom_mode ? 1 : 0 %>
+<% date_heading_size = zoom_mode ? 'large' : 'medium' %>
+<% heading_size = zoom_mode ? 'medium' : 'small' %>
+<% sub_heading_size = zoom_mode ? 'small' : 'xsmall' %>
+<% event_time_style = zoom_mode ? 'inverted' : 'underline' %>
+
 <div class="view view--full">
-  <div class="layout">
+    <div class="layout layout--col layout--top">
     <div class="columns">
-      <% events.sort_by { |k,_v| Date.parse(k.to_s) }.first(3).to_h.each do |day_of_events| %>
+      <% formulate_and_group_events_by_day(events, today_in_tz, days_to_show).to_h.each_pair do |day, events| %>
+        <% idx = 0 %>
         <div class="column">
           <div class="list">
-            <span class="label"><%= day_of_events[0] %></span>
-            <% max_event_count = include_description ? 4 : 7 %>
-            <% all_day_events = day_of_events[1].select { |e| e[:all_day] }[0..max_event_count] %>
-            <% regular_events = (day_of_events[1] - all_day_events)[0..(max_event_count-all_day_events.count)] %>
-            <% hidden_events_count = day_of_events[1].size - all_day_events.size - regular_events.size %>
-
-            <% all_day_events.each do |event| %>
-              <%= render partial: 'plugins/calendars/all_day_event', locals: { event: event, include_description: } %>
-            <% end %>
-
-            <% regular_events.each do |event| %>
-              <div class="item">
-                <div class="meta">
-                  <span class="index"></span>
-                </div>
-                <div class="content">
-                  <span class="title title--small"><%= event[:summary] %></span>
-                  <% if include_description %><span class="description"><%= event[:description] %></span><% end %>
-                  <div class="flex gap--xsmall">
-                    <span class="label label--small label--underline"><%= "#{event[:start]}" %> - <%= event[:end] %></span>
-                    <!-- hiding status, as we only fetch events where status == 'confirmed' -->
-                    <!-- <span class="label label--small label--underline"><%= event[:status] %></span> -->
+            <span class="label label--<%= date_heading_size %>"><%= day %></span>
+            <% max_event_count = include_description ? 6 : 8 %>
+            <% hidden_events_count = events[max_event_count..].to_a.count %>
+            <% events[0..max_event_count].each do |event| %>
+              <% if event[:all_day] %>
+                  <%= render partial: 'plugins/calendars/all_day_event', locals: { event: event, include_description:, heading_size: } %>
+              <% else %>
+                <div class="item">
+                  <div class="meta">
+                    <span class="index"><%= idx += 1 %></span>
+                  </div>
+                  <div class="content">
+                    <span class="title title--<%= heading_size %>"><%= event[:summary] %></span>
+                    <% if include_description %><span class="description"><%= event[:description].html_safe %></span><% end %>
+                    <div class="flex gap--<%= sub_heading_size %>">
+                      <span class="label label--<%= heading_size %> label--<%= event_time_style %>"><%= "#{event[:start]}" %> - <%= event[:end] %></span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              <% end %>
             <% end %>
-            <% if hidden_events_count > 0 %>
+            <% if hidden_events_count.positive? %>
               <div class="item">
                 <div class="meta"></div>
                 <div class="content">
-                  <span class="title title--small">And <%= hidden_events_count %> more</span>
+                  <span class="title title--<%= heading_size %>">And <%= hidden_events_count %> more</span>
                 </div>
               </div>
             <% end %>

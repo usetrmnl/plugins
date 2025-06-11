@@ -1,24 +1,25 @@
 # all ICS calendars look like this; they compile a hash of ~6 values and collections
 module Plugins
   class OutlookCalendar < Base
-    include Ics::Calendar
+    include Calendar::Ics
 
     def locals
-      { events:, event_layout:, include_description:, include_event_time:, first_day:, scroll_time:, time_format:, today_in_tz: }
+      { events:, event_layout:, include_description:, include_event_time:, first_day:, scroll_time:, scroll_time_end:, time_format:, today_in_tz: beginning_of_day, zoom_mode: }
     end
   end
 end
 
 # module below is included in all ICS calendars (ex: Apple, Outlook, Fastmail, Nextcloud, etc)
-module Ics
-  # rubocop:disable Metrics/ModuleLength
-  module Calendar
+module Calendar
+  module Ics
+    include Helper
+
     def events
       @prepare_events ||= prepare_events
     end
 
     def prepare_events
-      unique_events.sort_by { |e| e[:date_time] }.group_by { |e| e[:day] }
+      unique_events.sort_by { |e| e[:date_time] }
     rescue Plugins::Helpers::Errors::InvalidURL
       handle_erroring_state("ics_url is invalid")
       {}
@@ -62,7 +63,7 @@ module Ics
 
     # de-duplicates events where every param (except calname) matches -- helpful for family calendars where multiple entries otherwise exist for same event
     def unique_events
-      filtered_events.compact.uniq { |evt| evt.values_at(:summary, :description, :status, :date_time, :day, :all_day, :start_full, :end_full, :start, :end) }
+      filtered_events.compact.uniq { |evt| evt.values_at(:summary, :description, :status, :date_time, :all_day, :start_full, :end_full, :start, :end) }
     end
 
     def prepare_event(event)
@@ -72,7 +73,7 @@ module Ics
       # however all must be included as user may set event_layout==week, then create a mashup with event_layout==default
       layout_params = {
         start_full: event.dtstart&.in_time_zone(time_zone),
-        end_full: event.dtend&.in_time_zone(time_zone),
+        end_full: guaranteed_end_time(event),
         start: event.dtstart&.in_time_zone(time_zone)&.strftime(formatted_time),
         end: event.dtend&.in_time_zone(time_zone)&.strftime(formatted_time)
       }
@@ -82,7 +83,6 @@ module Ics
         description: sanitize_description(event.description),
         status: event.status.to_s,
         date_time: event.dtstart.in_time_zone(time_zone),
-        day: formatted_day(event),
         all_day: all_day_event?(event),
         calname: calname(event)
       }.merge(layout_params)
@@ -103,9 +103,21 @@ module Ics
       if event.dtstart.is_a?(Icalendar::Values::Date)
         event.dtstart = event.dtstart.in_time_zone(time_zone)
         event.dtend = (event.dtend || event.dtstart).in_time_zone(time_zone)
+        event.exdate.map! do |item|
+          if item.is_a?(Icalendar::Values::Helpers::Array)
+            item.map! { it.in_time_zone(time_zone) }
+          else
+            item.in_time_zone(time_zone)
+          end
+        end
       end
 
-      recurrences = event.occurrences_between(recurring_event_start_date, recurring_event_end_date)
+      begin
+        recurrences = event.occurrences_between(recurring_event_start_date, recurring_event_end_date)
+      rescue StandardError => e
+        recurrences = []
+        Rails.logger.error("[PluginSetting ID: #{plugin_settings.id}] #{e.message} (calname: #{calname(event)}, uid: #{event.uid})")
+      end
 
       recurrences.map do |recurrence|
         evt = event.dup
@@ -123,28 +135,34 @@ module Ics
 
     def recurring_event_start_date
       case event_layout
-      when 'default'
+      when 'default', 'today_only'
         today_in_tz.to_date
       when 'week'
         today_in_tz.to_date - 7.days
       when 'month'
         today_in_tz.to_date.beginning_of_month
+      when 'rolling_month'
+        today_in_tz.to_date.beginning_of_week # today could be wednesday, but 'first_day' could be monday, so need earlier events
       end
     end
 
     def recurring_event_end_date
       case event_layout
-      when 'default'
-        today_in_tz.to_date + 4.days
-      when 'week'
-        today_in_tz.to_date + 7.days
-      when 'month'
-        today_in_tz.to_date.end_of_month
+      when 'today_only'
+        today_in_tz.to_date + 2.days
+      when 'default', 'week', 'month', 'rolling_month'
+        time_max.to_date
       end
     end
 
-    def formatted_day(event)
-      event.dtstart.in_time_zone(time_zone).strftime('%A, %B %-d')
+    def guaranteed_end_time(event)
+      g_et = event.dtend&.in_time_zone(time_zone)
+      g_et = (event.dtstart&.in_time_zone(time_zone)&.+ 24.hours) if g_et.nil?
+      g_et
+    end
+
+    def single_day_event?(event)
+      guaranteed_end_time(event) - event.dtstart&.in_time_zone(time_zone) == 86400
     end
 
     def all_day_event?(event)
@@ -165,8 +183,9 @@ module Ics
       cals = []
       cal_urls.each do |url|
         response = HTTParty.get(url, headers:, verify: false) ## Not using fetch, as fetch has a timeout of 10s with 3 retries so 30s in total
+        next if response.body.nil?
 
-        cals << Icalendar::Calendar.parse(response&.body).first unless response.nil?
+        cals << Icalendar::Calendar.parse(response&.body&.gsub('Customized Time Zone', time_zone)).first
       end
 
       raise Plugins::Helpers::Errors::DataFetchError if cals.compact.empty?
@@ -176,28 +195,16 @@ module Ics
 
     def time_zone = user.tz || 'America/New_York'
 
-    def formatted_time
-      return "%-I:%M %p" if time_format == 'am/pm'
-
-      "%R"
-    end
-
-    def time_format
-      settings['time_format'] || 'am/pm'
-    end
-
     def event_should_be_ignored?(event)
       return false if event.instance_of?(Icalendar::Recurrence::Occurrence)
+      return true if empty?(event)
 
       includes_ignored_phrases?(event) || ignore_based_on_status?(event) || ignore_based_on_time?(event)
     end
 
-    def ignore_based_on_status?(event)
-      return false if event.status&.downcase == 'confirmed' # always include confirmed events
-
-      # include non-confirmed events if user prefers to see them (received requests for both options)
-      # if this branch is reached, event.status == [nil, 'rejected'] etc
-      settings['event_status_filter'] == 'confirmed_only'
+    # some events have ~all nil attributes (time, summary, description, etc)
+    def empty?(event)
+      event.dtstart.nil? && event.dtend.nil?
     end
 
     def includes_ignored_phrases?(event)
@@ -209,42 +216,13 @@ module Ics
 
     # consider changing this to use 'start' vs 'end'
     def ignore_based_on_time?(event)
-      end_time = event.dtend&.in_time_zone(time_zone)
-      return false if end_time.nil?
-
-      end_time < cutoff_time
-    end
-
-    # some users prefer to maintain 'state' and see already-passed events
-    # default is to ignore events already completed on this same day
-    def cutoff_time
-      settings['include_past_events'] == 'yes' ? time_min : now_in_tz
-    end
-
-    def ignored_phrases
-      return [] unless settings['ignore_phrases']
-
-      settings['ignore_phrases'].gsub("\n", "").gsub("\r", "").split(',').map(&:squish)
-    end
-
-    def event_layout
-      settings['event_layout']
-    end
-
-    def time_min
-      days_behind = case event_layout
-                    when 'month'
-                      30 # don't simply get remainder of month; FullCalendar 'previews' next month near the end
-                    else
-                      7
-                    end
-
-      (beginning_of_day - days_behind.days)
+      end_time = guaranteed_end_time(event)
+      end_time <= cutoff_time
     end
 
     def time_max
       days_ahead = case event_layout
-                   when 'month'
+                   when 'month', 'rolling_month'
                      30 # don't simply get remainder of month; FullCalendar 'previews' next month near the end
                    else
                      7
@@ -253,52 +231,10 @@ module Ics
       (now_in_tz.end_of_day + days_ahead.days)
     end
 
-    def now_in_tz
-      DateTime.now.in_time_zone(time_zone)
-    end
-
-    # required to ensure locals data has a 'diff' at least 1x per day
-    # given week/month view 'highlight' current day
-    # without this local, previous day will be highlighted if events dont change
-
-    def today_in_tz
-      now_in_tz.to_date.to_s
-    end
-
-    def beginning_of_day
-      now_in_tz.beginning_of_day
-    end
-
-    def include_description
-      return true unless settings['include_description'] # backward compatible default value
-
-      settings['include_description'] == 'yes'
-    end
-
-    def include_event_time
-      return false unless settings['include_event_time'] # backward compatible default value
-
-      settings['include_event_time'] == 'yes'
-    end
-
-    def first_day
-      Date.strptime(settings['first_day'], '%a').wday
-    end
-
     def headers
       return {} unless settings['headers']
 
       string_to_hash(settings['headers'])
     end
-
-    # ability to hard-code each day's first time slot in event_layout=week mode
-    # by default we lookup the earliest event within the period, but some users
-    # prefer to sacrifice morning visibility to see more throughout the day
-    def scroll_time
-      return settings['scroll_time'] if settings['scroll_time'].present?
-
-      events.values.flatten.reject { |e| e[:all_day] }.map { |e| e[:start_full].to_time.strftime("%H:00:00") }.min || '08:00:00'
-    end
   end
-  # rubocop:enable Metrics/ModuleLength
 end
