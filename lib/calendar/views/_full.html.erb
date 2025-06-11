@@ -1,6 +1,6 @@
 <% if event_layout == 'week' %>
   <%= render partial: 'plugins/calendars/full_week', locals: local_assigns %>
-<% elsif event_layout == 'month' %>
+<% elsif %w[month rolling_month].include?(event_layout) %>
   <%= render partial: 'plugins/calendars/full_month', locals: local_assigns %>
 <% else %>
   <%= render partial: 'plugins/calendars/full_auto', locals: local_assigns %>

@@ -1,16 +1,4 @@
 <style media="screen">
-  #calendar {
-    -webkit-font-smoothing: none !important;
-  }
-
-  #calendar,
-  .fc {
-    --fc-event-bg-color: black;
-    --fc-event-border-color: black;
-    --fc-event-text-color: white;
-    --fc-today-bg-color: transparent;
-  }
-
   .fc-v-event .fc-event-title {
     font-size: 16px;
     line-height: 12px;
@@ -158,5 +146,11 @@
   .fc .fc-timegrid-axis-cushion, .fc .fc-timegrid-slot-label-cushion {
     padding: 0px 0px;
     margin-right: 4px;
+  }
+
+  /* removes scrollbar, which can happen due to contentHeight: 100% */
+  /* some tips suggest using contentHeight: 'auto', but this disallows auto expanding rows */
+  .fc-scroller {
+   overflow-y: hidden !important;
   }
 </style>

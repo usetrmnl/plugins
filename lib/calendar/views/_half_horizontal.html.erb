@@ -1,33 +1,31 @@
+<% days_to_show = event_layout == 'today_only' ? 1 : 3 %>
+
 <div class="view view--half_horizontal">
   <div class="layout" style="justify-content: flex-start; padding-bottom: 0px">
     <div style="display: flex; height: 100%; width: 52%; flex-direction: column; flex-wrap: wrap; gap: var(--list-gap-small)">
-      <% events.sort_by { |k,_v| Date.parse(k.to_s) }.first(3).to_h.each do |day_of_events| %>
-        <% all_day_events = day_of_events[1].select { |e| e[:all_day] } %>
-        <% visible_events = (day_of_events[1] - all_day_events) %>
-
-        <span class="label"><%= day_of_events[0] %></span>
-
-        <% all_day_events.each do |event| %>
+      <% formulate_and_group_events_by_day(events, today_in_tz, days_to_show).to_h.each_pair do |day, events| %>
+        <% idx = 0 %>
+        <span class="label"><%= day %></span>
+        <% events.each do |event|  %>
+          <% if event[:all_day] %>
             <%= render partial: 'plugins/calendars/all_day_event', locals: { event: event, include_description: } %>
-          <% end %>
-
-        <% visible_events.each_with_index do |event, idx| %>
-          <div class="item">
-            <div class="meta">
-              <span class="index"><%= idx + 1 %></span>
-            </div>
-            <div class="content">
-              <span class="title title--small"><%= event[:summary] %></span>
-              <% if include_description %>
-                <span class="description"><%= event[:description] %></span>
-              <% end %>
-              <div class="flex gap--xsmall">
-                <span class="label label--small label--underline"><%= day_of_events[0] %></span>
-                <span class="label label--small label--underline"><%= "#{event[:start]}" %> - <%= event[:end] %></span>
-                <!-- <span class="label label--small label--underline"><%= event[:status] %></span> -->
+          <% else %>
+            <div class="item">
+              <div class="meta">
+                <span class="index"><%= idx += 1 %></span>
+              </div>
+              <div class="content">
+                <span class="title title--small"><%= event[:summary] %></span>
+                <% if include_description %>
+                  <span class="description"><%= event[:description] %></span>
+                <% end %>
+                <div class="flex gap--xsmall">
+                  <span class="label label--small label--underline"><%= day %></span>
+                  <span class="label label--small label--underline"><%= "#{event[:start]}" %> - <%= event[:end] %></span>
+                </div>
               </div>
             </div>
-          </div>
+          <% end %>
         <% end %>
       <% end %>
 

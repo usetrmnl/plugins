@@ -1,7 +1,9 @@
 module Plugins
   class GoogleCalendar < Base
+    include Calendar::Helper
+
     def locals
-      { events:, event_layout:, include_description:, include_event_time:, first_day:, scroll_time:, time_format:, today_in_tz: }
+      { events:, event_layout:, include_description:, include_event_time:, first_day:, scroll_time:, scroll_time_end:, time_format:, today_in_tz: beginning_of_day, zoom_mode: }
     end
 
     class << self
@@ -78,9 +80,9 @@ module Plugins
         end
 
         # de-duplicates events if every param (except calname) matches -- helpful for family calendars where multiple entries otherwise exist for same event
-        unique_events = all_events.compact.uniq { |evt| evt.values_at(:summary, :description, :status, :date_time, :day, :all_day, :start_full, :end_full, :start, :end) }
+        unique_events = all_events.compact.uniq { |evt| evt.values_at(:summary, :description, :status, :date_time, :all_day, :start_full, :end_full, :start, :end) }
 
-        unique_events.sort_by { |e| e[:date_time] }.group_by { |e| e[:day] } # G Cal doesn't allow native sorting
+        unique_events.sort_by { |e| e[:date_time] }
       rescue Google::Apis::AuthorizationError
         refresh!
         retry_count += 1
@@ -103,26 +105,21 @@ module Plugins
       event.summary ||= 'Busy'
       return if event_should_be_ignored?(event, calendar_email)
 
-      start_date = event.start.date_time || event.start.date
-
       # some params below are only needed for 1 or more event_layout options but not all
       # however all must be included as user may set event_layout==week, then create a mashup with event_layout==default
-      layout_params = {
-        start_full: event.start.date_time&.in_time_zone(time_zone) || event.start.date,
-        end_full: event.end.date_time&.in_time_zone(time_zone) || event.end.date,
-        start: event.start.date_time&.in_time_zone(time_zone)&.strftime(formatted_time) || event.start.date,
-        end: event.end.date_time&.in_time_zone(time_zone)&.strftime(formatted_time) || event.end.date
-      }
 
       {
         summary: event.summary,
         description: sanitize(event.description) || '',
         status: event.status,
-        date_time: start_date,
-        day: formatted_day(start_date),
-        all_day: (event.start.date_time || event.end.date_time).nil?,
-        calname: calname(event)
-      }.merge(layout_params)
+        date_time: start_date(event),
+        all_day: all_day?(event),
+        calname: calname(event),
+        start_full: safe_start_time(event),
+        end_full: safe_end_time(event),
+        start: safe_start_time(event, in_strftime: true),
+        end: safe_end_time(event, in_strftime: true)
+      }
     end
 
     def calendars
@@ -133,7 +130,36 @@ module Plugins
     # event object doesn't have a calendar/parent type attr like ICS event.parent
     # rather than pass calendar_email into prepare_event(), simply look up which attendee is 'me' (self)
     def calname(event)
+      # event&.creator&.email == event creator, but this could be many different people; not useful for grouping
       event&.attendees&.find(&:self)&.email
+    end
+
+    def all_day?(event)
+      (event.start.date_time || event.end.date_time).nil?
+    end
+
+    def safe_start_time(event, in_strftime: false)
+      st = event.start.date_time&.in_time_zone(time_zone)
+
+      if in_strftime
+        st&.strftime(formatted_time) || event.start.date
+      else
+        st || event.start.date
+      end
+    end
+
+    def safe_end_time(event, in_strftime: false)
+      et_raw = event.end.date_time&.in_time_zone(time_zone)
+
+      if in_strftime
+        et_raw&.strftime(formatted_time) || event.end.date
+      else
+        # all-day events (+ multi-day events) "end" at 00:00 on the following day,
+        # but should appear in calendar as ending at 11:59 on the previous day
+        # this is a known quirk of G Cal + Microsoft schemas; see core/pulls#1183 for details
+        # however, multi-day events need their original end date of +1 day for FullCalendar parser
+        et_raw || event.end.date
+      end
     end
 
     def client
@@ -145,22 +171,15 @@ module Plugins
 
     def time_zone = user.tz || 'America/New_York'
 
-    def formatted_time
-      return "%-I:%M %p" if time_format == 'am/pm'
-
-      "%R"
-    end
-
-    def formatted_day(start_date)
-      start_date.in_time_zone(time_zone).strftime('%A, %B %-d')
-    end
-
-    def time_format
-      settings['time_format'] || 'am/pm'
+    def start_date(event)
+      event.start.date_time || event.start.date
     end
 
     def event_should_be_ignored?(event, calendar_email)
-      includes_ignored_phrases?(event) || ignore_based_on_acceptance?(event, calendar_email) || ignore_based_on_time?(event) || ignore_based_on_status?(event)
+      includes_ignored_phrases?(event) ||
+        ignore_based_on_acceptance?(event, calendar_email) ||
+        ignore_based_on_time?(event) ||
+        ignore_based_on_status?(event)
     end
 
     # not possible to filter for *only* events accepted by user
@@ -171,16 +190,8 @@ module Plugins
     end
 
     def ignore_based_on_time?(event)
-      end_date = event.end.date_time || event.end.date
-      end_date.in_time_zone(time_zone) <= cutoff_time # <= handles events that were yesterday, but all-day, and thus end today at 00:00 (should be ignored)
-    end
-
-    def ignore_based_on_status?(event)
-      return false if event.status&.downcase == 'confirmed' # always include confirmed events
-
-      # include non-confirmed events if user prefers to see them (received requests for both options)
-      # if this branch is reached, event.status == [nil, 'rejected'] etc
-      settings['event_status_filter'] == 'confirmed_only'
+      end_date = safe_end_time(event)
+      end_date.in_time_zone(time_zone) < cutoff_time
     end
 
     def includes_ignored_phrases?(event)
@@ -193,30 +204,17 @@ module Plugins
       summary_includes || description_includes || summary_is || description_is
     end
 
-    def ignored_phrases
-      settings['ignore_phrases']&.gsub("\n", "")&.gsub("\r", "")&.split(',')&.map(&:squish) || []
-    end
+    def ignored_phrases_exact_match = line_separated_string_to_array(settings['ignore_phrases_exact_match'] || '')
 
-    def ignored_phrases_exact_match
-      line_separated_string_to_array(settings['ignore_phrases_exact_match'] || '')
-    end
-
-    def event_layout
-      settings['event_layout']
-    end
-
-    def cutoff_time
-      return beginning_of_day if event_layout == 'default'
-
-      settings['include_past_events'] == 'yes' ? time_min : beginning_of_day
-    end
-
+    # Google API response already includes multi-day all_day events even if queried for today.
+    # Example if event is between dates 01-05 and if we query for events between 03-10 (week), it'd still return the multi-day all_day event between 01-05
+    # So unlike ics calendar type it's not necessary to go back X days to get multi-day all day events.
     def time_min
-      days_behind = case event_layout
-                    when 'month'
-                      30 # don't simply get remainder of month; FullCalendar 'previews' next month near the end
-                    else
-                      7
+      days_behind = case [event_layout, include_past_event?]
+                    when ['month', true], ['rolling_month', true]
+                      30
+                    else # ['month', false], ['week', true], ['week', false], ['default', true], ['default', false], ['today_only', true], ['today_only', false]
+                      0
                     end
 
       (beginning_of_day - days_behind.days)
@@ -224,51 +222,13 @@ module Plugins
 
     def time_max
       days_ahead = case event_layout
-                   when 'month'
+                   when 'month', 'rolling_month'
                      30 # don't simply get remainder of month; FullCalendar 'previews' next month near the end
                    else
                      7
                    end
 
-      (now_in_tz + days_ahead.days).iso8601
-    end
-
-    def now_in_tz = user.datetime_now
-
-    # required to ensure locals data has a 'diff' at least 1x per day
-    # given week/month view 'highlight' current day
-    # without this local, previous day will be highlighted if events dont change
-    def today_in_tz
-      now_in_tz.to_date.to_s
-    end
-
-    def beginning_of_day
-      now_in_tz.beginning_of_day
-    end
-
-    def include_description
-      return true unless settings['include_description'] # backward compatible default value
-
-      settings['include_description'] == 'yes'
-    end
-
-    def include_event_time
-      return false unless settings['include_event_time'] # backward compatible default value
-
-      settings['include_event_time'] == 'yes'
-    end
-
-    def first_day
-      Date.strptime(settings['first_day'], '%a').wday
-    end
-
-    # ability to hard-code each day's first time slot in event_layout=week mode
-    # by default we lookup the earliest event within the period, but some users
-    # prefer to sacrifice morning visibility to see more throughout the day
-    def scroll_time
-      return settings['scroll_time'] if settings['scroll_time'].present?
-
-      events.values.flatten.reject { |e| e[:all_day] }.map { |e| e[:start_full].to_time.strftime("%H:00:00") }.min || '08:00:00'
+      (beginning_of_day + days_ahead.days).iso8601
     end
 
     def refresh!
