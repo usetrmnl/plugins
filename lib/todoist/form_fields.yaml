@@ -1,0 +1,88 @@
+- keyname: todoist_project_id
+  field_type: xhrSelect
+  name: Todoist Project
+  description: Select Todoist Project
+  encrypted: true
+- keyname: sort_grouping
+  name: Sort/Grouping
+  description: How to group tasks in the task list.
+  field_type: select
+  options:
+  - None
+  - Date
+  - Date Added
+  - Deadline
+  - Priority
+  - Label
+  default: none
+- keyname: sort_sorting
+  name: Sort/Sorting
+  description: How to sort tasks in the task list.
+  field_type: select
+  options:
+    - Manual
+    - Name
+    - Date
+    - Date Added
+    - Deadline
+    - Priority
+  default: date
+- keyname: sort_direction
+  name: Sort/Direction
+  description: The direction to sort tasks in the task list.
+  field_type: select
+  options:
+    - Ascending
+    - Descending
+  default: ascending
+- keyname: filter_completed_tasks
+  name: Completed Tasks
+  description: To show completed tasks in the task list.
+  field_type: select
+  options:
+  - Yes
+  - No
+  default: no
+- keyname: filter_date
+  name: Filter/Date
+  description: Filter tasks by date in the task list.
+  field_type: select
+  options:
+    - All          # nil
+    - Today        # `overdue | today`
+    - This Week    # `due before: next week`
+    - Next 7 Days  # `overdue | next 7 days`
+    - This month   # `due before: first day`
+    - Next 30 Days # `overdue | next 30 days`
+    - No date      # `no date`
+  default: all
+- keyname: filter_deadline
+  name: Filter/Deadline
+  description: Filter tasks by deadline in the task list.
+  field_type: select
+  options:
+    - All
+    - Today
+    - This Week
+    - Next 7 Days
+    - This month
+    - Next 30 Days
+    - No deadline
+  default: all
+- keyname: filter_priority
+  name: Filter/Priority
+  description: Filter tasks by priority in the task list.
+  field_type: select
+  options:
+    - Priority 1: p1
+    - Priority 2: p2
+    - Priority 3: p3
+    - Priority 4: p4
+  multiple: true
+  optional: true
+- keyname: todoist_filter_label_ids
+  name: Filter/Label
+  description: Filter tasks by labels.
+  field_type: xhrSelect
+  multiple: true
+  optional: true

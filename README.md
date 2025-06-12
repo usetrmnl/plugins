@@ -17,6 +17,7 @@ community Recipes:
 - [Lunch Money](/lib/lunch_money)
 - [Stock Price](/lib/stock_price)
 - [Tempest Weather Station](/lib/tempest_weather_station)
+- [Todoist](/lib/todoist)
 - [Weather (generic)](/lib/weather)
 - [Days Left Until](/lib/days_left_until)
 
@@ -41,7 +42,6 @@ native plugin structure:
 
 - [(USA) Top 10 College Football Rankings](/lib/usa_college_football_rankings.md) by [@SnarfulSolutionsGroup](https://github.com/SnarfulSolutionsGroup) & [@Sitnik](https://github.com/Sitnik)
 - [xkcd comics](https://github.com/SnarfulSolutionsGroup/TRMNL-Plugins/blob/main/TRMNL_Comic.md) by [@SnarfulSolutionsGroup](https://github.com/SnarfulSolutionsGroup)
-- [Todoist](https://github.com/Nynir/trmnl-todoist) by [@Nynir](https://github.com/Nynir)
 - [Surf reports](https://github.com/pcifaldi/surf_api) by [@pcifaldi](https://github.com/pcifaldi)
 - [On This Day (in history)](https://github.com/frethop/TRMNL-thisday) by [@frethop](https://github.com/frethop)
 - [Multi-column ICS calendar](https://github.com/jfsso/trmnl-calendar) by [@jfsso](https://github.com/jfsso)
