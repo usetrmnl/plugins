@@ -1,6 +1,7 @@
 module Plugins
   class Todoist < Base
 
+    LEGACY_TASKS_URL = 'https://api.todoist.com/rest/v2/tasks'.freeze
     TASKS_URL = 'https://api.todoist.com/api/v1/tasks/filter'.freeze
 
     def locals
@@ -71,7 +72,7 @@ module Plugins
     def tasks
       if filters_present?
         response = fetch(TASKS_URL, query:, headers: Plugins::Todoist.headers(access_token))
-        tasks = response.parsed_response
+        tasks = response.parsed_response['results']
 
         tasks = tasks_sort(tasks)
         tasks = tasks_group(tasks)
@@ -88,23 +89,19 @@ module Plugins
     end
 
     def query
-      qry = if today_view?
-              {
-                filter: filter_today
-              }
-            else
-              {
-                project_id: settings['todoist_project_id'],
-                filter: tasks_filter_project
-              }
-            end
-
-      qry.delete(:filter) if qry[:filter].blank? # if '' or nil, API response 'Invalid argument value'
-      qry
+      if today_view?
+        {
+          query: filter_today
+        }
+      else
+        {
+          query: "##{project_name},#{tasks_filter_project}"
+        }
+      end
     end
 
     def tasks_legacy
-      fetch(TASKS_URL, query: query_legacy, headers: Plugins::Todoist.headers(access_token))
+      fetch(LEGACY_TASKS_URL, query: query_legacy, headers: Plugins::Todoist.headers(access_token))
         .sort_by { Date.parse(it.dig('due', 'date') || (Date.today + 100.days).to_s) }
         .reject { today_view? ? (it.dig('due', 'date').blank? || Date.parse(it.dig('due', 'date')) > today) : false }
         .map do |it|
@@ -115,7 +112,19 @@ module Plugins
         end
     end
 
-    def query_legacy = today_view? ? {} : { project_id: settings['todoist_project_id'] }
+    def query_legacy = today_view? ? {} : { project_id: project_id }
+
+    def project_name
+      # don't store this permanently in case user changes name
+      # return settings['project_name'] if settings['project_name'].present?
+
+      projects = Plugins::Todoist.projects(access_token)
+      projects.find { |p| p.values.to_s.include? settings['todoist_project_id'].to_s }.keys.first
+    end
+
+    def project_id
+      settings['todoist_project_id']
+    end
 
     # @note The internal Todoist API wraps the "Today" view, so this is a best guess
     #   to match the behavior of the Todoist Web App.
@@ -342,7 +351,7 @@ module Plugins
 
     def access_token = settings.dig('todoist', 'access_token')
 
-    def today_view? = settings['todoist_project_id'] == 'today'
+    def today_view? = project_id == 'today'
 
     def today = user.datetime_now.end_of_day
   end
