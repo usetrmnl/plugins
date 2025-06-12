@@ -1,7 +1,7 @@
 module Plugins
   class Todoist < Base
 
-    TASKS_URL = 'https://api.todoist.com/rest/v2/tasks'.freeze
+    TASKS_URL = 'https://api.todoist.com/api/v1/tasks/filter'.freeze
 
     def locals
       { tasks: }
