@@ -61,7 +61,7 @@ module Plugins
       # @see https://developer.todoist.com/rest/v2/#get-all-personal-labels
       def labels(access_token)
         response = HTTParty.get('https://api.todoist.com/rest/v2/labels', headers: headers(access_token))
-        response.map { |m| { m['name'] => m['name'] } }
+        response.parsed_response&.map { |m| { m['name'] => m['name'] } }
       end
 
       def headers(access_token) = { "Authorization" => "Bearer #{access_token}" }
@@ -345,7 +345,8 @@ module Plugins
         description: task['description'],
         due_date: task.dig('due', 'date'),
         due_is_recurring: task.dig('due', 'is_recurring'),
-        dateline_date: task.dig('deadline', 'date')
+        dateline_date: task.dig('deadline', 'date'),
+        meta: task # for data mode / power users
       }
     end
 
