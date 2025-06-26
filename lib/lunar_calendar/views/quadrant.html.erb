@@ -1,0 +1,71 @@
+<div class="view view--quadrant">
+  <div class="layout layout--col gap--space-between">
+    <div class="grid grid--cols-2">
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--xsmall"><%= current_phase[:name] %></span>
+          <span class="label"><%= t('renders.lunar_calendar.current_phase') %></span>
+        </div>
+      </div>
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--xsmall"><%= next_phase[:name] %></span>
+          <span class="label"><%= t('renders.lunar_calendar.next_phase_short') %> (<%= next_phase[:date] %>)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="border--h-5 w--full"></div>
+
+    <% ordered_phase_sequence = phase_sequence.sort_by { |seq| seq[:date_full] } %>
+    <% current = ordered_phase_sequence.find { |phase| phase[:current] } %>
+    <div class="w--full">
+      <div class="grid grid--row grid--center">
+        <% ordered_phase_sequence.each do |phase| %>
+          <div class="flex flex--row flex--center <%= 'active' if phase[:current] %>">
+            <img class="moon-icon" src="<%= Rails.application.credentials.base_url %>/images/plugins/weather/<%= phase[:icon] %>.svg" />
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="border--h-5 w--full"></div>
+
+    <div class="grid grid--cols-2">
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--xsmall"><%= next_full_moon %></span>
+          <span class="label"><%= t('renders.lunar_calendar.next_full_moon') %></span>
+        </div>
+      </div>
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--xsmall"><%= next_new_moon %></span>
+          <span class="label"><%= t('renders.lunar_calendar.next_new_moon') %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <img class="image" src="<%= Rails.application.credentials.base_url %>/images/plugins/lunar_calendar--render.svg" />
+    <span class="title"><%= t('renders.lunar_calendar.title') %></span>
+    <span class="instance"><%= instance_name %></span>
+  </div>
+</div>
+
+<style>
+  .view--quadrant .moon-icon {
+    width: 35px;
+    height: 35px;
+  }
+
+  .view--quadrant .active .moon-icon {
+    width: 50px;
+    height: 50px;
+  }
+</style>

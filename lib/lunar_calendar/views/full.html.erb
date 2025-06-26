@@ -1,0 +1,105 @@
+<div class="view view--full">
+  <div class="layout layout--col gap--space-between">
+    <div class="grid">
+      <div class="item col--span-4">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value"><%= current_phase[:name] %></span>
+          <span class="label"><%= t('renders.lunar_calendar.current_phase') %></span>
+        </div>
+      </div>
+
+      <div class="item col--span-2">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--xsmall"><%= illumination %>%</span>
+          <span class="label"><%= t('renders.lunar_calendar.illumination') %></span>
+        </div>
+      </div>
+
+      <div class="item col--span-2">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--xsmall"><%= age %></span>
+          <span class="label"><%= t('renders.lunar_calendar.age') %></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="w--full b-h-gray-5"></div>
+
+    <% ordered_phase_sequence = phase_sequence.sort_by { |seq| seq[:date_full] } %>
+
+    <div class="flex flex--col w--full gap--large">
+      <div class="grid grid--row grid--top">
+        <% ordered_phase_sequence.each do |phase| %>
+          <div class="flex flex--row flex--center">
+            <span class="label label--small <%= 'label--inverted' if phase[:current] %>"><%= phase[:date] %></span>
+          </div>
+        <% end %>
+      </div>
+      <div class="grid grid--row grid--center">
+        <% ordered_phase_sequence.each do |phase| %>
+          <div class="flex flex--row flex--center <%= 'active' if phase[:current] %>">
+            <img class="moon-icon" src="<%= Rails.application.credentials.base_url %>/images/plugins/weather/<%= phase[:icon] %>.svg" />
+          </div>
+        <% end %>
+      </div>
+      <div class="grid grid--row grid--top">
+        <% ordered_phase_sequence.each do |phase| %>
+          <div class="flex flex--row flex--center">
+            <span class="label label--small truncate-none <%= 'label--inverted' if phase[:current] %>">
+              <%= phase[:name] %>
+            </span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="w--full b-h-gray-5"></div>
+
+    <div class="grid">
+      <div class="item col--span-4">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--xsmall"><%= next_phase[:name] %></span>
+          <span class="label"><%= t('renders.lunar_calendar.next_phase') %> (<%= next_phase[:date] %>)</span>
+        </div>
+      </div>
+
+      <div class="item col--span-2">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--xsmall"><%= next_full_moon %></span>
+          <span class="label"><%= t('renders.lunar_calendar.next_full_moon') %></span>
+        </div>
+      </div>
+
+      <div class="item col--span-2">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--xsmall"><%= next_new_moon %></span>
+          <span class="label"><%= t('renders.lunar_calendar.next_new_moon') %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <img class="image" src="<%= Rails.application.credentials.base_url %>/images/plugins/lunar_calendar--render.svg" />
+    <span class="title"><%= t('renders.lunar_calendar.title') %></span>
+    <span class="instance"><%= instance_name %></span>
+  </div>
+</div>
+
+<style>
+  .view--full .moon-icon {
+    width: 90px;
+    height: 90px;
+  }
+
+  .view--full .active .moon-icon {
+    width: 110px;
+    height: 110px;
+  }
+</style>

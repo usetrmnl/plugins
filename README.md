@@ -11,15 +11,16 @@ community Recipes:
 ## Native plugin examples
 
 - [Calendar](/lib/calendar)
+- [Days Left Until](/lib/days_left_until)
 - [GitHub Commit Graph](/lib/github_commit_graph)
 - [Google Analytics](/lib/google_analytics)
 - [Hacker News](/lib/hacker_news)
+- [Lunar Calendar](/lib/lunar_calendar)
 - [Lunch Money](/lib/lunch_money)
 - [Stock Price](/lib/stock_price)
 - [Tempest Weather Station](/lib/tempest_weather_station)
 - [Todoist](/lib/todoist)
 - [Weather (generic)](/lib/weather)
-- [Days Left Until](/lib/days_left_until)
 
 native plugin structure:
 
