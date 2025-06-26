@@ -74,6 +74,8 @@ module Plugins
         response = fetch(TASKS_URL, query:, headers: Plugins::Todoist.headers(access_token))
         tasks = response.parsed_response['results']
 
+        return tasks if tasks.empty?
+
         tasks = tasks_sort(tasks)
         tasks = tasks_group(tasks)
 
@@ -209,8 +211,10 @@ module Plugins
     end
 
     def sort_by_date(tasks)
+      date_infinity = tasks.map { it.dig('due', 'date') && Date.parse(it['due']['date']) }.compact.max + 1
+
       tasks.sort_by do |task|
-        task.dig('due', 'date') ? Date.parse(task.dig('due', 'date')) : Date::Infinity.new
+        task.dig('due', 'date') ? Date.parse(task.dig('due', 'date')) : date_infinity
       end
     end
 
