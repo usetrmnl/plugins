@@ -12,6 +12,8 @@ module Plugins
       { name: "Waning Crescent", keyname: 'waning_crescent', icon: "wi-moon-alt-waning-crescent-3", age_range: 23..29.53, phase_order: 8 }
     ].freeze
 
+    LUNAR_MONTH_DAYS = 29.53058867.freeze
+
     def locals
       { phase_sequence:, current_phase:, next_phase:, illumination:, age:, next_full_moon:, next_new_moon: }
     end
@@ -24,14 +26,14 @@ module Plugins
       current_age = age
       current_date = today
 
-      sequence = MOON_PHASES.map do |phase|
+      sequence = localized_moon_phases.map do |phase|
         days_to_phase = calculate_days_to_phase(current_age, phase[:age_range].begin)
         target_date = current_date + days_to_phase
         {
-          name: phase_name(phase),
+          name: phase[:name],
           icon: phase[:icon],
           current: phase == current_phase,
-          date: l(target_date, format: "%b %d", locale:),
+          date: l(target_date, format: :short, locale:),
           date_full: target_date
         }
       end
@@ -45,15 +47,9 @@ module Plugins
       sorted[start_idx..end_idx]
     end
 
-    def phase_name(phase)
-      t("renders.lunar_calendar.moon_phases.#{phase[:keyname]}", locale:)
-    end
-
     def calculate_days_to_phase(current_age, target_age)
-      lunar_month = 29.53058867
-
-      forward_days = (target_age - current_age) % lunar_month
-      backward_days = (current_age - target_age) % lunar_month
+      forward_days = (target_age - current_age) % LUNAR_MONTH_DAYS
+      backward_days = (current_age - target_age) % LUNAR_MONTH_DAYS
 
       if forward_days < backward_days
         forward_days.round
@@ -63,8 +59,8 @@ module Plugins
     end
 
     def sequenced_phases
-      looped_phases = MOON_PHASES * 3
-      starting_idx = current_phase[:phase_order] - 1 + MOON_PHASES.count
+      looped_phases = localized_moon_phases * 3
+      starting_idx = current_phase[:phase_order] - 1 + localized_moon_phases.count
       looped_phases[starting_idx - 3..starting_idx + 3]
     end
 
@@ -80,16 +76,16 @@ module Plugins
     end
 
     def current_phase
-      MOON_PHASES.find { |phase| phase[:age_range].include?(age) }
+      localized_moon_phases.find { |phase| phase[:age_range].include?(age) }
     end
 
     def next_phase
-      next_phase_order = (current_phase[:phase_order] % MOON_PHASES.size) + 1
-      next_phase_data = MOON_PHASES.find { |phase| phase[:phase_order] == next_phase_order }
+      next_phase_order = (current_phase[:phase_order] % localized_moon_phases.size) + 1
+      next_phase_data = localized_moon_phases.find { |phase| phase[:phase_order] == next_phase_order }
       next_phase_date = find_next_phase_date(next_phase_data[:age_range].begin)
       {
         name: next_phase_data[:name],
-        date: l(next_phase_date, format: "%b %d", locale:)
+        date: l(next_phase_date, format: :short, locale:)
       }
     end
 
@@ -103,21 +99,25 @@ module Plugins
 
     def next_full_moon
       phase_date = find_next_phase_date(15)
-      l(phase_date, format: "%b %d", locale:)
+      l(phase_date, format: :short, locale:)
     end
 
     def next_new_moon
       phase_date = find_next_phase_date(0)
-      l(phase_date, format: "%b %d", locale:)
+      l(phase_date, format: :short, locale:)
     end
 
     def moon_age(date)
-      # Known new moon date
       known_new_moon = Date.new(2000, 1, 6)
       days_since = (date - known_new_moon).to_i
-      lunar_month = 29.53058867
+      ((days_since % LUNAR_MONTH_DAYS) + LUNAR_MONTH_DAYS) % LUNAR_MONTH_DAYS
+    end
 
-      ((days_since % lunar_month) + lunar_month) % lunar_month
+    def localized_moon_phases
+      MOON_PHASES.map do |phase|
+        phase[:name] = t("renders.lunar_calendar.moon_phases.#{phase[:keyname]}", locale:)
+        phase
+      end
     end
 
     def today
