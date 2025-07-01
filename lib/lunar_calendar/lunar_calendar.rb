@@ -115,8 +115,9 @@ module Plugins
 
     def localized_moon_phases
       MOON_PHASES.map do |phase|
-        phase[:name] = t("renders.lunar_calendar.moon_phases.#{phase[:keyname]}", locale:)
-        phase
+        phase.dup.tap do |localized_phase|
+          localized_phase[:name] = t("renders.lunar_calendar.moon_phases.#{phase[:keyname]}", locale:)
+        end
       end
     end
 
