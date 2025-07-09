@@ -1,0 +1,134 @@
+<% unless (metrics[:errors].present?) %>
+  <div class="view view--quadrant">
+    <div class="layout layout--col gap--space-between">
+      <div class="grid grid--cols-2 gap--[9px]" data-adjust-grid-gaps="false">
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value value--tnums" data-value-type="number"><%= number_to_currency(metrics[:order_sales], unit: currency, precision: 0) %></span>
+            <span class="label">Total Sales</span>
+          </div>
+        </div>
+        <div class="item">
+          <% formatted_data = histogram.map { |key, period| { name: key.capitalize, data: period.map { [it[:date], it[:value]] }}} %>
+          <% chart_id = "chart-#{SecureRandom.hex(6)}" %>
+
+          <div id="<%= chart_id %>" class="w--full"></div>
+
+          <%= render 'plugins/chart_js', libs: [:highcharts, :highcharts_more, :highcharts_pattern_fill] %>
+
+          <script type="text/javascript">
+            document.addEventListener("DOMContentLoaded", () => {
+
+              var data = <%= raw formatted_data.to_json %>;
+
+              Highcharts.chart('<%= chart_id %>', {
+                chart: {
+                  type: 'spline',
+                  height: 60,
+                  width: null,
+                  animation: false,
+                  spacing: [0, 0, 0, 0]
+                },
+                title: {
+                  text: null
+                },
+                plotOptions: {
+                  series: {
+                    animation: false,
+                    enableMouseTracking: false,
+                    states: {
+                      hover: { enabled: false }
+                    },
+                    marker: {
+                      enabled: false
+                    }
+                  }
+                },
+                series: [{
+                  data: data[0].data,
+                  lineWidth: 4,
+                  color: '#000000',
+                  name: data[0].name,
+                  zIndex: 2
+                }, {
+                  data: data[1].data,
+                  lineWidth: 5,
+                  name: data[1].name,
+                  zIndex: 1,
+                  color: {
+                    pattern: {
+                      image: 'https://usetrmnl.com/images/grayscale/gray-5.png',
+                      width: 12,
+                      height: 12
+                    }
+                  }
+                }],
+                tooltip: { enabled: false },
+                legend: { enabled: false },
+                yAxis: { visible: false },
+                xAxis: { visible: false },
+                credits: {
+                  enabled: false
+                }
+              });
+            });
+          </script>
+        </div>
+      </div>
+      <div class="w-full b-h-gray-5"></div>
+      <div class="grid grid--cols-2">
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value value--xsmall value--tnums" data-value-type="number"><%= number_with_delimiter(metrics[:open_order_count]) %></span>
+            <span class="label">Pending Orders</span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value value--xsmall value--tnums" data-value-type="number"><%= number_with_delimiter(metrics[:closed_order_count]) %></span>
+            <span class="label">Fulfilled Orders</span>
+          </div>
+        </div>
+      </div>
+      <div class="w-full b-h-gray-5"></div>
+      <div class="grid grid grid--cols-2">
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value value--xxsmall value--tnums" data-value-type="date">
+              <div class="w--12 h--1.5 mb--2 bg--gray-5"></div>
+              <%= DateTime.parse(comparison_period.first).strftime("%b %d") %> -
+              <%= DateTime.parse(comparison_period.last).strftime("%b %d") %>
+            </span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value value--xxsmall value--tnums" data-value-type="date">
+              <div class="w--12 h--1.5 mb--2 bg--black" style="border-radius: 20px;"></div>
+                <%= DateTime.parse(histogram[:current].first[:date]).strftime("%b %d") %> -
+                <%= DateTime.parse(histogram[:current].last[:date]).strftime("%b %d") %>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="title_bar">
+      <img class="image" src="<%= Rails.application.credentials.base_url %>/images/plugins/shopify--render.svg" />
+      <span class="title">Shopify</span>
+      <span class="instance"><%= instance_name %></span>
+    </div>
+  </div>
+<% else %>
+  <%= render partial: 'plugins/errors/quadrant', locals: {
+    icon: 'shopify--render.svg',
+    title: 'Shopify',
+    instance: instance_name,
+    error_message: metrics[:errors]
+  } %>
+<% end %>
