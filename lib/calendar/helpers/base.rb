@@ -1,15 +1,18 @@
 module Calendar
   module Helper
+    # rubocop:disable Lint/DuplicateBranch
     def cutoff_time
       case [event_layout, include_past_event?]
-      when ['default', true], ['today_only', true], ['week', true], ['week', false], ['month', false], ['rolling_month', false]
+      when ['default', true], ['today_only', true], ['week', false], ['month', false], ['rolling_month', false]
         beginning_of_day
       when ['default', false], ['today_only', false] # this is useful for busy calendar to remove event that have elapsed.
         now_in_tz
-      when ['month', true], ['rolling_month', true]
+      when ['week', true], ['month', true], ['rolling_month', true]
         time_min
+      else beginning_of_day
       end
     end
+    # rubocop:enable Lint/DuplicateBranch
 
     def event_layout = settings['event_layout']
 
@@ -36,6 +39,8 @@ module Calendar
     end
 
     def first_day = Date.strptime(settings['first_day'], '%a').wday
+
+    def fixed_week = settings['fixed_week'] == 'yes'
 
     def ignore_based_on_status?(event)
       if event.instance_of?(Icalendar::Event)
@@ -75,6 +80,15 @@ module Calendar
       "%R"
     end
 
+    def date_format
+      return '%A, %B %-d' unless settings['date_format'].present? # => Monday, June 16
+
+      # special i18n key that must be symbolized to be accepted as an arg to l(.. format:)
+      return :short if settings['date_format'] == 'short'
+
+      settings['date_format']
+    end
+
     # ability to hard-code each day's first time slot in event_layout=week mode
     # by default we lookup the earliest event within the period, but some users
     # prefer to sacrifice morning visibility to see more throughout the day
@@ -92,6 +106,17 @@ module Calendar
 
     def zoom_mode
       settings['zoom_mode'] == 'yes'
+    end
+
+    # Override the no_screen_padding? method from Formatter to handle calendar-specific logic
+    def no_screen_padding?
+      # Check if event_layout requires no padding
+      if %w[week month rolling_month].include?(event_layout)
+        return true
+      end
+
+      # Fall back to default behavior from Formatter
+      super
     end
   end
 end

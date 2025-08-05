@@ -3,7 +3,7 @@ module Plugins
     include Calendar::Helper
 
     def locals
-      { events:, event_layout:, include_description:, include_event_time:, first_day:, scroll_time:, scroll_time_end:, time_format:, today_in_tz: beginning_of_day, zoom_mode: }
+      { events:, event_layout:, include_description:, include_event_time:, first_day:, fixed_week:, scroll_time:, scroll_time_end:, time_format:, date_format:, today_in_tz: beginning_of_day, zoom_mode: }
     end
 
     class << self
@@ -68,7 +68,7 @@ module Plugins
         calendars.each do |calendar_email|
           # TODO: investigate, maybe Google Cal does support ordering by start Time? mixed reports:
           # https://github.com/googleapis/google-api-ruby-client/blob/main/samples/cli/lib/samples/calendar.rb#L65
-          events = service.list_events(calendar_email, single_events: true, time_min: time_min.iso8601, time_max: time_max).items
+          events = events_for_calendar(service, calendar_email)
           events.each do |event|
             all_events << prepare_event(event, calendar_email)
           end
@@ -114,7 +114,7 @@ module Plugins
         status: event.status,
         date_time: start_date(event),
         all_day: all_day?(event),
-        calname: calname(event),
+        calname: calendar_email,
         start_full: safe_start_time(event),
         end_full: safe_end_time(event),
         start: safe_start_time(event, in_strftime: true),
@@ -125,13 +125,6 @@ module Plugins
     def calendars
       # 'flatten()' ensures back/forward compatibility btwn single vs multi-select dropdown
       [settings['calendar']].flatten.uniq
-    end
-
-    # event object doesn't have a calendar/parent type attr like ICS event.parent
-    # rather than pass calendar_email into prepare_event(), simply look up which attendee is 'me' (self)
-    def calname(event)
-      # event&.creator&.email == event creator, but this could be many different people; not useful for grouping
-      event&.attendees&.find(&:self)&.email
     end
 
     def all_day?(event)
@@ -186,7 +179,7 @@ module Plugins
     # also, generated events don't have attendees (B-day, recurring / self-assigned)
     def ignore_based_on_acceptance?(event, calendar_email)
       attendees = event.attendees || [Struct.new(:response_status, :email).new('accepted', calendar_email)]
-      !attendees.find { |a| a.email == calendar_email }&.response_status == 'accepted'
+      attendees.find { |a| a.email == calendar_email }&.response_status == 'declined'
     end
 
     def ignore_based_on_time?(event)
@@ -213,6 +206,8 @@ module Plugins
       days_behind = case [event_layout, include_past_event?]
                     when ['month', true], ['rolling_month', true]
                       30
+                    when ['week', true]
+                      7
                     else # ['month', false], ['week', true], ['week', false], ['default', true], ['default', false], ['today_only', true], ['today_only', false]
                       0
                     end
@@ -220,15 +215,27 @@ module Plugins
       (beginning_of_day - days_behind.days)
     end
 
-    def time_max
+    def time_max(extend: false)
       days_ahead = case event_layout
                    when 'month', 'rolling_month'
                      30 # don't simply get remainder of month; FullCalendar 'previews' next month near the end
+                   when 'schedule'
+                     14
                    else
                      7
                    end
 
+      # helps prevent blank screen if calendar is mostly empty
+      days_ahead += 7 if extend && event_layout == 'schedule'
       (beginning_of_day + days_ahead.days).iso8601
+    end
+
+    def events_for_calendar(service, calendar_email)
+      evts = service.list_events(calendar_email, single_events: true, time_min: time_min.iso8601, time_max: time_max).items
+      return evts if evts.present?
+
+      # IDEA: refactor time_max(extend) to a while() that adds a few more days until events present, with a max cutoff
+      service.list_events(calendar_email, single_events: true, time_min: time_min.iso8601, time_max: time_max(extend: true)).items
     end
 
     def refresh!

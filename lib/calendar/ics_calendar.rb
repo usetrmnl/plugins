@@ -10,9 +10,15 @@ module Plugins
 end
 
 # module below is included in all ICS calendars (ex: Apple, Outlook, Fastmail, Nextcloud, etc)
+require_relative 'ics_rrule_helper'
+require_relative 'ics_event_helper'
+
 module Calendar
   module Ics
     include Helper
+    include IcsRruleHelper
+    include IcsEventHelper
+    include TimezoneHelper
 
     def events
       @prepare_events ||= prepare_events
@@ -33,13 +39,19 @@ module Calendar
 
     def all_events
       @all_events ||= begin
+        recurring_overrides = fetch_recurring_overrides
         all_evts = []
+
         calendars.each do |cal|
           cal.events.each do |event|
             next unless event
+            next if event.respond_to?(:recurrence_id) && event.recurrence_id
 
             if event.rrule.present?
-              occurences(event).each { |recurring_event| all_evts << prepare_event(recurring_event) }
+              occurrences(event).each do |recurring_event|
+                key = "#{event.uid}-#{recurring_event.dtstart.in_time_zone(time_zone)}"
+                all_evts << prepare_event(recurring_overrides[key] || recurring_event)
+              end
             else
               # process regular upcoming events
               all_evts << prepare_event(event)
@@ -49,6 +61,20 @@ module Calendar
 
         all_evts
       end
+    end
+
+    def fetch_recurring_overrides
+      overrides = {}
+      calendars.each do |cal|
+        cal.events.each do |event|
+          next unless event
+
+          if event.respond_to?(:recurrence_id) && event.recurrence_id
+            overrides["#{event.uid}-#{event.recurrence_id.in_time_zone(time_zone)}"] = event
+          end
+        end
+      end
+      overrides
     end
 
     def filtered_events
@@ -88,54 +114,9 @@ module Calendar
       }.merge(layout_params)
     end
 
-    def sanitize_description(description)
-      description = description.join(', ') if description.is_a?(Icalendar::Values::Helpers::Array)
-      return '' if description.nil?
-
-      Rails::Html::FullSanitizer.new.sanitize(description.strip.split("\n").first&.strip || '')
-    end
-
-    def calname(event)
-      event.parent.custom_properties.dig('x_wr_calname', 0)
-    end
-
-    def occurences(event)
-      if event.dtstart.is_a?(Icalendar::Values::Date)
-        event.dtstart = event.dtstart.in_time_zone(time_zone)
-        event.dtend = (event.dtend || event.dtstart).in_time_zone(time_zone)
-        event.exdate.map! do |item|
-          if item.is_a?(Icalendar::Values::Helpers::Array)
-            item.map! { it.in_time_zone(time_zone) }
-          else
-            item.in_time_zone(time_zone)
-          end
-        end
-      end
-
-      begin
-        recurrences = event.occurrences_between(recurring_event_start_date, recurring_event_end_date)
-      rescue StandardError => e
-        recurrences = []
-        Rails.logger.error("[PluginSetting ID: #{plugin_settings.id}] #{e.message} (calname: #{calname(event)}, uid: #{event.uid})")
-      end
-
-      recurrences.map do |recurrence|
-        evt = event.dup
-        evt.dtstart = recurrence.start_time.in_time_zone(time_zone).change(
-          hour: event.dtstart.in_time_zone(time_zone).hour,
-          min: event.dtstart.in_time_zone(time_zone).min
-        )
-        evt.dtend = recurrence.end_time.in_time_zone(time_zone).change(
-          hour: event.dtend.in_time_zone(time_zone).hour,
-          min: event.dtend.in_time_zone(time_zone).min
-        )
-        evt
-      end
-    end
-
     def recurring_event_start_date
       case event_layout
-      when 'default', 'today_only'
+      when 'default', 'today_only', 'schedule'
         today_in_tz.to_date
       when 'week'
         today_in_tz.to_date - 7.days
@@ -150,80 +131,37 @@ module Calendar
       case event_layout
       when 'today_only'
         today_in_tz.to_date + 2.days
-      when 'default', 'week', 'month', 'rolling_month'
+      when 'default', 'week', 'month', 'rolling_month', 'schedule'
         time_max.to_date
       end
     end
 
-    def guaranteed_end_time(event)
-      g_et = event.dtend&.in_time_zone(time_zone)
-      g_et = (event.dtstart&.in_time_zone(time_zone)&.+ 24.hours) if g_et.nil?
-      g_et
-    end
-
-    def single_day_event?(event)
-      guaranteed_end_time(event) - event.dtstart&.in_time_zone(time_zone) == 86400
-    end
-
-    def all_day_event?(event)
-      return true if event.dtstart.to_datetime.hour.zero? && event.dtstart.to_datetime.min.zero?
-      return true if event.dtstart.instance_of?(Icalendar::Values::Date)
-
-      if event.rrule.present? && event.dtend
-        # 24+ hours long, ex: 00:00 - 00:00 (next day)
-        return (event.dtend.to_date - event.dtstart.to_date).to_i >= 1
-      end
-
-      false
-    end
-
     def calendars
-      cal_urls = line_separated_string_to_array(settings['ics_url']).map { it.gsub('webcal', 'https') }
+      @calendars ||= begin
+        cal_urls = line_separated_string_to_array(settings['ics_url']).map { it.gsub('webcal', 'https') }
+        cals = []
+        cal_urls.each do |url|
+          response = fetch(url, headers:, timeout: 30, should_retry: false)
+          next if response == nil # rubocop:disable Style/NilComparison
+          next if response.body.nil? || response.body.empty?
 
-      cals = []
-      cal_urls.each do |url|
-        response = HTTParty.get(url, headers:, verify: false) ## Not using fetch, as fetch has a timeout of 10s with 3 retries so 30s in total
-        next if response.body.nil?
+          cals << Icalendar::Calendar.parse(response&.body&.gsub('Customized Time Zone', time_zone)).first
+        end
 
-        cals << Icalendar::Calendar.parse(response&.body&.gsub('Customized Time Zone', time_zone)).first
+        raise Plugins::Helpers::Errors::DataFetchError if cals.compact.empty?
+
+        cals.uniq.compact
       end
-
-      raise Plugins::Helpers::Errors::DataFetchError if cals.compact.empty?
-
-      cals.uniq.compact
     end
 
     def time_zone = user.tz || 'America/New_York'
-
-    def event_should_be_ignored?(event)
-      return false if event.instance_of?(Icalendar::Recurrence::Occurrence)
-      return true if empty?(event)
-
-      includes_ignored_phrases?(event) || ignore_based_on_status?(event) || ignore_based_on_time?(event)
-    end
-
-    # some events have ~all nil attributes (time, summary, description, etc)
-    def empty?(event)
-      event.dtstart.nil? && event.dtend.nil?
-    end
-
-    def includes_ignored_phrases?(event)
-      summary_includes = ignored_phrases.any? { |phrase| (event.summary || '').include?(phrase) }
-      description_includes = ignored_phrases.any? { |phrase| (event.description || '').include?(phrase) }
-
-      summary_includes || description_includes
-    end
-
-    # consider changing this to use 'start' vs 'end'
-    def ignore_based_on_time?(event)
-      end_time = guaranteed_end_time(event)
-      end_time <= cutoff_time
-    end
 
     def time_max
       days_ahead = case event_layout
                    when 'month', 'rolling_month'
                      30 # don't simply get remainder of month; FullCalendar 'previews' next month near the end
+                   when 'schedule'
+                     14
                    else
                      7
                    end
