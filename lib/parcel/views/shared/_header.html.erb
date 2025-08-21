@@ -1,0 +1,42 @@
+<% compact ||= false %>
+<% value_size ||= '' %>
+
+<div class="flex w-full">
+  <div class="item">
+    <div class="meta"></div>
+    <div class="content">
+      <% if compact %>
+        <span class="label">
+          <%= deliveries.count %>
+          <%= t("renders.parcel.filter_modes.#{filter_mode.downcase}", count: deliveries.count, locale:) %>
+        </span>
+      <% else %>
+        <span class="value value--<%= value_size %>">
+          <%= deliveries.count %>
+        </span>
+        <span class="label">
+          <%= t("renders.parcel.filter_modes.#{filter_mode.downcase}", count: deliveries.count, locale:) %>
+        </span>
+      <% end %>
+    </div>
+  </div>
+  
+  <div class="item">
+    <div class="meta"></div>
+    <div class="content">
+      <% if compact %>
+        <span class="label">
+          <%= deliveries.count { it[:status_key] == 'out_for_delivery' } %>
+          <%= t('renders.parcel.status.out_for_delivery', locale:) %>
+        </span>
+      <% else %>
+        <span class="value value--<%= value_size %>">
+          <%= deliveries.count { it[:status_key] == 'out_for_delivery' } %>
+        </span>
+        <span class="label">
+          <%= t('renders.parcel.status.out_for_delivery', locale:) %>
+        </span>
+      <% end %>
+    </div>
+  </div>
+</div>

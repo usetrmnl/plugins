@@ -1,0 +1,21 @@
+<div class="columns">
+    <div
+        class="column"
+        data-list-limit="true"
+        data-list-hidden-count="false"
+        data-list-max-columns="<%= max_columns %>"
+        data-list-max-height="<%= max_height %>"
+    >
+    <% if error.present? %>
+        <div class="flex flex--center-x">
+            <span class="label"><%= error %></span>
+        </div>
+    <% elsif deliveries.empty? %>
+        <div class="flex flex--center-x">
+            <span class="label"><%= t('renders.parcel.empty', locale:) %></span>
+        </div>
+    <% else %>
+        <%= render partial: "plugins/parcel/shared/delivery", collection: deliveries, locals: { style: } %>
+    <% end %>
+    </div>
+</div>

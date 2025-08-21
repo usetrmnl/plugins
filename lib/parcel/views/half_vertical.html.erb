@@ -1,0 +1,11 @@
+<div class="view view--half_vertical">
+  <div class="layout layout--col layout--top">
+    <%= render 'plugins/parcel/shared/header', deliveries:, filter_mode: %>
+    
+    <div class="border--h-3 w-full my--2"></div>
+
+    <%= render 'plugins/parcel/shared/deliveries', max_height: 360, max_columns: 1, deliveries:, error:, style: %>
+  </div>
+
+  <%= render "plugins/parcel/shared/title_bar", instance_name: instance_name %>
+</div>

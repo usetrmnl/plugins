@@ -1,0 +1,44 @@
+
+<div class="item">
+    <div class="meta">
+        <span class="index"></span>
+    </div>
+    <div class="content">
+        <% if style == 'compact' %>
+            <div class="flex flex--row">
+                <span class="title title--small">
+                    <%= delivery[:title] %>
+                </span>
+                <span class="label label--small label--inverted no-shrink">
+                    <%= t("renders.parcel.status.#{delivery[:status_key]}", locale:) %>
+                </span>
+            </div>
+            <div class="description">
+                <% if delivery[:delivery_by] %>
+                    <div class="label label--small clamp--2">
+                        <%= t('renders.parcel.delivery_by', locale:) %>:
+                        <%= delivery[:delivery_by] %>
+                    </div>
+                <% end %>
+            </div>
+        <% else %>
+            <span class="title title--small">
+                <%= delivery[:title] %>
+            </span>
+            <span class="label label--small label--inverted">
+                <%= t("renders.parcel.status.#{delivery[:status_key]}", locale:) %>
+            </span>
+            <div class="description">
+                <div class="label label--small clamp--2">
+                    <%= delivery[:latest] %>
+                </div>
+                <% if delivery[:delivery_by] %>
+                    <div class="label label--small clamp--2">
+                        <%= t('renders.parcel.delivery_by', locale:) %>:
+                        <%= delivery[:delivery_by] %>
+                    </div>
+                <% end %>
+            </div>
+        <% end %>
+    </div>
+</div>
