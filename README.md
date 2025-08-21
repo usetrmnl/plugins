@@ -21,6 +21,7 @@ community Recipes:
 - [Stock Price](/lib/stock_price)
 - [Tempest Weather Station](/lib/tempest_weather_station)
 - [Todoist](/lib/todoist)
+- [parcel](/lib/parcel)
 - [Weather (generic)](/lib/weather)
 
 native plugin structure:
