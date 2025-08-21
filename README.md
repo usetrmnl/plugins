@@ -17,11 +17,11 @@ community Recipes:
 - [Hacker News](/lib/hacker_news)
 - [Lunar Calendar](/lib/lunar_calendar)
 - [Lunch Money](/lib/lunch_money)
+- [Parcel](/lib/parcel)
 - [Shopify](/lib/shopify)
 - [Stock Price](/lib/stock_price)
 - [Tempest Weather Station](/lib/tempest_weather_station)
 - [Todoist](/lib/todoist)
-- [parcel](/lib/parcel)
 - [Weather (generic)](/lib/weather)
 
 native plugin structure:
