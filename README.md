@@ -17,6 +17,7 @@ community Recipes:
 - [Hacker News](/lib/hacker_news)
 - [Lunar Calendar](/lib/lunar_calendar)
 - [Lunch Money](/lib/lunch_money)
+- [Mondrian](/lib/mondrian)
 - [Parcel](/lib/parcel)
 - [Shopify](/lib/shopify)
 - [Stock Price](/lib/stock_price)

@@ -1,0 +1,106 @@
+<style>
+.view--mondrian .mondrian-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border: 4px solid black;
+    box-sizing: border-box;
+    z-index: 0;
+}
+
+.view--mondrian.view--half_vertical,
+.view--mondrian.view--half_horizontal,
+.view--mondrian.view--quadrant {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.view--mondrian.view--half_vertical::before,
+.view--mondrian.view--half_horizontal::before,
+.view--mondrian.view--quadran::before {
+    background-image: none;
+}
+
+.view--mondrian .rect {
+    position: absolute;
+    box-sizing: border-box;
+    border: 4px solid black;
+    z-index: 1;
+}
+
+.view--mondrian .frame {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    bottom: -4px;
+    right: -4px;
+    border: 8px solid black;
+    box-sizing: border-box;
+    z-index: 2;
+    pointer-events: none;
+    border-radius: 12px;
+}
+
+.view--mondrian.view--full .frame {
+    display: none;
+}
+</style>
+
+<script>
+function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
+var patterns = [
+   'bg-black', 'bg--gray-1', 'bg--gray-2', 'bg--gray-3', 'bg--gray-4', 'bg--gray-5', 'bg--gray-6', 'bg--gray-7', 'bg-white'
+];
+
+function generateMondrian(container) {
+    var viewDiv = container.closest('.view');
+    var containerWidth = viewDiv.clientWidth - 8;
+    var containerHeight = viewDiv.clientHeight - 8;
+
+    var xPad = Math.floor(containerWidth * 0.1);
+    var yPad = Math.floor(containerHeight * 0.1);
+    var recursionLimit = 5;
+
+    function createRect(x, y, width, height) {
+        var rect = document.createElement('div');
+        rect.className = 'rect ' + patterns[randInt(0, patterns.length)];
+        rect.style.left = x + 'px';
+        rect.style.top = y + 'px';
+        rect.style.width = width + 'px';
+        rect.style.height = height + 'px';
+        container.appendChild(rect);
+    }
+
+    function splitRect(x, y, width, height, depth) {
+        createRect(x, y, width, height);
+
+        if (depth === recursionLimit || width < 2 * xPad || height < 2 * yPad) {
+            return;
+        }
+
+        if (width > height) {
+            var splitX = randInt(x + xPad, x + width - xPad);
+            splitRect(x, y, splitX - x, height, depth + 1);
+            splitRect(splitX, y, x + width - splitX, height, depth + 1);
+        } else {
+            var splitY = randInt(y + yPad, y + height - yPad);
+            splitRect(x, y, width, splitY - y, depth + 1);
+            splitRect(x, splitY, width, y + height - splitY, depth + 1);
+        }
+    }
+
+    splitRect(0, 0, containerWidth, containerHeight, 0);
+    
+    // Add frame div after all rects
+    var frame = document.createElement('div');
+    frame.className = 'frame';
+    container.appendChild(frame);
+}
+
+document.querySelectorAll('.mondrian-container').forEach(function(container) {
+    generateMondrian(container);
+});
+</script>
