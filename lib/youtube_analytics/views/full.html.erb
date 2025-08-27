@@ -1,0 +1,103 @@
+<div class="view view--full">
+  <div class="layout layout--col gap--space-between">
+    <div class="grid">
+      <div class="col--span-2">
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value value--xlarge value--tnums" data-value-type="number"><%= number_with_delimiter(metrics[:views]) %></span>
+            <span class="label label--large">Views</span>
+          </div>
+        </div>
+      </div>
+      <div class="col--span-1">
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value value--xlarge value--tnums">
+              <% total_seconds = metrics[:minutes_watched].to_i * 60 %>
+              <% days = total_seconds / 86400 %>
+              <% hours = (total_seconds % 86400) / 3600 %>
+              <% minutes = (total_seconds % 3600) / 60 %>
+              <% seconds = total_seconds % 60 %>
+
+              <% if days > 0 %>
+                <%= days %>+
+                <% time_unit = 'Days' %>
+              <% elsif hours > 0 %>
+                <%= hours %>+
+                <% time_unit = 'Hours' %>
+              <% elsif minutes > 0 %>
+                <%= minutes %>+
+                <% time_unit = 'Minutes' %>
+              <% else %>
+                <%= seconds %>
+                <% time_unit = 'Seconds' %>
+              <% end %>
+            </span>
+            <span class="label label--large"><%= time_unit %> Watched</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="w-full b-h-gray-5"></div>
+    <div class="grid grid--cols-3">
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--tnums">
+            <% avg_view_duration = metrics[:average_view_duration].to_i %>
+            <% minutes = avg_view_duration / 60 %>
+            <% seconds = avg_view_duration % 60 %>
+            <%= "#{minutes}m #{seconds}s" %>
+          </span>
+          <span class="label">Average View Duration</span>
+        </div>
+      </div>
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--tnums" data-value-type="number"><%= number_with_delimiter(metrics[:subscribers_gained]) %></span>
+          <span class="label">Subscribers Gained</span>
+        </div>
+      </div>
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--tnums"><%= (metrics[:average_view_percentage])&.round %>%</span>
+          <span class="label">View Through Rate</span>
+        </div>
+      </div>
+    </div>
+    <div class="w-full b-h-gray-5"></div>
+    <div class="grid grid--cols-3">
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--tnums" data-value-type="number"><%= number_with_delimiter(metrics[:likes]) %></span>
+          <span class="label">Likes</span>
+        </div>
+      </div>
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--tnums" data-value-type="number"><%= number_with_delimiter(metrics[:comments]) %></span>
+          <span class="label">Comments</span>
+        </div>
+      </div>
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--tnums" data-value-type="number"><%= number_with_delimiter(metrics[:shares]) %></span>
+          <span class="label">Shares</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <img class="image" src="<%= Rails.application.credentials.base_url %>/images/plugins/youtube--render.svg" />
+    <span class="title">YouTube</span>
+    <span class="instance"><%= instance_name %></span>
+  </div>
+</div>
