@@ -1,0 +1,42 @@
+<%= render 'plugins/chart_js' %>
+
+<div class="view view--half_horizontal">
+  <div class="layout layout--row gap--space-between">
+    <div class="grid h-full">
+      <div class="col--span-1 h-full">
+        <div class="col gap--space-between">
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value value--tnums"><%= current_weight %></span>
+              <span class="label">Current Weight</span>
+            </div>
+          </div>
+
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <% this_period_change = (metrics.last.values.first - metrics.first.values.first).round(1) %>
+              <span class="value value--tnums"><%= this_period_change.positive? ? '+' : '-' %><%= this_period_change.abs %></span>
+              <span class="label">This Period</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col--span-4 col h-full gap--space-between">
+        <% formatted_data = metrics.map { |period| [l(Time.at(period.keys.first).to_date, format: :short, locale:), period.values.first] } %>
+        <%= line_chart formatted_data, adapter: :highcharts, prefix: "", thousands: ",", points: false, colors: ["black"], curve: true,
+          library: {
+            chart: { height: 176, width: 612 },
+            plotOptions: { series: { animation: false, lineWidth: 4 } },
+            yAxis: { min: metrics.map { it.values.first }.min - 2, labels: { style: { fontSize: '16px', color: '#000000' } }, gridLineDashStyle: 'shortdot', gridLineWidth: 1, gridLineColor: '#000000', tickAmount: 5 },
+            xAxis: { type: 'daytime', labels: { enabled: false }, lineWidth: 0, gridLineDashStyle: 'dot', tickWidth: 1, tickLength: 0, gridLineWidth: 1, gridLineColor: '#000000', tickPixelInterval: 120 }
+          }
+        %>
+      </div>
+    </div>
+  </div>
+
+  <%= render partial: 'plugins/withings/shared/title_bar', locals: { instance_name: instance_name } %>
+</div>

@@ -24,6 +24,7 @@ community Recipes:
 - [Tempest Weather Station](/lib/tempest_weather_station)
 - [Todoist](/lib/todoist)
 - [Weather (generic)](/lib/weather)
+- [Withings](/lib/withings)
 - [Youtube Analytics](/lib/youtube_analytics)
 
 native plugin structure:
