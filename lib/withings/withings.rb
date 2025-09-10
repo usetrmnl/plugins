@@ -49,7 +49,7 @@ module Plugins
 
     private
 
-    def device_models = ['Body Smart', 'Body Scan', 'Body+']
+    def device_models = ['Body Smart', 'Body Scan', 'Body+', 'Body Cardio']
 
     def start_date = lookback_period.days.ago.to_i
 
