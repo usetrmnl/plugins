@@ -1,0 +1,20 @@
+<div class="view view--full">
+  <div class="layout">
+    <div class="flex flex--col">
+      <% if defined?(error_title) %>
+        <span class="title" data-pixel-perfect="true"><%= error_title %></span>
+      <% end %>
+      <div class="richtext richtext--left gap--large">
+        <div class="content content--left gap text--left">
+          <p><%= error_message %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <img class="image" src="<%= plugin_asset_url %>/images/plugins/<%= icon %>" />
+    <span class="title"><%= title %></span>
+    <span class="instance"><%= instance %></span>
+  </div>
+</div>
