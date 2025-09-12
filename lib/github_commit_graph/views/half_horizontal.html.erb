@@ -1,0 +1,56 @@
+<% unless framework_v2 %>
+  <%= render 'plugins/github_commit_graph/v1/half_horizontal', local_assigns %>
+<% else %>
+<div class="view view--half_horizontal">
+  <div class="layout">
+    <div class="grid">
+      <div class="col col--span-2 gap">
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value value--tnums value--small"><%= contributions[:total] %></span>
+            <span class="label">Contributions</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value value--tnums value--xsmall"><%= stats[:longest_streak] %></span>
+            <span class="label">Longest streak</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value value--tnums value--xsmall"><%= stats[:current_streak] %></span>
+            <span class="label">Current streak</span>
+          </div>
+        </div>
+      </div>
+      <div class="col--span-7">
+        <div id="github_commit_graph">
+          <% contributions[:commits].each do |week_of_commits| %>
+            <% week_of_commits[:contributionDays].each do |day| %>
+              <span class="day <%= git_commit_grayscale(day[:contributionCount]) %>"></span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <img class="image" src="<%= plugin_asset_url %>/images/plugins/github--render.svg" />
+    <span class="title">GitHub</span>
+    <span class="instance"><%= instance_name %></span>
+  </div>
+</div>
+
+<%= render 'plugins/github_commit_graph/common' %>
+<% end %>

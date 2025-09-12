@@ -1,6 +1,3 @@
-<% unless framework_v2 %>
-  <%= render 'plugins/github_commit_graph/v1/full', local_assigns %>
-<% else %>
 <% unless (contributions[:errors].present?) %>
   <div class="view view--full">
     <div class="layout layout--col gap--space-between">
@@ -56,7 +53,7 @@
       <div id="github_commit_graph">
         <% contributions[:commits].each do |week_of_commits| %>
           <% week_of_commits[:contributionDays].each do |day| %>
-            <span class="day <%= git_commit_grayscale(day[:contributionCount]) %>"></span>
+            <span class="day <%= git_commit_grayscale(day[:contributionCount], framework_v2: false) %>"></span>
           <% end %>
         <% end %>
       </div>
@@ -68,7 +65,7 @@
       <span class="instance"><%= instance_name %></span>
     </div>
   </div>
-  <%= render 'plugins/github_commit_graph/common' %>
+  <%= render 'plugins/github_commit_graph/v1/common' %>
 <% else %>
   <%= render partial: 'plugins/errors/full', locals: {
     icon: 'github--render.svg',
@@ -77,5 +74,4 @@
     error_message: contributions[:errors]
   }
   %>
-<% end %>
 <% end %>
