@@ -1,0 +1,44 @@
+<div class="view view--full">
+  <% if defined?(error) && error %>
+    <%= render 'plugins/notion/shared/error_section',
+               title_class: "title",
+               title_text: "Notion Error",
+               description_text: error %>
+  <% elsif display_type == "database" %>
+    <div class="layout layout--top">
+      <% if items && items.any? %>
+        <div class="columns" data-overflow-max-cols="<%= multi_column_display %>" data-overflow-counter="true">
+          <div class="column">
+            <% items.each_with_index do |item, idx| %>
+              <%= render partial: 'plugins/notion/shared/database_item', locals: { item: item, index: idx, current_layout: "full", labeled_properties: labeled_properties, listed_properties: listed_properties, status_field: status_field } %>
+            <% end %>
+          </div>
+        </div>
+      <% else %>
+        <%= render 'plugins/notion/shared/error_section',
+                   title_class: "title",
+                   title_text: "No Content Available",
+                   description_text: "Check your Notion configuration and try again" %>
+      <% end %>
+    </div>
+  <% elsif display_type == "page" %>
+    <div class="layout layout--top">
+      <% if items && items[:blocks] && items[:blocks].any? %>
+        <div class="columns" data-overflow-max-cols="<%= multi_column_display %>" data-overflow-counter="false">
+          <div class="column">
+            <% items[:blocks].each_with_index do |block, idx| %>
+              <%= render 'plugins/notion/shared/page_block', block: block, index: idx, current_layout: "full", image_height: image_height %>
+            <% end %>
+          </div>
+        </div>
+      <% else %>
+        <%= render 'plugins/notion/shared/error_section',
+                   title_class: "title",
+                   title_text: "No Content Available",
+                   description_text: "Check your Notion configuration and try again" %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= render partial: 'plugins/notion/shared/title_bar', locals: { instance_name: instance_name } %>
+</div>

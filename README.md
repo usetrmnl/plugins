@@ -18,6 +18,7 @@ community Recipes:
 - [Lunar Calendar](/lib/lunar_calendar)
 - [Lunch Money](/lib/lunch_money)
 - [Mondrian](/lib/mondrian)
+- [Notion](/lib/notion)
 - [Parcel](/lib/parcel)
 - [Shopify](/lib/shopify)
 - [Stock Price](/lib/stock_price)

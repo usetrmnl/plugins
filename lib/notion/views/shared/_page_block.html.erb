@@ -1,0 +1,56 @@
+<% if block[:type] == "divider" %>
+  <div style="border-top: 1px dotted #000000;"></div>
+<% elsif ["table_of_contents", "table", "unsupported", "synced_block", "breadcrumb", "column_list"].include?(block[:type]) %>
+  <% return %>
+<% else %>
+  <div class="item">
+    <div class="meta">
+      <% # Show meta for placeholders, database views, and non-heading/non-image blocks %>
+      <% show_meta = (block[:type] == "image" && !block[:image_url]) || 
+                    block[:type] == "child_database" || 
+                    !%w[heading_1 heading_2 heading_3 image].include?(block[:type]) %>
+      <% if show_meta %>
+        <% meta_content = case block[:type]
+                          when "bulleted_list_item", "numbered_list_item" then "•"
+                          when "to_do" then block[:checked] ? "✓" : "☐"
+                          when "quote" then '❝'
+                          when "callout" then "[!]"
+                          when "child_page", "bookmark" then "↗"
+                          when "code" then "{}"
+                          end %>
+        <% if meta_content %> 
+          <% meta_classes = "label label--gray" if block[:type] == "to_do" && block[:checked] %>
+          <span class="<%= meta_classes %>"><%= meta_content %></span>
+        <% end %>
+      <% end %>
+    </div>
+    <div class="content">
+      <% if block[:type] == "image" && block[:image_url] %>
+        <img src="<%= block[:image_url] %>" class="image-dither" style="max-width: 100%; max-height: <%= image_height %>px" alt="<%= block[:caption] || 'Image' %>">
+        <% if block[:caption] %>
+          <span class="label label--small" data-pixel-perfect="true"><%= block[:caption] %></span>
+        <% end %>
+      <% else %>
+        <% text = case block[:type]
+                  when "image" then (block[:image_url] ? nil : "Image placeholder")
+                  when "child_database" then "Database view"
+                  else block[:text]
+                  end %>
+        <% if text %>
+          <% content_classes = ["clamp--none"] %>
+          <% case block[:type]
+            when "heading_1"
+              content_classes << (current_layout == "quadrant" ? " title title--small" : " title title--large")
+            when "heading_2"
+              content_classes << (current_layout == "quadrant" ? " text text--small" : " title")
+            when "heading_3"
+              content_classes << (current_layout == "quadrant" ? " text text--small" : " title title--small")
+            else
+              content_classes << "description"
+            end %>
+          <span class="<%= content_classes.join(" ") %>" data-pixel-perfect="true"><%= text %></span>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
