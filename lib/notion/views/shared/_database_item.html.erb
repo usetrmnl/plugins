@@ -1,0 +1,45 @@
+
+<div class="item">
+  <div class="meta">
+    <span class="index"><%= index + 1 %></span>
+  </div>
+  <div class="content">
+    <div class="flex w--full gap pb--2">
+      <span class="title title--small" data-pixel-perfect="true"><%= item[:title] %></span>
+      <% if status_field.present? %>
+        <% status_properties = filter_properties_by_names(item[:properties], [status_field]) %>
+        <% if status_properties.any? %>
+          <span class="label label--small label--inverted" data-pixel-perfect="true"><%= status_properties.first[:value] %></span>
+        <% end %>
+      <% end %>
+    </div>
+    
+    <% labeled_property_names = labeled_properties || [] %>
+    <% if labeled_property_names.any? %>
+      <% matched_labeled_properties = filter_properties_by_names(item[:properties], labeled_property_names) %>
+
+      <% patterns = ["label--inverted", "label--outline", "label--underline"] %>
+
+      <div class="flex w--full gap pb--1">
+        <% matched_labeled_properties.each_with_index do |label, index| %>
+          <% pattern = patterns[index % patterns.length] %>
+          <% label_classes = "label label--small #{pattern}" %>
+          <span class="<%= label_classes %>" data-pixel-perfect="true"><%= label[:value] %></span>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% listed_property_names = listed_properties || [] %>
+    <% if listed_property_names.any? %>
+      <% matched_listed_properties = filter_properties_by_names(item[:properties], listed_property_names) %>
+
+      <% if matched_listed_properties.any? %>
+        <div class="flex w--full gap--xsmall">
+          <% matched_listed_properties.each_with_index do |prop, index| %>
+            <span class="description w--auto" data-pixel-perfect="true"><%= "✶" if index > 0 %> <%= prop[:value] %></span>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
