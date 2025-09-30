@@ -1,0 +1,58 @@
+<div class="view view--full">
+  <div class="layout layout--col gap--space-between">
+    <div class="grid grid--cols-1">
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--tnums value--xxxlarge"><%= number_with_delimiter(metrics[:messages_sent]) %></span>
+          <span class="label label--large">Messages Sent</span>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="grid grid--cols-2">
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--large value--tnums"><%= number_with_delimiter(metrics[:recipients]) %></span>
+          <span class="label">Recipients</span>
+        </div>
+      </div>
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--large value--tnums">
+            <% if metrics.dig(:avg_response_time, :hours).to_i > 0 %>
+              <%= metrics.dig(:avg_response_time, :hours) %>h
+            <% end %>
+            <%= metrics.dig(:avg_response_time, :minutes) %>m
+          </span>
+          <span class="label">Avg Response Time</span>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="grid grid--cols-2">
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--large value--tnums"><%= number_with_delimiter(metrics[:messages_received]) %></span>
+          <span class="label">Messages Received</span>
+        </div>
+      </div>
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--large value--tnums"><%= number_with_delimiter(metrics[:senders]) %></span>
+          <span class="label">Senders</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <img class="image" src="<%= plugin_asset_url %>/images/plugins/email-meter--render.svg" />
+    <span class="title">Email Meter</span>
+    <span class="instance"><%= instance_name %></span>
+  </div>
+</div>
