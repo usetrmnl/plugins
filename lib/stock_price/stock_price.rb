@@ -7,6 +7,8 @@ module Plugins
       'VIX', 'MXACW', 'XWLD', 'MXUSA', 'MXEF', 'MXEA', 'DJI', 'RUI', 'RUT', 'OEX', 'OEX', 'SPX', 'XSP', 'XSP', 'SPESG', 'XND', 'IXIC'
     ].freeze
 
+    SUPPORTED_METAL = ['XAG', 'XAU', 'XPD', 'HG'].freeze
+
     def locals = { tickers:, currency_symbol:, currency_separator: }
 
     private
@@ -33,19 +35,39 @@ module Plugins
     def ticker_name(symbol) = TICKER_NAME_DATA[symbol]
 
     def ticker_price(symbol)
-      Rails.cache.fetch "STOCK_PRICE_#{symbol}_extended_#{extended_hours?}_v1", expire_in: 1.hour, skip_nil: true do
-        response = SUPPORTED_INDEX.include?(symbol) ? fetch(index_url(symbol), headers:) : fetch(stock_url(symbol), headers:)
-
-        if %w[error no_data].include?(response['s'])
-          invalid_symbol(symbol)
+      Rails.cache.fetch "STOCK_PRICE_#{symbol}_extended_#{extended_hours?}_v2", expire_in: 15.minutes, skip_nil: true do
+        if SUPPORTED_INDEX.include?(symbol)
+          response = fetch(index_url(symbol), headers:)
+          format_data(response, symbol)
+        elsif SUPPORTED_METAL.include?(symbol.upcase.gsub!('USD', ''))
+          response = fetch(metal_url(symbol), headers:)
+          format_metal_data(response, symbol)
         else
-          {
-            symbol: symbol.upcase,
-            name: ticker_name(symbol.upcase),
-            price: response.dig("last", 0),
-            change: "#{(response.dig('changepct', 0).to_f * 100)&.round(2)}%"
-          }
+          response = fetch(stock_url(symbol), headers:)
+          format_data(response, symbol)
         end
+      end
+    end
+
+    def format_metal_data(response, symbol)
+      {
+        symbol: symbol,
+        name: response['name'],
+        price: response['price'],
+        change: "N/A"
+      }
+    end
+
+    def format_data(response, symbol)
+      if %w[error no_data].include?(response['s'])
+        invalid_symbol(symbol)
+      else
+        {
+          symbol: symbol.upcase,
+          name: ticker_name(symbol.upcase),
+          price: response.dig("last", 0),
+          change: "#{(response.dig('changepct', 0).to_f * 100)&.round(2)}%"
+        }
       end
     end
 
@@ -53,9 +75,7 @@ module Plugins
       (base_price * currency_conversions[currency])&.round(2)
     end
 
-    def currency
-      settings['currency'].upcase
-    end
+    def currency = settings['currency'].upcase
 
     def currency_symbol
       {
@@ -67,7 +87,9 @@ module Plugins
         'KRW' => '₩',
         'CNY' => '¥',
         'JPY' => '¥',
-        'INR' => '₹'
+        'INR' => '₹',
+        'ZAR' => 'R',
+        'CLP' => '$'
       }[currency]
     end
 
@@ -100,6 +122,8 @@ module Plugins
     def stock_url(symbol) = "https://api.marketdata.app/v1/stocks/quotes/#{CGI.escape(symbol)}/?extended=#{extended_hours?}"
 
     def index_url(symbol) = "https://api.marketdata.app/v1/indices/quotes/#{CGI.escape(symbol)}/?extended=#{extended_hours?}"
+
+    def metal_url(symbol) = "https://api.gold-api.com/price/#{symbol.gsub!('USD', '')}"
 
     def currency_conversion_url = "https://api.currencyapi.com/v3/latest?apikey=#{Rails.application.credentials.plugins.currency_api}&currencies=#{supported_currencies.join('%2C')}"
 
