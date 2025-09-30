@@ -12,6 +12,7 @@ community Recipes:
 
 - [Calendar](/lib/calendar)
 - [Days Left Until](/lib/days_left_until)
+- [Email Meter](/lib/email_meter)
 - [Github Commit Graph](/lib/github_commit_graph)
 - [Google Analytics](/lib/google_analytics)
 - [Hacker News](/lib/hacker_news)
