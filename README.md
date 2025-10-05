@@ -11,6 +11,7 @@ community Recipes:
 ## Native plugin examples
 
 - [Calendar](/lib/calendar)
+- [Chatgpt](/lib/chatgpt)
 - [Days Left Until](/lib/days_left_until)
 - [Email Meter](/lib/email_meter)
 - [Github Commit Graph](/lib/github_commit_graph)
