@@ -1,0 +1,251 @@
+<div class="view view--full">
+  <div class="layout layout--col gap--large">
+    <!-- Daily gauges in grid -->
+    <div class="grid">
+      <% metrics['samples'].sort_by { |s| s['date'] }.each_with_index do |day, idx| %>
+        <div class="h--32">
+          <div id="day_<%= idx %>" class="h--24"></div>
+          <span class="description text--center"><%= day['date'].to_date.strftime('%A') %></span>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Weekly summary section -->
+    <div class="grid">
+      <div class="col--span-7 gap--large">
+        <div class="flex flex--col gap--medium w--full flex--center">
+          <div class="grid grid--cols-2">
+            <div class="item">
+              <div class="meta"></div>
+              <div class="content">
+                <span class="value value--tnums"><%= metrics['avg'].find { |m| m['name'] == 'sqs' }['value'].to_i %>%</span>
+                <span class="label">Quality</span>
+              </div>
+            </div>
+            <div class="item">
+              <div class="meta"></div>
+              <div class="content">
+                <span class="value value--tnums"><%= metrics['avg'].find { |m| m['name'] == 'snore_percent' }['value'].to_f.round(1) %>%</span>
+                <span class="label">Snoring</span>
+              </div>
+            </div>
+          </div>
+          <div class="grid grid--cols-2">
+            <div class="item">
+              <div class="meta"></div>
+              <div class="content">
+                <span class="value value--tnums"><%= metrics['avg'].find { |m| m['name'] == 'deep_percent' }['value'].to_i %>%</span>
+                <span class="label">Deep Sleep</span>
+              </div>
+            </div>
+            <div class="item">
+              <div class="meta"></div>
+              <div class="content">
+                <span class="value value--tnums"><%= metrics['avg'].find { |m| m['name'] == 'rem_percent' }['value'].to_i %>%</span>
+                <span class="label">REM Sleep</span>
+              </div>
+            </div>
+          </div>
+          <div class="grid grid--cols-2">
+            <div class="item">
+              <div class="meta"></div>
+              <div class="content">
+                <span class="value value--tnums"><%= (metrics['avg'].find { |m| m['name'] == 'ttfa' }['value'].to_f / 60).round %>m</span>
+                <span class="label">Time to Sleep</span>
+              </div>
+            </div>
+            <div class="item">
+              <div class="meta"></div>
+              <div class="content">
+                <span class="value value--tnums"><%= (metrics['avg'].find { |m| m['name'] == 'sleep' }['value'].to_f / 60 / 60).round(1) %>h</span>
+                <span class="label">Sleep Duration</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col--span-5 col--center">
+        <div id="day_all" class="w-[340px] h--52"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <%= image_tag plugin_image_path("eight_sleep--render.svg"), class: "image", alt: "" %>
+    <span class="title">Eight Sleep</span>
+    <span class="instance"><%= instance_name %></span>
+  </div>
+</div>
+
+<%= render 'plugins/chart_js', libs: [:highcharts, :highcharts_more, :highcharts_pattern_fill] %>
+
+<script type="text/javascript">
+  var dailyScores = <%== metrics['samples'].sort_by { |k, _| Date.parse(k['date'])}.map {|k, v| k['avg'].find { |score| score['name'] == 'sfs' }['value'].to_i } %>
+  var weeklyScore = <%= metrics['avg'].find { |m| m['name'] == 'sfs'}['value'].to_f.round %>
+
+  function createGauge(score, day, opts) {
+    opts ||= {
+      title: null, // ex: 'Week'
+      height: '80%',
+      labels: {
+        distance: 15
+      },
+      series: {
+        fontSize: '3em'
+      },
+      yAxis: {
+        title: textRating(score)
+      }
+    };
+    Highcharts.chart(`day_${day}`, {
+
+      chart: {
+        type: 'gauge',
+        height: opts.height,
+        animation: false
+      },
+
+      title: {
+        text: opts.title
+      },
+
+      pane: {
+        // size: '75%',
+        startAngle: -150,
+        endAngle: 150,
+        background: {
+            backgroundColor: 'transparent',
+            borderWidth: 0
+        }
+      },
+
+      plotOptions: {
+        gauge: {
+        	animation: false,
+          pivot: {
+            backgroundColor: 'transparent'
+          },
+          dial: {
+            backgroundColor: 'transparent',
+            baseWidth: 0,
+          },
+        }
+      },
+
+      // The value axis
+      yAxis: {
+          min: 0,
+          max: 100,
+
+          minorTickInterval: 0,
+          tickColor: '#ffffff',
+          tickLength: 40,
+          tickPixelInterval: 40,
+          tickWidth: 0, // spacing between sections of loop
+          lineWidth: 0,
+          title: {
+            text: opts.yAxis.title,
+            style: {
+              color: '#000000',
+              fontFamily: 'NicoPups',
+              fontSize: '16px'
+            }
+          },
+          labels: opts.labels,
+
+  				// tips to make them overlap nicely without rounded transitions
+          // https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/xaxis/plotbands-gauge-borderradius
+          plotBands: [{
+            from: 1,
+            to: score,
+  					color: {
+            	pattern: {
+   							image: 'https://usetrmnl.com/images/grayscale/gray-2.png',
+                width: 12,
+                height: 12
+              }
+            },
+            innerRadius: '82%',
+            borderRadius: '50%'
+        }, {
+            from: (score + 1),
+            to: 100,
+            color: {
+  						pattern: {
+   							image: 'https://usetrmnl.com/images/grayscale/gray-5.png',
+                width: 12,
+                height: 12
+              }
+            },
+            innerRadius: '82%',
+            borderRadius: '50%',
+        }]
+      },
+
+      series: [{
+        name: 'Score',
+        data: [score],
+        dataLabels: {
+          borderWidth: 0,
+          style: {
+            fontSize: opts.series.fontSize,
+            fontWeight: opts.series.fontWeight || '400',
+            fontFamily: opts.series.fontFamily || 'inherit'
+          }
+        }
+      }],
+
+      credits: {
+        enabled: false
+      }
+    });
+  }
+
+  function textRating(score) {
+    if (score <= 50) {
+      return 'Low';
+    } else if (score <= 65) {
+      return 'Pay Attention';
+    } else if (score < 80) {
+      return 'Fair';
+    } else {
+      return 'Good';
+    }
+  }
+
+  // headings - last week averages per day
+  dailyScores.forEach((score, idx) => {
+    let opts = {
+      title: null,
+      labels: { enabled: false },
+      series: {
+        fontSize: '16px',
+        fontWeight: '400',
+        fontFamily: 'NicoClean'
+      },
+      yAxis: {
+        title: null
+      }
+    }
+    createGauge(score, idx, opts);
+  })
+
+  // main content - weekly summary
+  createGauge(weeklyScore, 'all', {
+    title: null,
+    height: '80%',
+    labels: {
+      distance: 15
+    },
+    series: {
+      fontSize: '3em',
+      fontWeight: '550'
+    },
+    yAxis: {
+      title: textRating(weeklyScore)
+    }
+  })
+
+</script>
