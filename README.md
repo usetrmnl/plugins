@@ -13,6 +13,7 @@ community Recipes:
 - [Calendar](/lib/calendar)
 - [Chatgpt](/lib/chatgpt)
 - [Days Left Until](/lib/days_left_until)
+- [Eight Sleep](/lib/eight_sleep)
 - [Email Meter](/lib/email_meter)
 - [Github Commit Graph](/lib/github_commit_graph)
 - [Google Analytics](/lib/google_analytics)
