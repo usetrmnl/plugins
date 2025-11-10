@@ -2,25 +2,25 @@
   <div class="layout layout--col gap--space-between">
     <div class="grid">
       <div class="row row--center col--span-3 col--end">
-        <img class="weather-image" style="filter: brightness(0.5) saturate(0%);" src="<%= weather_image %>" />
+        <%= image_tag weather_image, class: "weather-image", style: "filter: brightness(0.5) saturate(0%);", alt: "Weather condition" %>
       </div>
       <div class="col col--span-3 col--end">
         <div class="item h--full">
           <div class="meta"></div>
           <div class="content">
             <span class="value value--xxxlarge" data-fit-value="true"><%= temperature&.round %>°</span>
-            <span class="label w--full">
-              <div class="content" style="display: inline;">
-                <img style="max-height: 24px; vertical-align: middle" src="<%= Rails.application.credentials.base_url %>/images/plugins/weather/wi-sunrise.svg" />
+            <span class="label w--full gap--xlarge">
+              <div class="flex gap--xsmall flex--row flex--center-y">
+                <%= image_tag plugin_image_path("weather/wi-sunrise.svg"), class: "h--6", alt: "Sunrise" %>
                 <%= forecast[:right_now][:sunrise] %>
               </div>
-              <div class="content" style="display: inline;">
-                <img style="max-height: 24px; vertical-align: middle" src="<%= Rails.application.credentials.base_url %>/images/plugins/weather/wi-sunset.svg" />
+              <div class="flex gap--xsmall flex--row flex--center-y">
+                <%= image_tag plugin_image_path("weather/wi-sunset.svg"), class: "h--6", alt: "Sunset" %>
                 <%= forecast[:right_now][:sunset] %>
               </div>
             </span>
-            <span class="label w--full">
-              <img style="max-height: 24px; vertical-align: middle" src="https://tempestwx.com/images/Updated/wind-arrow-<%= forecast[:right_now][:wind][:direction_cardinal].downcase %>.svg" />
+            <span class="label w--full gap--xsmall">
+              <%= image_tag "https://tempestwx.com/images/Updated/wind-arrow-#{forecast[:right_now][:wind][:direction_cardinal].downcase}.svg", class: "h--6", alt: "Wind direction" %>
               <%= forecast[:right_now][:wind][:gust] %> <%= forecast[:right_now][:wind][:units] %>
             </span>
           </div>
@@ -30,7 +30,7 @@
         <div class="item">
           <div class="meta"></div>
           <div class="icon">
-            <img class="weather-icon" src="<%= Rails.application.credentials.base_url %>/images/plugins/weather/wi-thermometer.svg" />
+            <%= image_tag plugin_image_path("weather/wi-thermometer.svg"), class: "weather-icon", alt: "Temperature" %>
           </div>
           <div class="content">
             <span class="value value--small"><%= feels_like&.round %>°</span>
@@ -41,7 +41,7 @@
         <div class="item">
           <div class="meta"></div>
           <div class="icon">
-            <img class="weather-icon" src="<%= Rails.application.credentials.base_url %>/images/plugins/weather/wi-raindrops.svg" />
+            <%= image_tag plugin_image_path("weather/wi-raindrops.svg"), class: "weather-icon", alt: "Humidity" %>
           </div>
           <div class="content">
             <span class="value value--small"><%= humidity %>%</span>
@@ -52,17 +52,17 @@
         <div class="item">
           <div class="meta"></div>
           <div class="icon">
-            <img class="weather-icon" style="filter: brightness(0.5) saturate(0%);" src="<%= weather_image %>" />
+            <%= image_tag weather_image, class: "weather-icon", style: "filter: brightness(0.5) saturate(0%);", alt: "Weather condition" %>
           </div>
           <div class="content">
-            <span class="value value--xsmall"><%= conditions %></span>
+            <span class="value value--xsmall"><%= right_now_conditions %></span>
             <span class="label"><%= t('renders.weather.right_now') %></span>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="w-full b-h-gray-5"></div>
+    <div class="divider"></div>
 
     <div class="grid">
       <div class="col gap--large">
@@ -71,7 +71,7 @@
             <div class="item col--span-3">
               <div class="meta"></div>
               <div class="icon">
-                <img class="weather-icon" style="filter: brightness(0.5) saturate(0%);" src="<%= local_assigns["#{day}_weather_image".to_sym] %>" />
+                <%= image_tag local_assigns["#{day}_weather_image".to_sym], class: "weather-icon", style: "filter: brightness(0.5) saturate(0%);", alt: "Weather condition" %>
               </div>
               <div class="content">
                 <span class="value value--xsmall"><%= forecast[day][:conditions] %></span>
@@ -83,26 +83,30 @@
               <div class="item">
                 <div class="meta"></div>
 
-                <div class="row">
-                  <div class="icon">
-                    <img class="weather-icon" src="<%= Rails.application.credentials.base_url %>/images/plugins/weather/wi-hot.svg" />
+                <div class="flex flex--row flex--center-y">
+                  <div class="flex flex--row flex--center-y gap--xsmall">
+                    <div class="icon">
+                      <%= image_tag plugin_image_path("weather/wi-hot.svg"), class: "weather-icon", alt: "UV Index" %>
+                    </div>
+
+                    <div class="content w--14">
+                      <span class="value value--xsmall"><%= forecast[day][:uv_index] %></span>
+                      <span class="label"><%= t('renders.weather.uv') %></span>
+                    </div>
                   </div>
 
-                  <div class="content w--14">
-                    <span class="value value--xsmall"><%= forecast[day][:uv_index] %></span>
-                    <span class="label"><%= t('renders.weather.uv') %></span>
-                  </div>
+                  <div class="flex flex--row flex--center-y gap--xsmall">
+                    <div class="icon">
+                      <%= image_tag "https://tempestwx.com/images/Updated/#{forecast[day][:precip][:icon]}.svg", class: "weather-icon", style: "max-height: 30px; filter: brightness(0.5) saturate(0%);", alt: "Precipitation" %>
+                    </div>
 
-                  <div class="icon" style="margin-top: auto; margin-bottom: auto;">
-                    <img class="weather-icon" style="max-height: 30px; filter: brightness(0.5) saturate(0%);" src="https://tempestwx.com/images/Updated/<%= forecast[day][:precip][:icon] %>.svg" />
-                  </div>
-
-                  <!-- justify-content is needed for 'tomorrow' precip amount/units, given they are always nil -->
-                  <div class="content w--14" style="<%= 'justify-content: center' if day == :tomorrow %>">
-                    <span class="value value--xsmall"><%= forecast[day][:precip][:probability] %>%</span>
-                    <% if forecast[day][:precip][:amount].present? %>
-                      <span class="label"><%= forecast[day][:precip][:amount] %> <%= forecast[day][:precip][:units] %></span>
-                    <% end %>
+                    <!-- justify-content is needed for 'tomorrow' precip amount/units, given they are always nil -->
+                    <div class="content w--14" style="<%= 'justify-content: center' if day == :tomorrow %>">
+                      <span class="value value--xsmall"><%= forecast[day][:precip][:probability] %>%</span>
+                      <% if forecast[day][:precip][:amount].present? %>
+                        <span class="label"><%= forecast[day][:precip][:amount].round(1) %> <%= forecast[day][:precip][:units] %></span>
+                      <% end %>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -111,17 +115,19 @@
             <div class="row col--span-3">
               <div class="item">
                 <div class="meta"></div>
-                <div class="icon">
-                  <img class="weather-icon" src="<%= Rails.application.credentials.base_url %>/images/plugins/weather/wi-thermometer.svg" />
-                </div>
-                <div class="row">
-                  <div class="content w--20">
-                    <span class="value value--small"><%= forecast[day][:mintemp]&.round %>°</span>
-                    <span class="label"><%= t('renders.weather.low') %></span>
+                <div class="flex flex--row flex--center-y">
+                  <div class="icon">
+                    <%= image_tag plugin_image_path("weather/wi-thermometer.svg"), class: "weather-icon", alt: "Temperature" %>
                   </div>
-                  <div class="content w--20">
-                    <span class="value value--small"><%= forecast[day][:maxtemp]&.round %>°</span>
-                    <span class="label"><%= t('renders.weather.high') %></span>
+                  <div class="flex flex--row flex--center-y gap--xsmall">
+                    <div class="content w--20">
+                      <span class="value value--small"><%= forecast[day][:mintemp]&.round %>°</span>
+                      <span class="label"><%= t('renders.weather.low') %></span>
+                    </div>
+                    <div class="content w--20">
+                      <span class="value value--small"><%= forecast[day][:maxtemp]&.round %>°</span>
+                      <span class="label"><%= t('renders.weather.high') %></span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -133,7 +139,7 @@
   </div>
 
   <div class="title_bar">
-    <img class="image" src="<%= Rails.application.credentials.base_url %>/images/plugins/tempest_weather_station--render.svg" />
+    <%= image_tag plugin_image_path("tempest_weather_station--render.svg"), class: "image", alt: "" %>
     <h1 class="title"><%= t('renders.weather.title') %></h1>
     <span class="instance"><%= instance_name %></span>
   </div>
