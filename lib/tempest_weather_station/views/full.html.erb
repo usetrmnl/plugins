@@ -139,9 +139,9 @@
   </div>
 
   <div class="title_bar">
-    <%= image_tag plugin_image_path("tempest_weather_station--render.svg"), class: "image", alt: "" %>
+    <%= image_tag plugin_image_path("tempest_weather_station--render.svg"), class: "image" %>
     <h1 class="title"><%= t('renders.weather.title') %></h1>
-    <span class="instance"><%= instance_name %></span>
+    <span class="instance"><%= instance_name %> (<%= refreshed_at %>)</span>
   </div>
 </div>
 

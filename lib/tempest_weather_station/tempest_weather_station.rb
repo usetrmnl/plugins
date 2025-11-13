@@ -4,37 +4,12 @@ module Plugins
     BASE_URL = 'https://swd.weatherflow.com/swd/rest'.freeze
 
     def locals
-      { temperature:, forecast:, weather_image:, today_weather_image:, tomorrow_weather_image:, conditions:, humidity:, feels_like: }
+      { temperature:, forecast:, weather_image:, today_weather_image:, tomorrow_weather_image:, today_conditions:, right_now_conditions:, humidity:, feels_like:, refreshed_at: }
     end
 
     class << self
-      def for_weather_instance(plugin_settings)
-        self.new(plugin_settings).locals
-      end
-
-      def redirect_url
-        query = {
-          response_type: 'code',
-          client_id: Rails.application.credentials.plugins[:tempest_weather_station][:client_id],
-          redirect_uri: redirect_uri
-        }.to_query
-        "https://tempestwx.com/authorize.html?#{query}"
-      end
-
-      def fetch_access_token(code)
-        body = {
-          grant_type: "authorization_code",
-          client_id: Rails.application.credentials.plugins[:tempest_weather_station][:client_id],
-          client_secret: Rails.application.credentials.plugins[:tempest_weather_station][:client_secret],
-          redirect_uri: redirect_uri,
-          code: code
-        }
-        response = HTTParty.post("https://swd.weatherflow.com/id/oauth2/token", body:)
-        { access_token: response.parsed_response['access_token'] }
-      end
-
-      def redirect_uri
-        "#{Rails.application.credentials.base_url}/plugin_settings/tempest_weather_station/redirect"
+      def for_weather_instance(plugin_setting)
+        self.new(plugin_setting).locals
       end
 
       def devices(credentials)
@@ -90,7 +65,8 @@ module Plugins
             sunset: today['sunset'] ? Time.at(today['sunset']).in_time_zone(user.tz).strftime("%H:%M") : '',
             sunrise_unix: today['sunrise'] ? Time.at(today['sunrise']).to_i : '',
             sunset_unix: today['sunset'] ? Time.at(today['sunset']).to_i : '',
-            wind: { direction_cardinal: right_now['wind_direction_cardinal'], gust: right_now['wind_gust'], units: units_wind }
+            wind: { direction_cardinal: right_now['wind_direction_cardinal'], gust: right_now['wind_gust'], units: units_wind },
+            conditions: right_now['conditions']
           },
           today: {
             icon: today['icon'],
@@ -124,11 +100,18 @@ module Plugins
 
     def forecast_url
       @forecast_url ||= if plugin.keyname == 'weather'
-                          lat, lon = settings['lat_lon'].split(',')
-                          "#{BASE_URL}/better_forecast?lat=#{lat}&lon=#{lon}&units_precip=#{units_precip}&snap_to_nearest_owned_station=true&api_key=#{Rails.application.credentials.plugins.weather.tempest_api_key}"
+                          "#{BASE_URL}/better_forecast?units_precip=#{units_precip}&#{weather_station_selection}&api_key=#{Rails.application.credentials.plugins.weather.tempest_api_key}"
                         else
                           "#{BASE_URL}/better_forecast?station_id=#{station_id}&units_wind=#{units_wind}&units_precip=#{units_precip}&token=#{access_token}"
                         end
+    end
+
+    def weather_station_selection
+      if settings['tempest_station_id'].present?
+        "station_id=#{settings['tempest_station_id']}"
+      else
+        "#{lat_lon_query}&snap_to_nearest_owned_station=true"
+      end
     end
 
     def station_id
@@ -157,9 +140,22 @@ module Plugins
       end
     end
 
+    def lat_lon_query
+      str = if settings['lat_lon'].include?(',')
+              settings['lat_lon'].split(',')
+            elsif settings['lat_lon'].include?('/')
+              settings['lat_lon'].split('/')
+            else
+              settings['lat_lon'].split
+            end
+
+      lat, lon = str.map(&:squish)
+      "lat=#{lat}&lon=#{lon}"
+    end
+
     # override Tempest defaults with native Weather icons on a case by case basis based on user feedback
     def icon_selector(icon)
-      native_icon_base_uri = "#{Rails.application.credentials.base_url}/images/plugins/weather"
+      native_icon_base_uri = "#{Rails.application.credentials.plugin_asset_url}/images/plugins/weather"
 
       case icon
       when 'clear-day'
@@ -199,6 +195,10 @@ module Plugins
       forecast[:right_now][:humidity]
     end
 
+    def refreshed_at
+      I18n.l(plugin_setting.previous_refresh_at.in_time_zone(user.tz), format: :short, locale: user.locale).split[-1]
+    end
+
     def max_uv_for(period)
       max_uv = case period
                when 'today' # returns a smaller sample throughout the date, so UV will be 0 in evening; TODO: fetch past data
@@ -227,7 +227,9 @@ module Plugins
 
     def daily_forecasts = forecast_data['forecast']['daily']
 
-    def conditions = forecast[:today][:conditions]
+    def today_conditions = forecast[:today][:conditions]
+
+    def right_now_conditions = forecast[:right_now][:conditions]
 
     def forecast_headings = settings['forecast_headings']
 
