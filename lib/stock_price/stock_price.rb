@@ -7,7 +7,7 @@ module Plugins
       'VIX', 'MXACW', 'XWLD', 'MXUSA', 'MXEF', 'MXEA', 'DJI', 'RUI', 'RUT', 'OEX', 'OEX', 'SPX', 'XSP', 'XSP', 'SPESG', 'XND', 'IXIC'
     ].freeze
 
-    SUPPORTED_METAL = ['XAG', 'XAU', 'XPD', 'HG'].freeze
+    SUPPORTED_METAL = ['XAG', 'XAU', 'XPD', 'HG','XPT'].freeze
 
     def locals = { tickers:, currency_symbol:, currency_separator: }
 
