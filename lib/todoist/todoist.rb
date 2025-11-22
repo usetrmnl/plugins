@@ -182,21 +182,27 @@ module Plugins
     end
 
     def tasks_sort(tasks)
-      case settings['sort_sorting']
-      when 'manual'
-        sort_by_manual(tasks)
-      when 'name'
-        sort_by_name(tasks)
-      when 'date'
-        sort_by_date(tasks)
-      when 'date_added'
-        sort_by_date_added(tasks)
-      when 'deadline'
-        sort_by_deadline(tasks)
-      when 'priority'
-        sort_by_priority(tasks)
+      sorted_tasks = case settings['sort_sorting']
+                     when 'manual'
+                       sort_by_manual(tasks)
+                     when 'name'
+                       sort_by_name(tasks)
+                     when 'date'
+                       sort_by_date(tasks)
+                     when 'date_added'
+                       sort_by_date_added(tasks)
+                     when 'deadline'
+                       sort_by_deadline(tasks)
+                     when 'priority'
+                       sort_by_priority(tasks)
+                     else
+                       tasks
+                     end
+
+      if settings['sort_direction']&.downcase == 'descending'
+        sorted_tasks.reverse
       else
-        tasks
+        sorted_tasks
       end
     end
 
