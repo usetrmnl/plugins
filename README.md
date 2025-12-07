@@ -95,5 +95,6 @@ native plugin structure:
 - [Bluesky](https://github.com/solimaniac/trmnl-bsky) by [@solimaniac](https://github.com/solimaniac)
 - [YoLink Temperature](https://github.com/erikbuild/trmnl-yolink-temperature) by [@erikbuild](https://github.com/erikbuild)
 - [Anki](https://github.com/ItsJustThomas/trmnl-anki) by [@ItsJustThomas](https://github.com/ItsJustThomas)
+- [Obsidian](https://github.com/vaaski/trmnl-custom-plugins?tab=readme-ov-file#obsidian-daily-notes) by [@vaaski](https://github.com/vaaski)
 
 to be featured here, add `trmnl` topic to your repo, then open a PR or join the developer-only Discord server (link inside TRMNL UI).
