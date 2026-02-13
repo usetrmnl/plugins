@@ -1,0 +1,9 @@
+<%= render 'plugins/image_display/half_horizontal',
+           image_url: local_assigns[:image_url],
+           image_fit: 'contain',
+           error_config: local_assigns[:errors].present? ? {
+             icon: 'nano_banana_dashboard',
+             title: 'Nano Banana Dashboard',
+             error_title: 'Generation Failed',
+             error_message: local_assigns[:errors]
+           } : nil %>

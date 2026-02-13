@@ -21,6 +21,7 @@ community Recipes:
 - [Lunar Calendar](/lib/lunar_calendar)
 - [Lunch Money](/lib/lunch_money)
 - [Mondrian](/lib/mondrian)
+- [Nano Banana Dashboard](/lib/nano_banana_dashboard)
 - [Notion](/lib/notion)
 - [Parcel](/lib/parcel)
 - [Shopify](/lib/shopify)

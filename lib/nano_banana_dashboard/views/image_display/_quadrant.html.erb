@@ -1,0 +1,10 @@
+<div class="view view--quadrant">
+  <% if local_assigns[:image_url].present? || !local_assigns[:error_config].present? %>
+    <% fit_mode = local_assigns[:image_fit] || 'cover' %>
+    <div class="image-display<%= ' image-dither' unless local_assigns[:skip_dither] %>" style="background-image: url('<%= image_url %>'); background-size: <%= fit_mode %>"></div>
+  <% else %>
+    <%= render 'plugins/errors/quadrant', **error_config %>
+  <% end %>
+</div>
+
+<%= render 'plugins/image_display/common' %>
