@@ -69,7 +69,6 @@ native plugin structure:
 - [Weekly Goal Tracker](https://github.com/azjgard/trmnl-weekly-goal-tracker) by [@azjgard](https://github.com/azjgard)
 - [METAR](https://github.com/schrockwell/trmnl-metar) by [@schrockwell](https://github.com/schrockwell)
 - [Block Clock](https://github.com/tyler-dot-earth/trmnl-notblockclock) by [@tyler-dot-earth](https://github.com/tyler-dot-earth)
-- [TickTick Calendar](https://github.com/frethop/TRMNL-ticktick) by [@frethop](https://github.com/frethop)
 - [Transport for London (TfL) status messages](https://github.com/stevekennedyuk/trmnl-tfl-status) by [@stevekennedyuk](https://github.com/stevekennedyuk)
 - [Home Assistant - sensor data](https://github.com/gitstua/trmnl-plugin-dev/tree/main/home-assistant-trmnl#home-assistant-trmnl-plugin) by [@gitstua](https://github.com/gitstua)
 - [Home Assistant - TRMNL data](https://github.com/Beat2er/homeassistant-trmnl-battery) by [@Beat2er](https://github.com/Beat2er)
