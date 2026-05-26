@@ -44,6 +44,7 @@ native plugin structure:
 ## Plugin utilities
 
 - [trmnl_preview](https://github.com/schrockwell/trmnl_preview) by [@schrockwell](https://github.com/schrockwell)
+- [TRMNL Plugin Preview](https://github.com/danmunoz/trmnl-plugin-preview) by [@danmunoz](https://github.com/danmunoz)
 - [TRMNL plugin Dev Kit](https://github.com/sdjmchattie/trmnl-plugin-dev-kit) by [@sdjmchattie](https://github.com/sdjmchattie)
 - [plugin generator [Laravel]](https://github.com/bnussbau/laravel-trmnl) by [@bnussbau](https://github.com/bnussbau)
 - [TRMNL api simulator](https://github.com/deisterhold/trmnl-simulator) by [@deisterhold](https://github.com/deisterhold)
