@@ -99,6 +99,7 @@ module Plugins
 
     def cache_key_inputs
       [
+        current_date,
         settings.slice(
           'style_prompt', 'style_custom', 'custom_text',
           'data_instructions', 'aspect_ratio', 'model', 'color_palette'
@@ -155,6 +156,9 @@ module Plugins
         The data is the reason this image exists — it must be prominent, legible, and accurate. But it should feel like it belongs in the world, not pasted on top.
 
         #{scene_section}
+        Today's date: #{current_date}
+        Use this as today's date. If source data contains a different date, the date above takes priority.
+
         Available data — each key is a data source name:
         #{data.to_json}
 
@@ -263,6 +267,12 @@ module Plugins
       when /No image data/i then "No image was generated. Try a different prompt."
       else "Image generation failed. Please try again."
       end
+    end
+
+    # --- Current Date ---
+
+    def current_date
+      user.datetime_now.strftime('%Y-%m-%d (%A)')
     end
 
     # --- Settings ---
