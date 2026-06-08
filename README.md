@@ -24,6 +24,7 @@ community Recipes:
 - [Nano Banana Dashboard](/lib/nano_banana_dashboard)
 - [Notion](/lib/notion)
 - [Parcel](/lib/parcel)
+- [RSS Feed](/lib/rss_feed)
 - [Shopify](/lib/shopify)
 - [Stock Price](/lib/stock_price)
 - [Tempest Weather Station](/lib/tempest_weather_station)
