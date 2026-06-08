@@ -1,0 +1,24 @@
+<div class="columns" data-overflow-max-cols="1">
+  <div class="column">
+    <% if rss_feed.count == 1 %>
+      <div class="richtext richtext--center gap">
+        <style>.content img { max-width: 100% }</style>
+        <span class="title lg:title--large"><%= rss_feed.first[:title] %></span>
+        <div class="content lg:content--large" data-content-limiter="true"><%= sanitize(rss_feed.first[:content]) %></div>
+      </div>
+    <% else %>
+      <% rss_feed.each_with_index do |feed, idx| %>
+        <div class="item">
+          <div class="meta">
+            <span class="index"><%= idx + 1 %></span>
+          </div>
+          <div class="content">
+            <span class="title title--small lg:title--base"><%= simple_format(render_markdown(feed[:title])) %></span>
+            <p class="description lg:description--large" data-clamp="2"><%= sanitize(feed[:content]) %></p>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
