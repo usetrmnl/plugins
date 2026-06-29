@@ -167,6 +167,9 @@ module Plugins
     end
 
     def build_sorts
+      sorts_json = settings["sorts_json"]&.strip
+      return parse_sorts_json(sorts_json) if settings["use_sorts_json"] == "true" && sorts_json.present?
+
       sort_property = settings["sort_property"]&.strip
       sort_direction = settings["sort_direction"]
 
@@ -182,18 +185,64 @@ module Plugins
       filter_json = settings["filter_json"]&.strip
       return nil if filter_json.blank?
 
-      # Basic size limit
       raise "Filter too large (max 10KB)" if filter_json.bytesize > 10_000
 
-      parsed_filter = JSON.parse(filter_json)
-      raise "Filter must be a JSON object" unless parsed_filter.is_a?(Hash) && parsed_filter.present?
+      parsed_filter = JSON.parse(filter_json).presence
+
+      return parsed_filter if parsed_filter.nil?
 
       # Allow users to use the top-level filter key or just the filter object directly
-      if parsed_filter.key?("filter")
-        parsed_filter["filter"]
-      else
-        parsed_filter
+      filter = if parsed_filter.key?("filter")
+                 parsed_filter["filter"]
+               else
+                 parsed_filter
+               end
+
+      replace_date_placeholders(filter)
+    end
+
+    def parse_sorts_json(sorts_json)
+      raise "Sorts too large (max 5KB)" if sorts_json.bytesize > 5_000
+
+      parsed_sorts = JSON.parse(sorts_json)
+
+      # Allow bare array or wrapped in {"sorts": [...]}
+      sorts = if parsed_sorts.is_a?(Array)
+                parsed_sorts
+              elsif parsed_sorts.key?("sorts")
+                parsed_sorts["sorts"]
+              end
+
+      sorts.presence || {}
+    end
+
+    # Supports: {{today}}, {{now}}, {{today+7}}, {{now*UTC-10}}, {{today+7*UTC-10}}
+    def replace_date_placeholders(obj)
+      case obj
+      when Hash then obj.transform_values { |v| replace_date_placeholders(v) }
+      when Array then obj.map { |v| replace_date_placeholders(v) }
+      when String then replace_date_string(obj)
+      else obj
       end
+    end
+
+    # Replaces date placeholder strings with ISO 8601 formatted dates
+    def replace_date_string(str)
+      str.gsub(/\{\{(today|now)([+-]\d+)?(\*UTC[+-]\d+)?\}\}/) do
+        type = Regexp.last_match(1)
+        day_offset = Regexp.last_match(2).to_i
+        tz_offset = Regexp.last_match(3)
+
+        time = Time.now.utc + day_offset.days
+        time = apply_timezone_offset(time, tz_offset) if tz_offset
+
+        type == "today" ? time.to_date.iso8601 : time.iso8601
+      end
+    end
+
+    def apply_timezone_offset(time, tz_string)
+      hours = tz_string.sub('*UTC', '').to_i
+      ActiveSupport::TimeZone[hours].at(time)
     end
 
     def transform_database_item(item)
@@ -318,10 +367,10 @@ module Plugins
     def extract_title_from_properties(properties)
       return "Untitled" unless properties&.any?
 
-      # Try configured title field first, then fall back to first property
+      # Try configured title field first, then locate by Notion's type=="title" invariant
       title_field = settings["title_field"]&.strip
       property = properties[title_field] if title_field.present?
-      property ||= properties.values.first
+      property ||= properties.values.find { |v| v.is_a?(Hash) && v["type"] == "title" }
 
       return "Untitled" unless property
 
