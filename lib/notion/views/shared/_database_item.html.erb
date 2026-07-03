@@ -1,11 +1,15 @@
 
 <div class="item">
-  <div class="meta">
-    <span class="index"><%= index + 1 %></span>
-  </div>
+  <% if item.dig(:icon, :svg) %>
+    <div class="icon"><%= item[:icon][:svg].html_safe %></div>
+  <% else %>
+    <div class="meta">
+      <span class="index"><%= index + 1 %></span>
+    </div>
+  <% end %>
   <div class="content">
     <div class="flex w--full gap pb--2">
-      <span class="title title--small" data-pixel-perfect="true"><%= item[:title] %></span>
+      <span class="<%= notion_title_size_class(item_size) %>" data-pixel-perfect="true"><%= item[:title] %></span>
       <% if status_field.present? %>
         <% status_properties = filter_properties_by_names(item[:properties], [status_field]) %>
         <% if status_properties.any? %>

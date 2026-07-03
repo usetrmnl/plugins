@@ -35,7 +35,8 @@ module Plugins
 
       common_locals = {
         multi_column_display: settings["multi_column_display"],
-        image_height: image_height
+        image_height: image_height,
+        item_size: settings["item_size"]
       }
 
       case settings["display_type"]
@@ -125,7 +126,7 @@ module Plugins
     end
 
     def database_items
-      return [] unless notion_database_id.present?
+      return [] if notion_database_id.blank?
 
       data = fetch_database_data
       return [] unless data
@@ -134,7 +135,7 @@ module Plugins
     end
 
     def page_content
-      return {} unless notion_page_id.present?
+      return {} if notion_page_id.blank?
 
       page_data = fetch_page_data
       blocks_data = fetch_page_blocks
@@ -250,9 +251,14 @@ module Plugins
         title: extract_title_from_properties(item["properties"]),
         properties: extract_properties(item["properties"]),
         url: item["url"],
-        last_edited: format_date(item["last_edited_time"])
+        last_edited: format_date(item["last_edited_time"]),
+        icon: item_icon(item)
       }
     end
+
+    def item_icon(item) = show_icon? ? NotionIcon.for(item["icon"]) : nil
+
+    def show_icon? = settings["show_icon"] == "true"
 
     def extract_properties(properties)
       return [] unless properties
