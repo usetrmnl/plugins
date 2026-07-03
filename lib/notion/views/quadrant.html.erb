@@ -10,7 +10,7 @@
         <div class="columns" data-overflow-max-cols="1" data-overflow-counter="true">
           <div class="column">
             <% items.each_with_index do |item, idx| %>
-              <%= render partial: 'plugins/notion/shared/database_item', locals: { item: item, index: idx, current_layout: "quadrant", labeled_properties: labeled_properties, listed_properties: listed_properties, status_field: status_field } %>
+              <%= render partial: 'plugins/notion/shared/database_item', locals: { item: item, index: idx, current_layout: "quadrant", item_size: local_assigns[:item_size], labeled_properties: labeled_properties, listed_properties: listed_properties, status_field: status_field } %>
             <% end %>
           </div>
         </div>
