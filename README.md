@@ -100,5 +100,8 @@ native plugin structure:
 - [Anki](https://github.com/ItsJustThomas/trmnl-anki) by [@ItsJustThomas](https://github.com/ItsJustThomas)
 - [Obsidian](https://github.com/vaaski/trmnl-custom-plugins?tab=readme-ov-file#obsidian-daily-notes) by [@vaaski](https://github.com/vaaski)
 - [Beszel Server Stats](https://github.com/mr-karan/trmnl-beszel) by [@mr-karan](https://github.com/mr-karan)
+- [Mod Analytics](https://github.com/me4502/trmnl-mod-analytics) by [@me4502](https://github.com/me4502)
+- [RuneScape HiScores](https://github.com/me4502/trmnl-runescape) by [@me4502](https://github.com/me4502)
+- [Rebigulator](https://github.com/me4502/trmnl-rebigulator) by [@me4502](https://github.com/me4502)
 
 to be featured here, add `trmnl` topic to your repo, then open a PR or join the developer-only Discord server (link inside TRMNL UI).
