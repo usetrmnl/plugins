@@ -1,0 +1,44 @@
+<% groups = (pages || {}).to_a.first(2) %>
+<% always_columns = local_assigns[:always_columns] == true %>
+<% large_text = local_assigns[:large_text] == true %>
+<% heading_label_class = large_text ? "label lg:label--large" : "label" %>
+<% title_class = large_text ? "title title--small lg:title--base" : "title title--small" %>
+
+<div class="layout">
+  <div class="flex flex--row flex--stretch-y h--full w--full <%= 'portrait:flex--col portrait:gap--none' unless always_columns %>">
+    <% groups.each_with_index do |(type, items), index| %>
+      <% section_items = Array(items) %>
+      <div class="grow basis--0 w--min-0 <%= 'portrait:h--[50cqh] portrait:grow-0 portrait:shrink-0 portrait:basis--auto portrait:w--full' unless always_columns %> <%= 'portrait:pt--2' if !always_columns && index.positive? %>">
+        <div class="flex flex--col flex--top h--full w--full">
+          <div class="item">
+            <span class="<%= heading_label_class %>"><%= type.to_s.titleize %></span>
+          </div>
+
+          <div class="stretch-y w--full">
+            <div class="flex flex--col gap h--full" data-overflow="true" data-overflow-max-height="auto" data-overflow-counter="<%= (local_assigns[:overflow_counter] == true).to_s %>">
+              <% section_items.each do |item| %>
+                <div class="item">
+                  <div class="meta"></div>
+                  <div class="content">
+                    <div class="flex flex--row flex--center-y">
+                      <%= render "plugins/statuspage/shared/#{item[:icon]}", classes: (local_assigns[:icon_classes] || "w--6 h--6") %>
+                      <span class="<%= title_class %>"><%= item[:site_name] %></span>
+                    </div>
+                    <span class="label label--small"<% if local_assigns[:clamp_details] %> data-clamp="1"<% end %>>
+                      <% if type.to_s == 'scheduled' %>
+                        Scheduled: <%= l(item[:date].to_date, format: "%B %d, %Y") %>
+                      <% elsif type.to_s == 'incidents' %>
+                        Last Incident: <%= localized_time_ago(item[:date]) %>
+                      <% end %>
+                    </span>
+                    <span class="label label--small"<% if local_assigns[:clamp_details] %> data-clamp="1"<% end %>><%= item[:title] %></span>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
