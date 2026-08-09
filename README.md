@@ -26,6 +26,7 @@ community Recipes:
 - [Parcel](/lib/parcel)
 - [RSS Feed](/lib/rss_feed)
 - [Shopify](/lib/shopify)
+- [Statuspage](/lib/statuspage)
 - [Stock Price](/lib/stock_price)
 - [Tempest Weather Station](/lib/tempest_weather_station)
 - [Todoist](/lib/todoist)
