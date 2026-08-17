@@ -20,6 +20,7 @@ community Recipes:
 - [Github Commit Graph](/lib/github_commit_graph)
 - [Google Analytics](/lib/google_analytics)
 - [Hacker News](/lib/hacker_news)
+- [Hubspot](/lib/hubspot)
 - [Lunar Calendar](/lib/lunar_calendar)
 - [Lunch Money](/lib/lunch_money)
 - [Mondrian](/lib/mondrian)
