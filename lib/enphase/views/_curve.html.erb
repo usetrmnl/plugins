@@ -1,0 +1,61 @@
+<% if production_series.present? %>
+  <% chart_id = "enphase-curve-#{SecureRandom.hex(4)}" %>
+  <%= render partial: 'plugins/chart_js', locals: { libs: [:highcharts] } %>
+  <div id="<%= chart_id %>" class="w--full stretch"></div>
+  <script type="text/javascript">
+    (function () {
+      var el = '<%= chart_id %>';
+      var data = <%= raw production_series.to_json %>;
+
+      // TRMNLCharts arrives with the deferred framework module while Highcharts loads
+      // during the parse, so neither order is guaranteed. Poll for both rather than
+      // hanging the build on one event.
+      function whenReady(cb) {
+        var tries = 0;
+        (function attempt() {
+          if (window.TRMNLCharts && window.Highcharts) return cb();
+          if (++tries > 200) return;
+          setTimeout(attempt, 50);
+        })();
+      }
+
+      whenReady(function () {
+        // watch() rebuilds when the screen device/scale/mode/dark/theme changes,
+        // re-reading adaptive paint from the live cascade each time.
+        TRMNLCharts.watch(el, function () {
+          var px = function (value) { return TRMNLPaint.px(value, { el: el }); };
+
+          return Highcharts.chart(el, TRMNLCharts.merge(TRMNLCharts.options({ el: el }), {
+            chart: {
+              type: 'area',
+              spacing: px([8, 0, 0, 8])
+            },
+            series: [{
+              data: data,
+              color: TRMNLCharts.series(0, 1, { el: el }),
+              fillOpacity: 0.25,
+              lineWidth: px(2)
+            }],
+            xAxis: {
+              type: 'category',
+              labels: { y: px(18), step: <%= (production_series.size / local_assigns.fetch(:max_x_axis_labels, 6).to_f).ceil %> },
+              lineWidth: 1,
+              tickWidth: 0,
+              gridLineWidth: 0,
+              tickPixelInterval: px(90)
+            },
+            yAxis: {
+              labels: { format: '{value}' },
+              gridLineDashStyle: 'shortdot',
+              tickAmount: 3
+            }
+          }));
+        });
+      });
+    })();
+  </script>
+<% else %>
+  <div class="stretch layout layout--center layout--middle">
+    <span class="label text--gray-50">No production data yet today</span>
+  </div>
+<% end %>

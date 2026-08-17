@@ -1,0 +1,22 @@
+<% if defined?(errors) && errors.present? %>
+  <%= render partial: 'plugins/errors/quadrant', locals: {
+        icon: 'enphase--render.svg', title: 'Enphase', instance: instance_name, error_message: errors } %>
+<% else %>
+  <div class="view view--quadrant">
+    <div class="layout layout--col gap">
+      <div class="grid stretch">
+        <div class="col col--span-4 col--center">
+          <%= render partial: 'plugins/enphase/hero', locals: local_assigns.merge(value_class: 'value--large') %>
+        </div>
+        <div class="col col--span-4 col--center">
+          <%= render partial: 'plugins/enphase/totals', locals: local_assigns.merge(
+                value_class: 'value--xsmall', metric_keys: %i[consumed]) %>
+        </div>
+      </div>
+
+      <%= render partial: 'plugins/enphase/curve', locals: local_assigns.merge(max_x_axis_labels: 4) %>
+    </div>
+
+    <%= render partial: 'plugins/enphase/title_bar', locals: { instance_name:, last_report_label: } %>
+  </div>
+<% end %>

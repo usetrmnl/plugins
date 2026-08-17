@@ -15,6 +15,7 @@ community Recipes:
 - [Days Left Until](/lib/days_left_until)
 - [Eight Sleep](/lib/eight_sleep)
 - [Email Meter](/lib/email_meter)
+- [Enphase](/lib/enphase)
 - [Github Commit Graph](/lib/github_commit_graph)
 - [Google Analytics](/lib/google_analytics)
 - [Hacker News](/lib/hacker_news)

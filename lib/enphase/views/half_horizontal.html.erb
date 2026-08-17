@@ -1,0 +1,22 @@
+<% if defined?(errors) && errors.present? %>
+  <%= render partial: 'plugins/errors/half_horizontal', locals: {
+        icon: 'enphase--render.svg', title: 'Enphase', instance: instance_name, error_message: errors } %>
+<% else %>
+  <div class="view view--half_horizontal">
+    <div class="layout layout--col gap">
+      <div class="grid stretch">
+        <div class="col col--span-3 col--center">
+          <%= render partial: 'plugins/enphase/hero', locals: local_assigns.merge(value_class: 'value--large') %>
+        </div>
+        <div class="col col--span-5">
+          <%= render partial: 'plugins/enphase/totals', locals: local_assigns.merge(
+                value_class: 'value--small', metric_keys: %i[produced consumed exported imported]) %>
+        </div>
+      </div>
+
+      <%= render partial: 'plugins/enphase/curve', locals: local_assigns %>
+    </div>
+
+    <%= render partial: 'plugins/enphase/title_bar', locals: { instance_name:, last_report_label: } %>
+  </div>
+<% end %>
