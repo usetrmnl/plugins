@@ -12,6 +12,7 @@ community Recipes:
 
 - [Calendar](/lib/calendar)
 - [Chatgpt](/lib/chatgpt)
+- [Close](/lib/close)
 - [Days Left Until](/lib/days_left_until)
 - [Eight Sleep](/lib/eight_sleep)
 - [Email Meter](/lib/email_meter)

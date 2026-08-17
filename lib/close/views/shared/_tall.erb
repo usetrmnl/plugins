@@ -1,0 +1,19 @@
+<div class="view view--<%= view %>">
+  <div class="layout">
+    <div class="columns">
+      <% opportunities.first(lg_columns).each.with_index do |(key, value), index| %>
+        <%# hide the extra columns on smaller screens %>
+        <% css_class = index < columns ? "flex" : "hidden lg:flex" %>
+        
+        <div class="column gap <%= css_class %>" data-overflow="true" data-overflow-counter="true">
+          <span class="title mb--2"><%= key %></span>
+          <% value.each_with_index do |opportunity, idx| %>
+            <%= render 'plugins/close/shared/item', opportunity:, idx: %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%= render 'plugins/close/shared/title_bar', instance_name: %>
+</div>

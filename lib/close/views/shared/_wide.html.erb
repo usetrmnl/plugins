@@ -1,0 +1,16 @@
+<div class="view view--<%= view %>">
+  <div class="layout">
+    <div class="columns" data-overflow-max-cols="<%= max_cols %>">
+      <% opportunities.first(1).each do |key, value| %>
+        <div class="column">
+          <span class="title title--small w-full mb-medium"><%= key %></span>
+          <% value.each_with_index do |opportunity, idx| %>
+            <%= render 'plugins/close/shared/item', opportunity:, idx: %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%= render 'plugins/close/shared/title_bar', instance_name: instance_name %>
+</div>
