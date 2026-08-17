@@ -1,0 +1,40 @@
+<% if defined?(errors) && errors.present? %>
+  <%= render partial: 'plugins/errors/full', locals: {
+        icon: 'enphase--render.svg', title: 'Enphase', instance: instance_name, error_message: errors } %>
+<% else %>
+  <div class="view view--full">
+    <div class="layout layout--col gap--large">
+      <div class="grid stretch">
+        <% if self_consumed_percent %>
+          <div class="col col--span-4 col--center">
+            <%= render partial: 'plugins/enphase/hero', locals: local_assigns.merge(
+                  value_class: 'value--xxlarge', label_class: 'label--large') %>
+          </div>
+          <div class="col col--span-4 col--center">
+            <div class="item">
+              <div class="meta"></div>
+              <div class="content">
+                <span class="value value--large value--tnums"><%= self_consumed_percent %>%</span>
+                <span class="label">Self-consumed</span>
+              </div>
+            </div>
+          </div>
+        <% else %>
+          <%= render partial: 'plugins/enphase/hero', locals: local_assigns.merge(
+                value_class: 'value--xxlarge', label_class: 'label--large', item_class: 'col--center') %>
+        <% end %>
+      </div>
+
+      <div class="divider"></div>
+
+      <%= render partial: 'plugins/enphase/totals', locals: local_assigns.merge(
+            value_class: 'lg:value--large', metric_keys: %i[produced consumed exported imported battery]) %>
+
+      <div class="divider"></div>
+
+      <%= render partial: 'plugins/enphase/curve', locals: local_assigns %>
+    </div>
+
+    <%= render partial: 'plugins/enphase/title_bar', locals: { instance_name:, last_report_label: } %>
+  </div>
+<% end %>

@@ -1,0 +1,25 @@
+<%
+  candidate_metrics = {
+    produced: { value: produced_kwh, label: 'Produced kWh' },
+    consumed: { value: consumed_kwh, label: 'Consumed kWh' },
+    exported: { value: exported_kwh, label: 'Exported kWh' },
+    imported: { value: imported_kwh, label: 'Imported kWh' },
+    battery: {
+      value: battery_power_kw && (battery_power_kw.positive? ? "+#{battery_power_kw}" : battery_power_kw),
+      label: "Battery kW#{" · #{state_of_charge_percent}%" if state_of_charge_percent}"
+    }
+  }
+  tiles = metric_keys.filter_map { |key| candidate_metrics[key] if candidate_metrics[key][:value] }
+%>
+<%# grid--cols-N with fewer than N tiles leaves the trailing track blank. %>
+<div class="grid<%= " grid--cols-#{grid_column_count}" if local_assigns[:grid_column_count] && tiles.size > grid_column_count %>">
+  <% tiles.each do |tile| %>
+    <div class="item">
+      <div class="meta"></div>
+      <div class="content">
+        <span class="value <%= value_class %> value--tnums"><%= tile[:value] %></span>
+        <span class="label"><%= tile[:label] %></span>
+      </div>
+    </div>
+  <% end %>
+</div>

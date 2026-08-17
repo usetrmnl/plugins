@@ -1,0 +1,7 @@
+<div class="item<%= " #{item_class}" if local_assigns[:item_class] %>">
+  <div class="meta"></div>
+  <div class="content">
+    <span class="value <%= value_class %> value--tnums" data-fit-value="true"><%= current_power_kw %> kW</span>
+    <span class="label<%= " #{label_class}" if local_assigns[:label_class] %>">Producing now</span>
+  </div>
+</div>
