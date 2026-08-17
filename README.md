@@ -26,6 +26,7 @@ community Recipes:
 - [Notion](/lib/notion)
 - [Parcel](/lib/parcel)
 - [RSS Feed](/lib/rss_feed)
+- [Salesforce](/lib/salesforce)
 - [Shopify](/lib/shopify)
 - [Statuspage](/lib/statuspage)
 - [Stock Price](/lib/stock_price)

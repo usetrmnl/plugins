@@ -1,0 +1,27 @@
+<% groups = (opportunities || {}).to_a.first(2) %>
+
+<div class="layout">
+  <div class="columns">
+    <% groups.each do |group_name, items| %>
+      <div class="column" data-overflow="true">
+        <span class="label label--base group-header"><%= group_name %></span>
+        <% items.each_with_index do |opportunity, idx| %>
+          <div class="item">
+            <div class="meta">
+              <span class="index"><%= idx + 1 %></span>
+            </div>
+            <div class="content">
+              <span class="title title--small"><%= sanitize(opportunity[:name]) %></span>
+              <div class="flex gap--xsmall">
+                <span class="label label--small label--underline"><%= number_to_currency(opportunity[:value], precision: 0) %></span>
+                <span class="label label--small label--underline">via <%= opportunity[:user] %></span>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  
+</div>
+
