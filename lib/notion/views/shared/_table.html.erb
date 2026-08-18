@@ -1,0 +1,192 @@
+<%
+  layout_limits = {
+    "full" => { rows: 12, columns: 8, lines: 3 },
+    "half_horizontal" => { rows: 6, columns: 8, lines: 2 },
+    "half_vertical" => { rows: 10, columns: 4, lines: 3 },
+    "quadrant" => { rows: 6, columns: 4, lines: 2 }
+  }
+  limits = layout_limits.fetch(current_layout, layout_limits["full"])
+
+  source_rows = Array(table[:rows]).map { |row| Array(row) }
+  source_column_count = table[:table_width].to_i
+  source_column_count = source_rows.map(&:length).max.to_i if source_column_count.zero?
+
+  hidden_column_count = source_column_count > limits[:columns] ? source_column_count - limits[:columns] + 1 : 0
+  visible_source_columns = hidden_column_count.positive? ? limits[:columns] - 1 : source_column_count
+  displayed_column_count = [source_column_count, limits[:columns]].min
+
+  hidden_row_count = source_rows.length > limits[:rows] ? source_rows.length - limits[:rows] + 1 : 0
+  visible_source_rows = hidden_row_count.positive? ? limits[:rows] - 1 : source_rows.length
+
+  rows = source_rows.first(visible_source_rows).map.with_index do |row, row_index|
+    cells = row.first(visible_source_columns)
+    cells.fill("", cells.length...visible_source_columns)
+    cells << (row_index.zero? ? "+#{hidden_column_count} cols" : "…") if hidden_column_count.positive?
+    cells
+  end
+
+  if hidden_row_count.positive?
+    summary_row = Array.new(displayed_column_count, "…")
+    summary_row[0] = "+#{hidden_row_count} rows"
+    rows << summary_row
+  end
+
+  dense = rows.length > 8 || displayed_column_count > 6
+  line_limit = dense ? [limits[:lines], 2].min : limits[:lines]
+%>
+
+<% if rows.any? && displayed_column_count.positive? %>
+  <style>
+    .notion-table-layout,
+    .notion-table-layout > .notion-table-columns,
+    .notion-table-layout > .notion-table-columns > .notion-table-column {
+      height: 100%;
+      min-height: 0;
+    }
+
+    .notion-table-columns {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .notion-table-column {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap);
+    }
+
+    .notion-table-frame {
+      width: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .notion-table-layout .notion-table-frame {
+      flex: 1 1 0;
+    }
+
+    .notion-table {
+      display: grid;
+      grid-template-columns: repeat(var(--notion-table-columns), minmax(0, 1fr));
+      grid-template-rows: repeat(var(--notion-table-rows), minmax(0, 1fr));
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+      border-top: 1px solid var(--framework-border-strong, #000);
+      border-left: 1px solid var(--framework-border-strong, #000);
+      box-sizing: border-box;
+      color: var(--framework-text-primary, #000);
+    }
+
+    .notion-table.notion-table > thead,
+    .notion-table.notion-table > tbody,
+    .notion-table.notion-table tr {
+      display: contents;
+    }
+
+    .notion-table th,
+    .notion-table td {
+      --notion-cell-pad-block: calc(3px * var(--content-scale, 1));
+      --notion-cell-pad-inline: calc(5px * var(--content-scale, 1));
+      --notion-cell-font: calc(14px * var(--text-ui-scale, 1));
+      --notion-cell-leading: 1.1;
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      padding: var(--notion-cell-pad-block) var(--notion-cell-pad-inline);
+      border-right: 1px solid var(--framework-border-strong, #000);
+      border-bottom: 1px solid var(--framework-border-strong, #000);
+      box-sizing: border-box;
+      font-size: var(--notion-cell-font);
+      font-weight: 400;
+      line-height: var(--notion-cell-leading);
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .notion-table .notion-table__cell--header,
+    .notion-table .notion-table__cell--summary {
+      background-color: var(--framework-fill-soft, #e5e5e5);
+      font-weight: 700;
+    }
+
+    .notion-table .notion-table__cell--important {
+      background-color: var(--framework-slot-chip-bg-color, var(--framework-fill-strong, #000));
+      background-image: var(--framework-slot-chip-bg-image, none);
+      color: var(--framework-slot-chip-text-color, var(--framework-text-inverse, #fff));
+      -webkit-text-fill-color: currentColor;
+      font-weight: 700;
+    }
+
+    .notion-table__text {
+      display: block;
+      width: 100%;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .notion-table--dense th,
+    .notion-table--dense td {
+      --notion-cell-pad-block: calc(2px * var(--content-scale, 1));
+      --notion-cell-pad-inline: calc(4px * var(--content-scale, 1));
+      --notion-cell-font: calc(12px * var(--text-ui-scale, 1));
+      --notion-cell-leading: 1.05;
+    }
+
+    .notion-table--half_horizontal th,
+    .notion-table--half_horizontal td {
+      --notion-cell-pad-block: calc(2px * var(--content-scale, 1));
+      --notion-cell-pad-inline: calc(4px * var(--content-scale, 1));
+      --notion-cell-font: calc(11px * var(--text-ui-scale, 1));
+      --notion-cell-leading: 1.1;
+    }
+
+    .notion-table--half_vertical th,
+    .notion-table--half_vertical td {
+      --notion-cell-pad-block: calc(3px * var(--content-scale, 1));
+      --notion-cell-pad-inline: calc(3px * var(--content-scale, 1));
+      --notion-cell-font: calc(11px * var(--text-ui-scale, 1));
+      --notion-cell-leading: 1.1;
+    }
+
+    .notion-table--quadrant th,
+    .notion-table--quadrant td {
+      --notion-cell-pad-block: calc(2px * var(--content-scale, 1));
+      --notion-cell-pad-inline: calc(2px * var(--content-scale, 1));
+      --notion-cell-font: calc(10px * var(--text-ui-scale, 1));
+      --notion-cell-leading: 1.05;
+    }
+  </style>
+
+  <% has_column_header = table[:has_column_header] && visible_source_rows.positive? %>
+  <div class="notion-table-frame">
+    <table class="table notion-table notion-table--<%= current_layout %><%= " notion-table--dense" if dense %>"
+           aria-rowcount="<%= source_rows.length %>"
+           aria-colcount="<%= source_column_count %>"
+           style="--notion-table-columns: <%= displayed_column_count %>; --notion-table-rows: <%= rows.length %>;">
+      <% rows.each_with_index do |row, row_index| %>
+        <% if has_column_header && row_index.zero? %><thead><% elsif row_index == (has_column_header ? 1 : 0) %><tbody><% end %>
+        <tr>
+          <% row.each_with_index do |cell, column_index| %>
+            <% summary = (hidden_row_count.positive? && row_index == rows.length - 1) || (hidden_column_count.positive? && column_index == row.length - 1) %>
+            <% header = (has_column_header && row_index.zero?) || (table[:has_row_header] && column_index.zero?) %>
+            <% important = !summary && cell.to_s.lines.any? { |line| line.lstrip.start_with?("!") } %>
+            <% cell_classes = ["notion-table__cell"] %>
+            <% cell_classes << "notion-table__cell--header" if header %>
+            <% cell_classes << "notion-table__cell--summary" if summary %>
+            <% cell_classes << "notion-table__cell--important" if important %>
+            <% tag_name = header ? "th" : "td" %>
+            <<%= tag_name %> class="<%= cell_classes.join(" ") %>"<% if header %> scope="<%= has_column_header && row_index.zero? ? "col" : "row" %>"<% end %>>
+              <span class="notion-table__text" data-clamp="<%= line_limit %>" data-pixel-perfect="true"><%= cell %></span>
+            </<%= tag_name %>>
+          <% end %>
+        </tr>
+        <% if has_column_header && row_index.zero? %></thead><% end %>
+      <% end %>
+      <% if rows.length > (has_column_header ? 1 : 0) %></tbody><% end %>
+    </table>
+  </div>
+<% end %>

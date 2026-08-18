@@ -22,22 +22,30 @@
       <% end %>
     </div>
   <% elsif display_type == "page" %>
-    <div class="layout layout--top">
-      <% if items && items[:blocks] && items[:blocks].any? %>
-        <div class="columns" data-overflow-max-cols="1" data-overflow-counter="false">
-          <div class="column">
+    <% if items && items[:blocks] && items[:blocks].any? %>
+      <% has_table = items[:blocks].any? { |block| block[:type] == "table" } %>
+      <div class="layout layout--top<%= " notion-table-layout" if has_table %>">
+        <% if has_table %>
+          <div class="notion-table-columns">
+            <div class="notion-table-column">
+        <% else %>
+          <div class="columns" data-overflow-max-cols="1" data-overflow-counter="false">
+            <div class="column">
+        <% end %>
             <% items[:blocks].each_with_index do |block, idx| %>
               <%= render 'plugins/notion/shared/page_block', block: block, index: idx, current_layout: "quadrant", image_height: image_height %>
             <% end %>
           </div>
         </div>
-      <% else %>
+      </div>
+    <% else %>
+      <div class="layout layout--top">
         <%= render 'plugins/notion/shared/error_section',
                    title_class: "title title--small",
                    title_text: "No Content",
                    description_text: "Check config" %>
-      <% end %>
-    </div>
+      </div>
+    <% end %>
   <% end %>
 
   <%= render partial: 'plugins/notion/shared/title_bar', locals: { instance_name: instance_name } %>
