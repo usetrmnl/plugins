@@ -15,8 +15,11 @@
   visible_source_columns = hidden_column_count.positive? ? limits[:columns] - 1 : source_column_count
   displayed_column_count = [source_column_count, limits[:columns]].min
 
-  hidden_row_count = source_rows.length > limits[:rows] ? source_rows.length - limits[:rows] + 1 : 0
-  visible_source_rows = hidden_row_count.positive? ? limits[:rows] - 1 : source_rows.length
+  row_results_truncated = table[:has_more_rows] == true
+  needs_row_summary = source_rows.length > limits[:rows] || row_results_truncated
+  visible_source_rows = needs_row_summary ? [limits[:rows] - 1, source_rows.length].min : source_rows.length
+  hidden_row_count = source_rows.length - visible_source_rows
+  hidden_row_label = row_results_truncated ? "+#{[hidden_row_count, 1].max}+ rows" : "+#{hidden_row_count} rows"
 
   rows = source_rows.first(visible_source_rows).map.with_index do |row, row_index|
     cells = row.first(visible_source_columns)
@@ -25,19 +28,23 @@
     cells
   end
 
-  if hidden_row_count.positive?
+  if needs_row_summary
     summary_row = Array.new(displayed_column_count, "…")
-    summary_row[0] = "+#{hidden_row_count} rows"
+    summary_row[0] = hidden_row_label
     rows << summary_row
   end
 
   dense = rows.length > 8 || displayed_column_count > 6
   line_limit = dense ? [limits[:lines], 2].min : limits[:lines]
+  line_limit = 1 if %w[half_horizontal quadrant].include?(current_layout) && rows.length == limits[:rows]
 %>
 
 <% if rows.any? && displayed_column_count.positive? %>
   <style>
-    .notion-table-layout,
+    .notion-table-layout {
+      min-height: 0;
+    }
+
     .notion-table-layout > .notion-table-columns,
     .notion-table-layout > .notion-table-columns > .notion-table-column {
       height: 100%;
@@ -128,6 +135,11 @@
       overflow: hidden;
     }
 
+    .notion-table__text[data-clamp="1"] {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     .notion-table--dense th,
     .notion-table--dense td {
       --notion-cell-pad-block: calc(2px * var(--content-scale, 1));
@@ -171,7 +183,7 @@
         <% if has_column_header && row_index.zero? %><thead><% elsif row_index == (has_column_header ? 1 : 0) %><tbody><% end %>
         <tr>
           <% row.each_with_index do |cell, column_index| %>
-            <% summary = (hidden_row_count.positive? && row_index == rows.length - 1) || (hidden_column_count.positive? && column_index == row.length - 1) %>
+            <% summary = (needs_row_summary && row_index == rows.length - 1) || (hidden_column_count.positive? && column_index == row.length - 1) %>
             <% header = (has_column_header && row_index.zero?) || (table[:has_row_header] && column_index.zero?) %>
             <% important = !summary && cell.to_s.lines.any? { |line| line.lstrip.start_with?("!") } %>
             <% cell_classes = ["notion-table__cell"] %>

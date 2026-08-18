@@ -23,7 +23,7 @@
     </div>
   <% elsif display_type == "page" %>
     <% if items && items[:blocks] && items[:blocks].any? %>
-      <% has_table = items[:blocks].any? { |block| block[:type] == "table" } %>
+      <% has_table = items[:blocks].any? { |block| block[:type] == "table" && Array(block[:rows]).any? && block[:table_width].to_i.positive? } %>
       <div class="layout layout--top<%= " notion-table-layout" if has_table %>">
         <% if has_table %>
           <div class="notion-table-columns">

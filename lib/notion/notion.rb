@@ -336,7 +336,8 @@ module Plugins
     end
 
     def format_table_block(block, block_data)
-      rows = fetch_table_rows(block["id"]).map do |row|
+      table_data = fetch_table_data(block["id"])
+      rows = table_data[:rows].map do |row|
         Array(row.dig("table_row", "cells")).map { |cell| extract_rich_text(cell) }
       end
 
@@ -348,13 +349,25 @@ module Plugins
         table_width: table_width,
         has_column_header: block_data["has_column_header"] == true,
         has_row_header: block_data["has_row_header"] == true,
+        has_more_rows: table_data[:has_more],
         rows: normalize_table_rows(rows, table_width)
       }
     end
 
-    def fetch_table_rows(table_id)
-      response = api_client.get_page_blocks(table_id, page_size: 100)
-      Array(response["results"]).select { |block| block["type"] == "table_row" }
+    def fetch_table_data(table_id)
+      @table_data ||= {}
+      @table_data[table_id] ||= begin
+        response = api_client.get_page_blocks(table_id, page_size: 100)
+        results = response.is_a?(Hash) ? response["results"] : nil
+
+        {
+          rows: Array(results).select { |block| block.is_a?(Hash) && block["type"] == "table_row" },
+          has_more: response.is_a?(Hash) && response["has_more"] == true
+        }
+      rescue StandardError => e
+        Rails.logger.error "Notion table API error: #{e.message}"
+        { rows: [], has_more: false }
+      end
     end
 
     def normalize_table_rows(rows, table_width)
@@ -367,7 +380,11 @@ module Plugins
     end
 
     def extract_rich_text(rich_text)
-      text = Array(rich_text).map { |fragment| fragment["plain_text"] || fragment.dig("text", "content") }.join
+      text = Array(rich_text).filter_map do |fragment|
+        next unless fragment.is_a?(Hash)
+
+        fragment["plain_text"] || fragment.dig("text", "content")
+      end.join
       strip_emojis(text)
     end
 
