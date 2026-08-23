@@ -1,0 +1,61 @@
+<% event_layout = local_assigns[:event_layout] %>
+<% if %w[week rolling_week work_week three_day_week].include?(event_layout) %>
+  <%= render partial: 'plugins/calendars/full_week',
+             locals: local_assigns.merge(
+               work_week: event_layout == 'work_week',
+               three_day_week: event_layout == 'three_day_week',
+               view_class: 'half_horizontal',
+               calendar_dom_id: "calendar-half-horizontal-week-#{SecureRandom.hex(2)}"
+             ) %>
+<% else %>
+<% days_to_show = event_layout == 'today_only' ? 1 : 3 %>
+<% zoom_mode ||= false %>
+<% date_heading_size = zoom_mode ? 'large' : 'medium' %>
+<% heading_size = zoom_mode ? 'medium' : 'small' %>
+<% event_time_style = zoom_mode ? 'inverted' : 'underline' %>
+<% alignment_class = vertical_alignment == 'top' ? ' layout--top' : (vertical_alignment == 'bottom' ? ' layout--bottom' : '') %>
+<% today_label = today_date_label(today_in_tz, date_format, highlight: highlight_today) %>
+
+<div class="view view--half_horizontal">
+  <% if events.blank? && event_layout == 'today_only' %>
+    <div class="layout layout--center layout--middle h--full">
+      <span class="title text--gray-50"><%= t('renders.calendars.no_events_today') %></span>
+    </div>
+  <% else %>
+  <div class="layout<%= alignment_class %>">
+    <div class="columns" data-overflow-max-cols="3" data-overflow-counter="true">
+      <div class="column">
+        <% idx = 0 %>
+        <% formulate_and_group_events_by_day(events, today_in_tz, days_to_show, date_format).to_h.each_pair do |day, events| %>
+          <span class="label label--<%= date_heading_size %><%= ' label--filled' if day == today_label %> group-header" data-group-header="true"><%= day %></span>
+          <% events.each do |event|  %>
+            <% if event[:all_day] %>
+              <%= render partial: 'plugins/calendars/all_day_event', locals: { event: event, include_description: } %>
+            <% else %>
+              <div class="item">
+                <div class="meta">
+                  <span class="index"><%= idx += 1 %></span>
+                </div>
+                <div class="content">
+                  <span class="title title--<%= heading_size %>" data-clamp="2"><%= event[:summary] %></span>
+                  <% if include_description %>
+                    <span class="description" data-clamp="1"><%= event[:description] %></span>
+                  <% end %>
+                  <% if include_event_time %>
+                    <div class="flex gap--xsmall">
+                      <span class="label label--small label--<%= event_time_style %>"><%= "#{event[:start]}" %> - <%= event[:end] %></span>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <% end %>
+
+  <%= render partial: "plugins/calendars/title_bar", locals: local_assigns %>
+</div>
+<% end %>
