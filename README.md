@@ -19,6 +19,7 @@ community Recipes:
 - [Enphase](/lib/enphase)
 - [Github Commit Graph](/lib/github_commit_graph)
 - [Google Analytics](/lib/google_analytics)
+- [Google Calendar](/lib/google_calendar)
 - [Hacker News](/lib/hacker_news)
 - [Hubspot](/lib/hubspot)
 - [Lunar Calendar](/lib/lunar_calendar)
