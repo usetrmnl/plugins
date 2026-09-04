@@ -10,7 +10,6 @@ community Recipes:
 
 ## Native plugin examples
 
-- [Calendar](/lib/calendar)
 - [Chatgpt](/lib/chatgpt)
 - [Close](/lib/close)
 - [Days Left Until](/lib/days_left_until)
