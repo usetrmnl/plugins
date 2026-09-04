@@ -1,5 +1,7 @@
 module Plugins
   class GoogleCalendar < Base
+    CALENDAR_FETCH_ATTEMPTS = 2
+
     include Calendar::Helper
 
     def locals
@@ -64,18 +66,21 @@ module Plugins
       service.authorization = GoogleOauthClient.build(self.class, access_token)
 
       calendars.each do |calendar_email|
-        # TODO: investigate, maybe Google Cal does support ordering by start Time? mixed reports:
-        # https://github.com/googleapis/google-api-ruby-client/blob/main/samples/cli/lib/samples/calendar.rb#L65
-        events = events_for_calendar(service, calendar_email)
-        events.each do |event|
-          all_events << prepare_event(event, calendar_email)
+        attempts = 0
+        begin
+          attempts += 1
+          # TODO: investigate, maybe Google Cal does support ordering by start Time? mixed reports:
+          # https://github.com/googleapis/google-api-ruby-client/blob/main/samples/cli/lib/samples/calendar.rb#L65
+          events = events_for_calendar(service, calendar_email)
+          events.each do |event|
+            all_events << prepare_event(event, calendar_email)
+          end
+        rescue Google::Apis::ClientError => e
+          # Raw message carries the user's email — log only the leading reason keyword (e.g. notFound)
+          Rails.logger.warn "Plugins::GoogleCalendar-> Google::Apis::ClientError: plugin_setting_id=#{plugin_setting.id} status=#{e.status_code} reason=#{e.message[/\A\w+/]}"
+        rescue Google::Apis::ServerError
+          retry if attempts < CALENDAR_FETCH_ATTEMPTS
         end
-      rescue Google::Apis::ClientError => e
-        # Raw message carries the user's email — log only the leading reason keyword (e.g. notFound)
-        Rails.logger.warn "Plugins::GoogleCalendar-> Google::Apis::ClientError: plugin_setting_id=#{plugin_setting.id} status=#{e.status_code} reason=#{e.message[/\A\w+/]}"
-      rescue Google::Apis::ServerError
-        sleep 1
-        retry
       end
 
       # de-duplicates events if every param (except calname) matches -- helpful for family calendars where multiple entries otherwise exist for same event
@@ -291,10 +296,23 @@ module Plugins
       fetch_events(service, calendar_email, time_max(extend: true))
     end
 
+    # Google caps the events to 250 entries. we loop the list_events endpoint via `page_token`.
     def fetch_events(service, calendar_email, ends_at)
-      instrument_fetch(service.root_url) do
-        service.list_events(calendar_email, single_events: true, time_min: time_min.iso8601, time_max: ends_at).items
+      events = []
+      page_token = nil
+
+      loop do
+        page = instrument_fetch(service.root_url) do
+          service.list_events(calendar_email, single_events: true,
+                                              page_token: page_token, time_min: time_min.iso8601, time_max: ends_at)
+        end
+
+        events.concat(page.items)
+        page_token = page.next_page_token
+        break if page.items.empty? || page_token.blank?
       end
+
+      events
     end
   end
 end

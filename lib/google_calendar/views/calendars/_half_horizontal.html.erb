@@ -1,4 +1,5 @@
 <% event_layout = local_assigns[:event_layout] %>
+<% month_grid_fits = local_assigns[:css_screen_height].to_i >= Calendar::Helper::HALF_HORIZONTAL_MONTH_MIN_SCREEN_HEIGHT %>
 <% if %w[week rolling_week work_week three_day_week].include?(event_layout) %>
   <%= render partial: 'plugins/calendars/full_week',
              locals: local_assigns.merge(
@@ -6,6 +7,14 @@
                three_day_week: event_layout == 'three_day_week',
                view_class: 'half_horizontal',
                calendar_dom_id: "calendar-half-horizontal-week-#{SecureRandom.hex(2)}"
+             ) %>
+<% elsif event_layout == 'rolling_month' && month_grid_fits %>
+  <%= render partial: 'plugins/calendars/full_month',
+             locals: local_assigns.merge(
+               view_class: 'half_horizontal',
+               cap_event_rows: true,
+               include_event_time: false,
+               calendar_dom_id: "calendar-half-horizontal-month-#{SecureRandom.hex(2)}"
              ) %>
 <% else %>
 <% days_to_show = event_layout == 'today_only' ? 1 : 3 %>
