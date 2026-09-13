@@ -1,0 +1,16 @@
+<% event_layout = local_assigns[:event_layout] %>
+<% if %w[week rolling_week].include?(event_layout) %>
+  <%= render partial: 'plugins/calendars/full_week', locals: local_assigns %>
+<% elsif event_layout == 'work_week' %>
+  <%= render partial: 'plugins/calendars/full_week', locals: local_assigns.merge({work_week: true}) %>
+<% elsif event_layout == 'three_day_week' %>
+  <%= render partial: 'plugins/calendars/full_week', locals: local_assigns.merge({three_day_week: true}) %>
+<% elsif %w[month rolling_month].include?(event_layout) %>
+  <%= render partial: 'plugins/calendars/full_month', locals: local_assigns %>
+<% elsif event_layout == 'schedule' %>
+    <div class="view view--full">
+      <%= render partial: 'plugins/calendars/schedule', locals: local_assigns %>
+    </div>
+<% else %>
+  <%= render partial: 'plugins/calendars/full_auto', locals: local_assigns %>
+<% end %>

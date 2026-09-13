@@ -1,0 +1,55 @@
+<% if events.blank? %>
+  <div class="layout layout--center layout--middle h--full">
+    <span class="title text--gray-50">No upcoming events</span>
+  </div>
+<% else %>
+  <% today_label = today_date_label(today_in_tz, date_format, highlight: highlight_today) %>
+  <div class="layout layout--top">
+    <div class="columns">
+      <div class="column" data-overflow="true">
+        <% formulate_and_group_events_by_day(events, today_in_tz, 20, date_format).to_h.each_pair do |day, events| %>
+          <div class="item flex flex--row w--full <%= day == today_label ? 'bg--black 2bit:bg--gray-30' : 'bg--gray-75' %> rounded--xsmall no-shrink" data-group-header="true">
+            <span class="label label--small <%= day == today_label ? 'text--white' : 'text-stroke' %>"><%== day %></span>
+          </div>
+
+          <% all_day_events = events.filter { it[:all_day] } %>
+          <% if all_day_events.present? %>
+            <div class="item flex flex--row flex--top w--full">
+              <span class="flex flex--row flex--center-x bg--black 2bit:bg--gray-30 w--10 rounded--xsmall no-shrink">
+                <span class="label label--small text--white">#</span>
+              </span>
+              <div class="stretch">
+                <span class="label no-shrink"><%= all_day_events.map { it[:summary] }.join(', ') %></span>
+              </div>
+            </div>
+          <% end %>
+
+          <% (events - all_day_events).each do |event| %>
+            <div class="item flex flex--row flex--top w--full">
+              <% if include_event_time %>
+                <span class="flex flex--row flex--center-x bg--black 2bit:bg--gray-30 w--10 rounded--xsmall no-shrink">
+                  <span class="label label--small text--white"><%= event[:start].to_s.split(' ')[0] %></span>
+                </span>
+              <% end %>
+
+              <!-- <div class="flex flex--row w--full stretch flex--left"> -->
+              <div class="stretch">
+                <span class="label no-shrink" data-clamp="1"><%= event[:summary] %></span>
+
+                <% if include_description %>
+                  <span class="description" data-clamp="1"><%== event[:description].html_safe %></span>
+                <% end %>
+              </div>
+
+              <% if include_event_time %>
+                <span class="flex flex--row flex--center-x bg--black 2bit:bg--gray-30 w--10 rounded--xsmall no-shrink">
+                  <span class="label label--small text--white"><%= event[:end].to_s.split(' ')[0] %></span>
+                </span>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

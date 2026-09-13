@@ -1,0 +1,265 @@
+<%= stylesheet_link_tag 'plugins/calendars', media: 'all' %>
+
+<% unless content_for?(:fullcalendar_loaded) %>
+  <% content_for :fullcalendar_loaded, true %>
+  <script src="https://trmnl.com/fullcalendar/index.global.min.js"></script>
+  <script>
+    // Shared helper: auto-toggle allDaySlot based on visible-range all-day events
+    window.trmnlAllDaySlotAuto = function(calendar) {
+      var lastAllDayEnabled = null;
+      function updateAllDaySlot() {
+        try {
+          var view = calendar.view;
+          var start = view.activeStart;
+          var end = view.activeEnd;
+          var hasAllDay = calendar.getEvents().some(function (ev) {
+            if (!ev.allDay) return false;
+            var s = ev.start;
+            var e = ev.end || s;
+            return (e > start) && (s < end);
+          });
+          if (lastAllDayEnabled !== hasAllDay) {
+            lastAllDayEnabled = hasAllDay;
+            calendar.setOption('allDaySlot', hasAllDay);
+          }
+        } catch (e) { /* ignore */ }
+      }
+      calendar.on('datesSet', function () { setTimeout(updateAllDaySlot, 0); });
+      calendar.on('eventsSet', function () { setTimeout(updateAllDaySlot, 0); });
+      setTimeout(updateAllDaySlot, 0);
+    };
+
+    // Shared helper: narrow the time grid to the events inside the visible date range.
+    // The server picks its bounds from the whole payload, so a 6am event five days out
+    // would otherwise anchor a 3-day layout that never renders it.
+    window.trmnlSlotBoundsAuto = function(calendar, cfg) {
+      var lastApplied = null;
+      function ceilToHour(date) { return date.getHours() + ((date.getMinutes() || date.getSeconds()) ? 1 : 0); }
+      function slotTime(hour) { return (hour < 10 ? '0' : '') + hour + ':00:00'; }
+
+      function updateSlotBounds() {
+        try {
+          var view = calendar.view;
+          var start = view.activeStart;
+          var end = view.activeEnd;
+          var earliest = 24;
+          var latest = 0;
+          calendar.getEvents().forEach(function (ev) {
+            if (ev.allDay || !ev.start) return;
+            var s = ev.start;
+            var e = ev.end || s;
+            if (!(e > start && s < end)) return;
+            var from = s < start ? 0 : s.getHours();
+            var to = e > end ? 24 : ceilToHour(e);
+            if (s.toDateString() !== e.toDateString()) { // crosses midnight, so each day it touches needs the full span
+              if (ceilToHour(e)) from = 0;
+              to = 24;
+            }
+            earliest = Math.min(earliest, from);
+            latest = Math.max(latest, to);
+          });
+          if (earliest >= latest) return; // nothing timed on screen, keep the server bounds
+
+          var min = cfg.autoScrollTime ? earliest : parseInt(cfg.slotMinTime, 10);
+          var max = cfg.autoScrollTimeEnd ? latest : parseInt(cfg.slotMaxTime, 10);
+          if (!(min < max)) return; // a bound the user typed wins, even against the events
+
+          if (lastApplied === min + '-' + max) return;
+          lastApplied = min + '-' + max;
+          calendar.batchRendering(function () { // three options, one re-render
+            if (cfg.autoScrollTime) {
+              calendar.setOption('slotMinTime', slotTime(min));
+              calendar.setOption('scrollTime', slotTime(min));
+            }
+            if (cfg.autoScrollTimeEnd) {
+              calendar.setOption('slotMaxTime', slotTime(max));
+            }
+          });
+        } catch (e) { /* ignore */ }
+      }
+
+      calendar.on('datesSet', function () { setTimeout(updateSlotBounds, 0); });
+      calendar.on('eventsSet', function () { setTimeout(updateSlotBounds, 0); });
+      setTimeout(updateSlotBounds, 0);
+    };
+
+    // Shared initializer: bootstrap any .trmnl-calendar element with data-calendar-config JSON
+    window.trmnlInitCalendars = function(root) {
+      try {
+        var scope = root || document;
+        var nodes = scope.querySelectorAll('.trmnl-calendar:not([data-initialized])');
+        nodes.forEach(function(node){
+          var cfgRaw = node.getAttribute('data-calendar-config');
+          if (!cfgRaw) { return; }
+          var cfg = {};
+          try { cfg = JSON.parse(cfgRaw); } catch(e) { console.warn('Invalid calendar config', e); }
+
+          // Base options shared by all calendars
+          var baseOpts = {
+            headerToolbar: false,
+            schedulerLicenseKey: (cfg.schedulerLicenseKey || ''),
+            locale: (cfg.locale || 'en'),
+            eventDidMount: function(info) {
+              var tc = info.event.textColor;
+              if (tc) {
+                info.el.style.backgroundImage = 'none';
+                if (cfg.adaptiveEventStroke) {
+                  info.el.style.webkitTextStroke = '2.5px var(--framework-semantic-stroke-contrast-stroke-color, ' + (tc === 'white' ? 'black' : 'white') + ')';
+                }
+              }
+            }
+          };
+
+          if (cfg.dayHeaders) {
+            baseOpts.dayHeaderContent = function(arg) {
+              var date = arg.date;
+              var key = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+              return cfg.dayHeaders[key] || arg.text; // outside the days the server sent, keep FullCalendar's label
+            };
+          }
+
+          // Month/rolling-month: force numeric day number, but add a small month label
+          if (node.classList.contains('trmnl-calendar--month')) {
+            baseOpts.dayCellContent = function(arg) {
+              try {
+                return { html: String(arg.date.getDate()) };
+              } catch (e) {
+                return { html: '' };
+              }
+            };
+
+            baseOpts.dayCellDidMount = function(arg) {
+              try {
+                var top = arg.el.querySelector('.fc-daygrid-day-top');
+                var numEl = top && top.querySelector('.fc-daygrid-day-number');
+                if (!top || !numEl) return;
+
+                // FullCalendar marks certain day numbers as month-start
+                if (!numEl.classList.contains('fc-daygrid-month-start')) return;
+
+                var monthName = arg.date.toLocaleDateString((cfg.locale || 'en'), { month: 'long' });
+                var label = document.createElement('span');
+                label.className = 'trmnl-month-label';
+                label.textContent = monthName;
+                // Mark parent so CSS can align the pair to the right without :has()
+                top.classList.add('trmnl-has-month-label');
+                top.insertBefore(label, numEl);
+              } catch (e) { /* ignore */ }
+            };
+          }
+
+          // Rolling month fills the screen with as many whole weeks as actually fit.
+          // Render the max first — 6, because the server only fetches 6 weeks of
+          // events ahead (Plugins::GoogleCalendar#time_max); further rows would be blank.
+          var rollingMonth = cfg.initialView === 'rollingMonth' && cfg.views && cfg.views.rollingMonth;
+          // Capped rows stretch to share the height, so every week count "fits" and counting
+          // them proves nothing — a capped grid keeps the weeks the server asked for.
+          var expandWeeksToFillHeight = rollingMonth && !cfg.dayMaxEventRows;
+          if (expandWeeksToFillHeight) { cfg.views.rollingMonth.duration = { weeks: 6 }; }
+
+          var calendar = new FullCalendar.Calendar(node, Object.assign(baseOpts, cfg));
+
+          if (cfg.autoAllDaySlot) {
+            try { window.trmnlAllDaySlotAuto(calendar); } catch(e) {}
+          }
+
+          if (cfg.autoScrollTime || cfg.autoScrollTimeEnd) {
+            try { window.trmnlSlotBoundsAuto(calendar, cfg); } catch(e) {}
+          }
+
+          calendar.render();
+
+          // Count the week rows that landed fully on screen (row height is content-
+          // driven, so dense months fit fewer). Re-render with just those weeks so
+          // the range — and the title — match what is actually visible.
+          if (expandWeeksToFillHeight) {
+            var gridBottom = node.getBoundingClientRect().bottom + 1;
+            var weekRows = node.querySelectorAll('.fc-daygrid-body tr');
+            var fitWeeks = 0;
+            weekRows.forEach(function(tr){ if (tr.getBoundingClientRect().bottom <= gridBottom) fitWeeks++; });
+            fitWeeks = Math.min(6, Math.max(4, fitWeeks));
+            if (fitWeeks < weekRows.length) {
+              calendar.destroy();
+              cfg.views.rollingMonth.duration = { weeks: fitWeeks };
+              calendar = new FullCalendar.Calendar(node, Object.assign(baseOpts, cfg));
+              calendar.render();
+            }
+          }
+
+          node.setAttribute('data-initialized', 'true');
+
+          // Hacky fix for bug shown in https://github.com/usetrmnl/core/pull/2951.
+          // Month view multi-day reflow detector. FC writes inline `top:Npx`
+          // on .fc-daygrid-event-harness-abs during render based on measured
+          // cell heights, but doesn't recompute when cells reflow later (font
+          // swap on hard refresh, late CSS, images). Watch per-cell event
+          // containers and trigger updateSize() when any height changes.
+          if (node.classList.contains('trmnl-calendar--month') && window.ResizeObserver) {
+            var rerunPending = false;
+            var lastHeights = new Map();
+            var rerun = function() {
+              if (rerunPending) return;
+              rerunPending = true;
+              requestAnimationFrame(function() {
+                rerunPending = false;
+                try { calendar.updateSize(); } catch (_) {}
+              });
+            };
+            var ro = new ResizeObserver(function(entries) {
+              var changed = false;
+              for (var i = 0; i < entries.length; i++) {
+                var el = entries[i].target;
+                var h = Math.round(entries[i].contentRect.height);
+                if (lastHeights.get(el) !== h) {
+                  lastHeights.set(el, h);
+                  changed = true;
+                }
+              }
+              if (changed) rerun();
+            });
+            node.querySelectorAll('.fc-daygrid-day-events').forEach(function(el) {
+              lastHeights.set(el, Math.round(el.getBoundingClientRect().height));
+              ro.observe(el);
+            });
+            // Insurance for the font-swap reflow specifically:
+            // some browsers may defer the per-cell ResizeObserver signal
+            // longer than the global fonts `loadingdone` event.
+            if (document.fonts && document.fonts.addEventListener) {
+              document.fonts.addEventListener('loadingdone', rerun);
+            }
+          }
+
+          // Full-week now indicator: measure column offsets and set CSS custom properties
+          // so the line spans exactly from the first day column to the last, without
+          // overlapping the time-label column on the left.
+          // Uses .fc-day-today (set synchronously by FullCalendar) rather than the
+          // now-indicator container (added asynchronously) to avoid a timing race.
+          if (node.classList.contains('now-indicator-full-week')) {
+            var measureNowIndicator = function() {
+              try {
+                // Exclude the time-axis td; measure only the actual day columns.
+                var dayCols  = node.querySelectorAll('td.fc-timegrid-col:not(.fc-timegrid-axis)');
+                var todayCol = node.querySelector('.fc-day-today.fc-timegrid-col');
+                if (!dayCols.length || !todayCol) return;
+                var firstRect = dayCols[0].getBoundingClientRect();
+                var lastRect  = dayCols[dayCols.length - 1].getBoundingClientRect();
+                var todayRect = todayCol.getBoundingClientRect();
+                node.style.setProperty('--now-indicator-left-offset', (todayRect.left - firstRect.left) + 'px');
+                node.style.setProperty('--now-indicator-total-width',  (lastRect.right - firstRect.left) + 'px');
+              } catch(e) {}
+            };
+            requestAnimationFrame(measureNowIndicator);
+            if (window.ResizeObserver) {
+              new ResizeObserver(measureNowIndicator).observe(node);
+            }
+          }
+        });
+      } catch (e) { /* noop */ }
+    };
+
+    // Auto-init on DOM ready
+    document.addEventListener('DOMContentLoaded', function(){
+      window.trmnlInitCalendars(document);
+    });
+  </script>
+<% end %>
