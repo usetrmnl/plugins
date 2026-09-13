@@ -1,0 +1,29 @@
+<%= render "plugins/calendars/common" %>
+<%= stylesheet_link_tag 'plugins/calendars_full_month', media: 'all' %>
+
+<% rolling_month_view = { type: 'dayGridMonth', duration: { weeks: 4 }, fixedWeekCount: false } %>
+<% rolling_month_view[:dateAlignment] = 'day' if local_assigns[:rolling_advancement] == 'day' %>
+
+<% cfg = {
+  now: today_in_tz.to_date,
+  headerToolbar: local_assigns[:month_header] ? { start: 'title', center: '', end: '' } : false,
+  height: '100%',
+  initialView: (local_assigns[:event_layout] == 'rolling_month' ? 'rollingMonth' : 'dayGridMonth'),
+  initialDate: today_in_tz.to_date,
+  firstDay: first_day,
+  eventTimeFormat: { hour: 'numeric', minute: '2-digit', hour12: (time_format == 'am/pm'), meridiem: false },
+  views: { rollingMonth: rolling_month_view },
+  events: fullcalendar_events_json(events, colorize: (color_display && colorize_events), palette_colors: palette_colors),
+  adaptiveEventStroke: (css_bit_depth == 2),
+  displayEventTime: include_event_time,
+  dayMaxEventRows: local_assigns.fetch(:cap_event_rows, false), # short cells need uniform rows, not content-sized ones
+  displayEventEnd: true, # FullCalendar defaults this off in dayGrid
+  weekNumbers: show_week_numbers,
+  weekNumberCalculation: 'ISO',
+  locale: locale,
+  schedulerLicenseKey: Rails.application.credentials.plugins.full_calendar.license_key
+} %>
+
+<div class="view view--<%= local_assigns.fetch(:view_class, 'full') %>">
+  <div id="<%= local_assigns.fetch(:calendar_dom_id, 'calendar-full-month') %>" class="trmnl-calendar trmnl-calendar--month<%= ' highlight-today' if highlight_today %><%= ' no-weekend-shading' if local_assigns[:shade_weekends] == false %>" data-calendar-config="<%= cfg.to_json %>"></div>
+</div>

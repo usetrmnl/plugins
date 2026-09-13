@@ -1,0 +1,70 @@
+<%= render "plugins/calendars/common" %>
+<%= stylesheet_link_tag 'plugins/calendars_full_week', media: 'all' %>
+<% event_layout = local_assigns[:event_layout] %>
+<% is_rolling_week = (event_layout == 'rolling_week') %>
+<% first_day_value = (fixed_week ? first_day : today_in_tz.to_datetime.wday) %>
+
+<% cfg = {
+  now: DateTime.now.in_time_zone(tz).strftime('%Y-%m-%dT%H:%M:%S'),
+  nowIndicator: show_now_indicator,
+  contentHeight: '100%',
+  initialView: (is_rolling_week ? 'rollingWeek' : 'timeGridWeek'),
+  firstDay: first_day_value,
+  scrollTime: scroll_time,
+  slotMinTime: scroll_time,
+  slotMaxTime: scroll_time_end,
+  expandRows: true,
+  slotLabelFormat: { hour: 'numeric', meridiem: 'short', hour12: (time_format == 'am/pm') },
+  eventTimeFormat: { hour: 'numeric', minute: '2-digit', hour12: (time_format == 'am/pm') },
+  slotDuration: '00:30:00',
+  allDaySlot: events.any? { |e| e[:all_day] },
+  events: fullcalendar_events_json(events, colorize: (color_display && colorize_events), palette_colors: palette_colors),
+  adaptiveEventStroke: (css_bit_depth == 2),
+  displayEventTime: include_event_time,
+  weekNumbers: show_week_numbers,
+  weekNumberCalculation: 'ISO',
+  locale: locale,
+  schedulerLicenseKey: Rails.application.credentials.plugins.full_calendar.license_key,
+  autoAllDaySlot: true,
+  autoScrollTime: local_assigns.fetch(:auto_scroll_time, false),
+  autoScrollTimeEnd: local_assigns.fetch(:auto_scroll_time_end, false),
+  views: (is_rolling_week ? { rollingWeek: { type: 'timeGridWeek', duration: { days: 7 } } } : {})
+} %>
+
+<% if local_assigns[:week_header_format].present? %>
+  <% cfg[:dayHeaders] = day_header_labels(today_in_tz, week_header_format) %>
+<% end %>
+
+<% if local_assigns[:work_week] %>
+  <script src="https://trmnl.com/fullcalendar/timegrid.min.js"></script>
+
+  <style media="screen">
+    .fc-day { width: calc(151px * var(--ui-scale, 1)) !important }
+  </style>
+
+  <!-- ignore first day setting -->
+  <% cfg.delete(:firstDay) %>
+
+  <!-- hides Sunday, Saturday -->
+  <% cfg[:hiddenDays] = [0, 6] %>
+<% end %>
+
+<% if local_assigns[:three_day_week] %>
+  <script src="https://trmnl.com/fullcalendar/timegrid.min.js"></script>
+
+  <style media="screen">
+    .fc-day { width: calc(251px * var(--ui-scale, 1)) !important }
+  </style>
+
+  <!-- ignore first day setting -->
+  <% cfg.delete(:firstDay) %>
+
+  <% cfg[:initialView] = 'threeDayView' %>
+  <% cfg[:views] = { threeDayView: { type: 'timeGrid', duration: { days: 3 } } } %>
+<% end %>
+
+<div class="view view--<%= local_assigns.fetch(:view_class, 'full') %>">
+  <div id="<%= local_assigns.fetch(:calendar_dom_id, 'calendar-full-week') %>"
+       class="trmnl-calendar trmnl-calendar--week<%= ' highlight-today' if highlight_today %><%= ' no-weekend-shading' if local_assigns[:shade_weekends] == false %><%= ' now-indicator-above' if show_now_indicator && now_indicator_layer == 'above_events' %><%= ' now-indicator-full-week' if show_now_indicator && now_indicator_span == 'full_week' %>"
+       data-calendar-config="<%= cfg.to_json %>"></div>
+</div>

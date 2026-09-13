@@ -1,0 +1,94 @@
+<% event_layout = local_assigns[:event_layout] %>
+<% if %w[week three_day_week].include?(event_layout) %>
+  <% random_suffix = SecureRandom.hex(2) %>
+
+  <%= render "plugins/calendars/common" %>
+  <%= stylesheet_link_tag 'plugins/calendars_full_week', media: 'all' %>
+
+  <div class="view view--half_vertical">
+    <div class="half-vertical-week-container">
+      <% floored_scroll = "#{scroll_time.split(':')[0]}:00" %>
+      <% cfg = {
+        now: DateTime.now.in_time_zone(tz).strftime('%Y-%m-%dT%H:%M:%S'),
+        nowIndicator: show_now_indicator,
+        contentHeight: '100%',
+        initialView: 'timeGrid',
+        duration: { days: 3 },
+        scrollTime: floored_scroll,
+        slotMinTime: floored_scroll,
+        slotMaxTime: scroll_time_end,
+        expandRows: true,
+        firstDay: today_in_tz.to_datetime.wday,
+        allDaySlot: true,
+        slotLabelFormat: { hour: 'numeric', meridiem: 'short', hour12: (time_format == 'am/pm') },
+        eventTimeFormat: { hour: 'numeric', minute: '2-digit', hour12: (time_format == 'am/pm') },
+        events: fullcalendar_events_json(events, colorize: (color_display && colorize_events), palette_colors: palette_colors),
+        adaptiveEventStroke: (css_bit_depth == 2),
+        displayEventTime: include_event_time,
+        weekNumbers: show_week_numbers,
+        weekNumberCalculation: 'ISO',
+        locale: locale,
+        schedulerLicenseKey: Rails.application.credentials.plugins.full_calendar.license_key,
+        autoAllDaySlot: true,
+        autoScrollTime: local_assigns.fetch(:auto_scroll_time, false),
+        autoScrollTimeEnd: local_assigns.fetch(:auto_scroll_time_end, false)
+      } %>
+      <div id="calendar-half-vertical-week-<%= random_suffix %>"
+           class="trmnl-calendar trmnl-calendar--week<%= ' highlight-today' if highlight_today %><%= ' no-weekend-shading' if local_assigns[:shade_weekends] == false %><%= ' now-indicator-above' if show_now_indicator && now_indicator_layer == 'above_events' %><%= ' now-indicator-full-week' if show_now_indicator && now_indicator_span == 'full_week' %>"
+           data-calendar-config="<%= cfg.to_json %>"></div>
+    </div>
+  </div>
+<% elsif event_layout == 'schedule' %>
+  <div class="view view--half_vertical">
+    <%= render partial: 'plugins/calendars/schedule', locals: local_assigns %>
+  </div>
+<% else %>
+  <% zoom_mode ||= false %>
+
+  <% days_to_show = event_layout == 'today_only' ? 1 : 3 %>
+  <% date_heading_size = zoom_mode ? 'large' : 'medium' %>
+  <% heading_size = zoom_mode ? 'medium' : 'small' %>
+  <% event_time_style = zoom_mode ? 'inverted' : 'underline' %>
+  <% alignment_class = vertical_alignment == 'top' ? ' layout--top' : (vertical_alignment == 'bottom' ? ' layout--bottom' : '') %>
+  <% today_label = today_date_label(today_in_tz, date_format, highlight: highlight_today) %>
+
+  <div class="view view--half_vertical">
+    <% if events.blank? && event_layout == 'today_only' %>
+      <div class="layout layout--center layout--middle h--full">
+        <span class="title text--gray-50"><%= t('renders.calendars.no_events_today') %></span>
+      </div>
+    <% else %>
+    <div class="layout layout--col<%= alignment_class %>">
+      <div class="columns" data-overflow-max-cols="2" data-overflow-counter="true">
+        <div class="column">
+          <% idx = 0 %>
+          <% formulate_and_group_events_by_day(events, today_in_tz, days_to_show, date_format).to_h.each_pair do |day, day_events| %>
+            <span class="label label--<%= date_heading_size %><%= ' label--filled' if day == today_label %> group-header" data-group-header="true"><%= day %></span>
+            <% day_events.each do |event| %>
+              <% if event[:all_day] %>
+                <%= render partial: 'plugins/calendars/all_day_event', locals: { event: event, include_description:, heading_size: } %>
+              <% else %>
+                <div class="item">
+                  <div class="meta">
+                    <span class="index"><%= idx += 1 %></span>
+                  </div>
+                  <div class="content">
+                    <span class="title title--<%= heading_size %>" data-clamp="3"><%= event[:summary] %></span>
+                    <% if include_description %><span class="description" data-clamp="3"><%= event[:description] %></span><% end %>
+                    <% if include_event_time %>
+                      <div class="flex gap--xsmall">
+                        <span class="label label--small label--<%= event_time_style %>"><%= "#{event[:start]}" %> - <%= event[:end] %></span>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <% end %>
+    <%= render partial: "plugins/calendars/title_bar", locals: local_assigns %>
+  </div>
+<% end %>
