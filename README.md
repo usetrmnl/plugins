@@ -111,4 +111,5 @@ native plugin structure:
 - [Multi-vendor cloud & SaaS status](https://github.com/outagedeck/trmnl-plugin) by [OutageDeck](https://github.com/outagedeck)
 - [Live tennis scores](https://github.com/livetennisapi/trmnl-live-tennis) by [@livetennisapi](https://github.com/livetennisapi)
 - [Oil Price Tracker (WTI/Brent)](https://github.com/nbbou81000/petrol) by [@nbbou81000](https://github.com/nbbou81000)
+- [Souvenir Map](https://github.com/nbbou81000/trmnl-carte-souvenir) by [@nbbou81000](https://github.com/nbbou81000)
 to be featured here, add `trmnl` topic to your repo, then open a PR or join the developer-only Discord server (link inside TRMNL UI).
