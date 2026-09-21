@@ -1,0 +1,25 @@
+<div class="view view--half_horizontal">
+  <div class="layout layout--col layout--top gap--xsmall">
+    <div class="flex flex--row flex--between flex--top w--full">
+      <span class="title title--large lg:title--xlarge grow" data-clamp="1"><%= room_name %></span>
+      <span class="label label--small no-shrink"><%= todays_date %></span>
+    </div>
+
+    <div class="grid grid--cols-2 gap--small">
+      <div class="col col--span-1">
+        <%= render 'plugins/mazevo/shared/status', current_event:, next_event: upcoming_events.first, value_size: 'value--small lg:value--base' %>
+      </div>
+      <div class="col col--span-1">
+        <% if upcoming_events.any? %>
+          <% upcoming_events.first(2).each do |booking| %>
+            <%= render 'plugins/mazevo/shared/booking', booking: %>
+          <% end %>
+        <% else %>
+          <span class="label label--small"><%= t(current_event.nil? && finished_events.empty? ? 'renders.mazevo.no_bookings' : 'renders.mazevo.nothing_later') %></span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%= render 'plugins/mazevo/shared/title_bar', updated_at:, footer_note: %>
+</div>

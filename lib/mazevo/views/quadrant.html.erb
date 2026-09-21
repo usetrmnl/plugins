@@ -1,0 +1,15 @@
+<div class="view view--quadrant">
+  <div class="layout layout--col layout--top gap--xsmall">
+    <span class="title lg:title--large w--full" data-clamp="1"><%= room_name %></span>
+
+    <%= render 'plugins/mazevo/shared/status', current_event:, next_event: upcoming_events.first, value_size: 'value--xsmall lg:value--small' %>
+
+    <% if upcoming_events.first %>
+      <%= render 'plugins/mazevo/shared/booking', booking: upcoming_events.first %>
+    <% else %>
+      <span class="label label--small w--full"><%= t(current_event.nil? && finished_events.empty? ? 'renders.mazevo.no_bookings' : 'renders.mazevo.nothing_later') %></span>
+    <% end %>
+  </div>
+
+  <%= render 'plugins/mazevo/shared/title_bar', updated_at:, footer_note: %>
+</div>

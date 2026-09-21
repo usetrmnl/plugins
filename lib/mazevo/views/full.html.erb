@@ -1,0 +1,34 @@
+<div class="view view--full">
+  <div class="layout layout--col layout--top gap--small">
+    <div class="flex flex--row flex--between flex--top w--full">
+      <span class="title title--xlarge lg:title--xxlarge grow" data-clamp="1"><%= room_name %></span>
+      <span class="label no-shrink"><%= todays_date %></span>
+    </div>
+
+    <%= render 'plugins/mazevo/shared/status', current_event:, next_event: upcoming_events.first %>
+
+    <% if current_event.nil? && upcoming_events.empty? && finished_events.empty? %>
+      <span class="label w--full"><%= t('renders.mazevo.no_bookings') %></span>
+    <% else %>
+      <%# columns/stretch-y, not col: .col claims min-height 100% and squeezes the band above it. %>
+      <div class="columns stretch-y">
+        <div class="column col--start gap--xsmall" data-list-limit="true" data-list-hidden-count="true">
+          <% if finished_events.any? %>
+            <span class="label label--small"><%= t('renders.mazevo.earlier_today') %></span>
+            <% finished_events.each do |booking| %>
+              <%= render 'plugins/mazevo/shared/booking', booking: %>
+            <% end %>
+          <% end %>
+          <% if upcoming_events.any? %>
+            <span class="label label--small"><%= t(current_event ? 'renders.mazevo.later_today' : 'renders.mazevo.coming_up') %></span>
+            <% upcoming_events.each do |booking| %>
+              <%= render 'plugins/mazevo/shared/booking', booking: %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%= render 'plugins/mazevo/shared/title_bar', updated_at:, footer_note: %>
+</div>

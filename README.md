@@ -23,6 +23,7 @@ community Recipes:
 - [Hubspot](/lib/hubspot)
 - [Lunar Calendar](/lib/lunar_calendar)
 - [Lunch Money](/lib/lunch_money)
+- [Mazevo](/lib/mazevo)
 - [Mondrian](/lib/mondrian)
 - [Nano Banana Dashboard](/lib/nano_banana_dashboard)
 - [Notion](/lib/notion)
