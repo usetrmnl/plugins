@@ -1,0 +1,18 @@
+<% value_size = local_assigns[:value_size] || 'value--large lg:value--xlarge' %>
+<%# rounded--small hides the band's overflow, so without no-shrink a tight column crushes it to its padding. %>
+<% if current_event %>
+  <div class="bg--black rounded--small p--4 w--full no-shrink">
+    <div class="flex flex--col flex--stretch-x">
+      <span class="label label--small text--white"><%= t('renders.mazevo.in_use') %></span>
+      <span class="value <%= value_size %> text--white" data-clamp="1"><%= current_event[:private] ? t('renders.mazevo.private_booking') : current_event[:summary] %></span>
+      <span class="label text--white" data-clamp="1"><%= [t('renders.mazevo.time_range', start: current_event[:start], end: current_event[:end]), current_event[:description].presence].compact.join(' · ') %></span>
+    </div>
+  </div>
+<% else %>
+  <div class="p--4 w--full no-shrink">
+    <div class="flex flex--col flex--stretch-x">
+      <span class="value <%= value_size %>" data-clamp="1"><%= t('renders.mazevo.available') %></span>
+      <span class="label" data-clamp="1"><%= next_event ? t('renders.mazevo.available_until', time: next_event[:start]) : t('renders.mazevo.available_all_day') %></span>
+    </div>
+  </div>
+<% end %>
