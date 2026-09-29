@@ -1,15 +1,15 @@
 module Plugins
-  # A door sign for one Mazevo room: in use or available now, then the rest of today's bookings.
+  # A door sign for one Mazévo room: in use or available now, then the rest of today's bookings.
   class Mazevo < Base
     include Calendar::Ics
 
     EVENTS_PATH = '/api/PublicEvent/getevents'.freeze
     ROOMS_PATH = '/api/PublicConfiguration/Rooms'.freeze
-    API_KEY_REJECTED_MESSAGE = 'Mazevo rejected the API key'.freeze
+    API_KEY_REJECTED_MESSAGE = 'Mazévo rejected the API key'.freeze
     ROOM_MISSING_MESSAGE = 'Choose a room in the plugin settings'.freeze
     LOCATION_BUILDING_SEPARATOR = ' - '.freeze
     ROOM_NOT_IN_FEED_MESSAGE = 'Room not found in this feed'.freeze
-    UNEXPECTED_ANSWER_MESSAGE = 'Mazevo did not answer with a list of bookings'.freeze
+    UNEXPECTED_ANSWER_MESSAGE = 'Mazévo did not answer with a list of bookings'.freeze
 
     # The key lacks the Building and Rooms Calls permission group.
     class RoomsForbidden < StandardError; end
@@ -72,6 +72,7 @@ module Plugins
         room_name:, current_event:, upcoming_events:, finished_events:,
         todays_date: I18n.l(refresh_time.to_date, format: '%A, %B %-d', locale:),
         updated_at: refresh_time.strftime(formatted_time),
+        available_label: settings['available_label'].presence,
         footer_note: settings['footer_note'].presence
       }
     end
@@ -143,7 +144,7 @@ module Plugins
       }
     end
 
-    # Mazevo stamps each time with its own offset; the zone only picks the wall clock shown.
+    # Mazévo stamps each time with its own offset; the zone only picks the wall clock shown.
     def booking_time(value)
       Time.find_zone!(time_zone).iso8601(value.to_s)
     rescue ArgumentError
