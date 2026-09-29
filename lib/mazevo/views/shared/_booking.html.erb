@@ -2,7 +2,7 @@
   <div class="meta"></div>
   <%# Full width, not shrink wrapped: data-clamp measures the box it sits in and would keep trimming. %>
   <div class="content flex flex--col flex--stretch-x gap--none w--full">
-    <span class="title title--small" data-clamp="1"><%= booking[:private] ? t('renders.mazevo.private_booking') : booking[:summary] %></span>
-    <span class="label label--small" data-clamp="1"><%= [t('renders.mazevo.time_range', start: booking[:start], end: booking[:end]), booking[:description].presence].compact.join(' · ') %></span>
+    <span class="title title--small lg:title--large" data-clamp="1"><%= booking[:private] ? t('renders.mazevo.private_booking') : booking[:summary] %></span>
+    <span class="label label--small lg:label--large" data-clamp="1"><%= [t('renders.mazevo.time_range', start: booking[:start], end: booking[:end]), booking[:description].presence].compact.join(' · ') %></span>
   </div>
 </div>

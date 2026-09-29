@@ -7,7 +7,7 @@
 
     <div class="grid grid--cols-2 gap--small">
       <div class="col col--span-1">
-        <%= render 'plugins/mazevo/shared/status', current_event:, next_event: upcoming_events.first, value_size: 'value--small lg:value--base' %>
+        <%= render 'plugins/mazevo/shared/status', current_event:, next_event: upcoming_events.first, available_label: local_assigns[:available_label], value_size: 'value--small lg:value--base' %>
       </div>
       <div class="col col--span-1">
         <% if upcoming_events.any? %>

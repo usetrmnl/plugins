@@ -5,22 +5,22 @@
       <span class="label label--small"><%= todays_date %></span>
     </div>
 
-    <%= render 'plugins/mazevo/shared/status', current_event:, next_event: upcoming_events.first, value_size: 'value--small lg:value--base' %>
+    <%= render 'plugins/mazevo/shared/status', current_event:, next_event: upcoming_events.first, available_label: local_assigns[:available_label], value_size: 'value--small lg:value--base' %>
 
     <% if current_event.nil? && upcoming_events.empty? && finished_events.empty? %>
-      <span class="label w--full"><%= t('renders.mazevo.no_bookings') %></span>
+      <span class="label lg:label--large w--full"><%= t('renders.mazevo.no_bookings') %></span>
     <% else %>
       <%# columns/stretch-y, not col: .col claims min-height 100% and squeezes the band above it. %>
       <div class="columns stretch-y">
         <div class="column col--start gap--xsmall" data-list-limit="true" data-list-hidden-count="true">
           <% if finished_events.any? %>
-            <span class="label label--small"><%= t('renders.mazevo.earlier_today') %></span>
+            <span class="label label--small lg:label--large"><%= t('renders.mazevo.earlier_today') %></span>
             <% finished_events.each do |booking| %>
               <%= render 'plugins/mazevo/shared/booking', booking: %>
             <% end %>
           <% end %>
           <% if upcoming_events.any? %>
-            <span class="label label--small"><%= t(current_event ? 'renders.mazevo.later_today' : 'renders.mazevo.coming_up') %></span>
+            <span class="label label--small lg:label--large"><%= t(current_event ? 'renders.mazevo.later_today' : 'renders.mazevo.coming_up') %></span>
             <% upcoming_events.each do |booking| %>
               <%= render 'plugins/mazevo/shared/booking', booking: %>
             <% end %>
