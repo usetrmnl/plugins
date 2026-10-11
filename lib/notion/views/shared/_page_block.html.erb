@@ -1,6 +1,8 @@
 <% if block[:type] == "divider" %>
   <div style="border-top: 1px dotted #000000;"></div>
-<% elsif ["table_of_contents", "table", "unsupported", "synced_block", "breadcrumb", "column_list"].include?(block[:type]) %>
+<% elsif block[:type] == "table" %>
+  <%= render 'plugins/notion/shared/table', table: block, current_layout: current_layout %>
+<% elsif ["table_of_contents", "unsupported", "synced_block", "breadcrumb", "column_list"].include?(block[:type]) %>
   <% return %>
 <% else %>
   <div class="item">
