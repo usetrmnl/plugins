@@ -1,0 +1,22 @@
+<div class="view view--full">
+  <div class="layout">
+    <div class="columns">
+      <div class="column">
+        <% if defined?(error_title) %>
+          <span class="title text--center" data-pixel-perfect="true"><%= error_title %></span>
+        <% end %>
+        <div class="richtext richtext--center gap--large">
+          <div class="content content--center gap text--center">
+            <p><%= error_message %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <%= image_tag plugin_image_path(icon), class: adaptive_icon_classes(icon), alt: "Icon" %>
+    <span class="title"><%= title %></span>
+    <span class="instance"><%= instance %></span>
+  </div>
+</div>

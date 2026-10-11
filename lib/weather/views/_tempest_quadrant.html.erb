@@ -1,0 +1,36 @@
+<div class="view view--quadrant">
+  <div class="layout">
+    <div class="grid grid--cols-2">
+      <div class="row row--center">
+        <%= image_tag inline_svg_src(weather_image), class: "w--[42cqw] h--[42cqw] portrait:w--auto portrait:h--[20cqh] lg:w--[46cqw] lg:h--[46cqw] lg:portrait:w--auto lg:portrait:h--[20cqh]", style: "filter: brightness(0.5) saturate(0%);", alt: "Weather condition" %>
+      </div>
+
+      <div class="grid">
+        <div class="col gap--auto">
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value value--large" data-fit-value="true"><%= temperature&.round %>°</span>
+              <span class="value value--xxsmall" data-value-fit="true"><%= today_conditions %></span>
+            </div>
+          </div>
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="label"><%= forecast[:today][:mintemp] %>° - <%= forecast[:today][:maxtemp] %>°</span>
+              <span class="label"><%= t('renders.weather.uv') %> <%= forecast[:today][:uv_index] %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <%= image_tag plugin_image_path("tempest_weather_station--render.svg"), class: "image image--adaptive", alt: "" %>
+    <h1 class="title"><%= t('renders.weather.title') %></h1>
+    <span class="instance"><%= instance_name %> (<%= render 'plugins/weather/render_time', utc_offset:, time_format: %>)</span>
+  </div>
+</div>
+
+<%= render 'plugins/weather/common' %>

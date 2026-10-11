@@ -1,0 +1,114 @@
+<div class="view view--full">
+  <div class="layout layout--col gap--auto">
+    <div class="grid grid--cols-6">
+      <div class="row row--center col--span-2 portrait:col--span-6 col--end">
+        <%= image_tag plugin_image_path("weather/#{weather_image}.svg"), class: "image--adaptive w--[22cqw] h--auto portrait:w--auto portrait:h--[40cqh] lg:w--[28cqw] lg:h--[28cqw] lg:portrait:w--auto lg:portrait:h--[33cqh]" %>
+      </div>
+      <div class="col col--span-2 portrait:col--span-3 col--end">
+        <div class="item grow">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value value--xxxlarge lg:value--giga" data-fit-value="true"><%= temperature&.round %>°</span>
+            <span class="label"><%= t('renders.weather.temperature') %> (<%= render 'plugins/weather/render_time', utc_offset:, time_format: %>)</span>
+          </div>
+        </div>
+      </div>
+      <div class="col col--span-2 portrait:col--span-3 col--end gap--medium">
+        <div class="item">
+          <div class="meta"></div>
+          <div class="icon">
+            <%= image_tag plugin_image_path("weather/wi-thermometer.svg"), class: "image--adaptive w--[6cqw] h--[6cqw] portrait:w--[10cqw] portrait:h--[10cqw]", alt: "Temperature" %>
+          </div>
+          <div class="content">
+            <span class="value value--xsmall lg:value--large"><%= feels_like&.round %>°</span>
+            <span class="label"><%= t('renders.weather.feels_like') %></span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="meta"></div>
+          <div class="icon">
+            <%= image_tag plugin_image_path("weather/wi-raindrops.svg"), class: "image--adaptive w--[6cqw] h--[6cqw] portrait:w--[10cqw] portrait:h--[10cqw]", alt: "Humidity" %>
+          </div>
+          <div class="content">
+            <span class="value value--xsmall lg:value--large"><%= humidity %>%</span>
+            <span class="label"><%= t('renders.weather.humidity') %></span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="meta"></div>
+          <div class="icon">
+            <%= image_tag plugin_image_path("weather/#{weather_image}.svg"), class: "image--adaptive w--[6cqw] h--[6cqw] portrait:w--[10cqw] portrait:h--[10cqw]" %>
+          </div>
+          <div class="content">
+            <span class="value value--xsmall lg:value--base"><%= conditions %></span>
+            <span class="label"><%= t('renders.weather.right_now') %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="grid">
+      <div class="col gap--large">
+        <% [
+          { key: :today, image: today_weather_image, translation_key: 'renders.weather.today', alt: 'Today weather condition' },
+          { key: :tomorrow, image: tomorrow_weather_image, translation_key: 'renders.weather.tomorrow', alt: 'Tomorrow weather condition' }
+        ].each do |day| %>
+          <div class="grid">
+            <div class="item col--span-3 grow">
+              <div class="meta"></div>
+              <div class="icon">
+                <%= image_tag plugin_image_path("weather/#{day[:image]}.svg"), class: "image--adaptive w--[6cqw] h--[6cqw] portrait:w--[10cqw] portrait:h--[10cqw]", alt: day[:alt] %>
+              </div>
+              <div class="content">
+                <span class="value value--xsmall lg:value--base"><%= forecast[day[:key]][:conditions] %></span>
+                <span class="label"><%= forecast[day[:key]][:day_override] || t(day[:translation_key]) %></span>
+              </div>
+            </div>
+
+            <div class="item col--span-3 grow">
+              <div class="meta"></div>
+              <div class="icon portrait:hidden">
+                <%= image_tag plugin_image_path("weather/wi-hot.svg"), class: "image--adaptive w--[6cqw] h--[6cqw] portrait:w--[10cqw] portrait:h--[10cqw]", alt: "UV Index" %>
+              </div>
+              <div class="content">
+                <span class="value value--xsmall lg:value--base"><%= forecast[day[:key]][:uv_index] %></span>
+                <span class="label"><%= t('renders.weather.uv') %></span>
+              </div>
+            </div>
+
+            <div class="row col--span-3 grow">
+              <div class="item">
+                <div class="meta"></div>
+                <div class="icon portrait:hidden">
+                  <%= image_tag plugin_image_path("weather/wi-thermometer.svg"), class: "image--adaptive w--[6cqw] h--[6cqw] portrait:w--[10cqw] portrait:h--[10cqw]", alt: "Temperature" %>
+                </div>
+                <div class="content">
+                  <div class="flex flex--row gap--xlarge portrait:gap">
+                    <div class="content">
+                      <span class="value value--xsmall lg:value--base"><%= forecast[day[:key]][:mintemp]&.round %>°</span>
+                      <span class="label"><%= t('renders.weather.low') %></span>
+                    </div>
+                    <div class="content">
+                      <span class="value value--xsmall lg:value--base"><%= forecast[day[:key]][:maxtemp]&.round %>°</span>
+                      <span class="label"><%= t('renders.weather.high') %></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <%= image_tag plugin_image_path("weather--render.svg"), class: "image image--adaptive", alt: "" %>
+    <h1 class="title"><%= t('renders.weather.title') %></h1>
+    <span class="instance"><%= instance_name %></span>
+  </div>
+</div>
+
+<%= render 'plugins/weather/common' %>

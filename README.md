@@ -35,6 +35,7 @@ community Recipes:
 - [Stock Price](/lib/stock_price)
 - [Tempest Weather Station](/lib/tempest_weather_station)
 - [Todoist](/lib/todoist)
+- [Weather](/lib/weather)
 - [Weather (generic)](/lib/weather)
 - [Withings](/lib/withings)
 - [Youtube Analytics](/lib/youtube_analytics)

@@ -1,0 +1,34 @@
+<div class="view view--half_vertical">
+  <div class="layout layout--col">
+    <%= image_tag inline_svg_src(weather_image), class: "w--[46cqw] h--[46cqw] portrait:w--auto portrait:h--[20cqh] lg:w--[46cqw] lg:h--[46cqw] lg:portrait:w--auto lg:portrait:h--[20cqh]", style: "filter: brightness(0.5) saturate(0%);", alt: "Weather condition" %>
+
+    <div class="grid grid--cols-2">
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content">
+          <span class="value value--large" data-fit-value="true"><%= temperature&.round %>°</span>
+          <span class="label" data-clamp="1"><%= today_conditions %></span>
+          <span class="label"><%= forecast[:today][:mintemp] %>° - <%= forecast[:today][:maxtemp] %>°</span>
+          <span class="label"><%= t('renders.weather.uv') %> <%= forecast[:today][:uv_index] %></span>
+        </div>
+      </div>
+      <div class="item">
+        <div class="meta"></div>
+        <div class="content gap">
+          <span class="label label--filled" data-clamp="1"><%= forecast[:tomorrow][:day_override] || t('renders.weather.tomorrow') %></span>
+          <span class="label"><%= forecast[:tomorrow][:conditions] %></span>
+          <span class="label"><%= t('renders.weather.low_high_short') %> <%= forecast[:tomorrow][:mintemp] %>° - <%= forecast[:tomorrow][:maxtemp] %>°</span>
+          <span class="label"><%= t('renders.weather.uv_short') %> <%= forecast[:tomorrow][:uv_index] %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <%= image_tag plugin_image_path("tempest_weather_station--render.svg"), class: "image image--adaptive" %>
+    <h1 class="title"><%= t('renders.weather.title') %></h1>
+    <span class="instance"><%= instance_name %> (<%= render 'plugins/weather/render_time', utc_offset:, time_format: %>)</span>
+  </div>
+</div>
+
+<%= render 'plugins/weather/common' %>
