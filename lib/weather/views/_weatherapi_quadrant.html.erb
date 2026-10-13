@@ -1,0 +1,62 @@
+<div class="view view--quadrant">
+  <div class="layout">
+    <div class="grid grid--cols-2 portrait:grid--cols-1 gap--none lg:portrait:gap">
+      <div class="col">
+        <div class="row row--center">
+          <%= image_tag plugin_image_path("weather/#{weather_image}.svg"), class: "image--adaptive w--[46cqw] h--auto portrait:w--auto portrait:h--[50cqh] lg:w--[46cqw] lg:h--[46cqw] lg:portrait:w--auto lg:portrait:h--[46cqh]", alt: "Weather condition" %>
+        </div>
+
+        <div class="hidden lg:flex lg:portrait:hidden h--full">
+          <div class="item grow">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value value--xsmall lg:value--base"><%= conditions %></span>
+              <span class="label hidden lg:visible"><%= t('renders.weather.right_now') %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col gap lg:portrait:grid lg:portrait:grid--cols-2">
+        <div class="item grow">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value value--large lg:value--xxxlarge" data-fit-value="true"><%= temperature&.round %>°</span>
+            <span class="label hidden lg:visible"><%= t('renders.weather.temperature') %></span>
+          </div>
+        </div>
+        <div class="visible lg:hidden lg:portrait:flex h--full">
+          <div class="item grow">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value value--xsmall lg:portrait:value--base"><%= conditions %></span>
+              <span class="label hidden lg:visible"><%= t('renders.weather.right_now') %></span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value value--xxsmall lg:value--small"><%= forecast[:today][:mintemp] %>° - <%= forecast[:today][:maxtemp] %>°</span>
+            <span class="label hidden lg:visible"><%= t('renders.weather.low_high_short') %></span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="meta"></div>
+          <div class="content">
+            <span class="value value--xxsmall lg:value--small"><%= forecast[:today][:uv_index] %></span>
+            <span class="label hidden lg:visible"><%= t('renders.weather.uv') %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <%= image_tag plugin_image_path("weather--render.svg"), class: "image image--adaptive", alt: "" %>
+    <h1 class="title"><%= render 'plugins/weather/render_time', utc_offset:, time_format: %></h1>
+    <span class="instance"><%= instance_name %></span>
+  </div>
+</div>
+
+<%= render 'plugins/weather/common' %>

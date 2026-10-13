@@ -1,0 +1,37 @@
+<div class="view view--half_horizontal">
+  <div class="layout">
+    <div class="grid">
+      <div class="col col--span-1 col--center">
+        <div class="row row--center">
+          <%= image_tag inline_svg_src(weather_image), class: "w--[22cqw] h--[22cqw] portrait:w--auto portrait:h--[20cqh] lg:w--[24cqw] lg:h--[24cqw] lg:portrait:w--auto lg:portrait:h--[20cqh]", style: "filter: brightness(0.5) saturate(0%);", alt: "Weather condition" %>
+        </div>
+      </div>
+      <div class="col col--span-2 col--center">
+        <div class="grid grid--cols-2">
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value value--xlarge" data-fit-value="true"><%= temperature&.round %>°</span>
+              <span class="label"><%= t('renders.weather.temperature') %></span>
+            </div>
+          </div>
+          <div class="item">
+            <div class="meta"></div>
+            <div class="content">
+              <span class="value" data-value-fit="true"><%= today_conditions %></span>
+              <span class="label"><%= t('renders.weather.today') %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="title_bar">
+    <%= image_tag plugin_image_path("tempest_weather_station--render.svg"), class: "image image--adaptive", alt: "" %>
+    <h1 class="title"><%= t('renders.weather.title') %></h1>
+    <span class="instance"><%= instance_name %> (<%= render 'plugins/weather/render_time', utc_offset:, time_format: %>)</span>
+  </div>
+</div>
+
+<%= render 'plugins/weather/common' %>
