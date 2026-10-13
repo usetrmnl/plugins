@@ -114,6 +114,7 @@ native plugin structure:
 - [Live tennis scores](https://github.com/livetennisapi/trmnl-live-tennis) by [@livetennisapi](https://github.com/livetennisapi)
 - [Oil Price Tracker (WTI/Brent)](https://github.com/nbbou81000/petrol) by [@nbbou81000](https://github.com/nbbou81000)
 - [Souvenir Map](https://github.com/nbbou81000/trmnl-carte-souvenir) by [@nbbou81000](https://github.com/nbbou81000)
+- [Top Wikipedia](https://github.com/nbbou81000/trmnl-wiki-pageviews) by [@nbbou81000](https://github.com/nbbou81000)
 - [Formula 1 Race Weekend](https://github.com/barrymichaeldoyle/GrandPrixPicks/tree/main/apps/trmnl) by [@barrymichaeldoyle](https://github.com/barrymichaeldoyle)
 - [Geek Almanac](https://github.com/nbbou81000/Geek-almanac) by [@nbbou81000](https://github.com/nbbou81000)
 
