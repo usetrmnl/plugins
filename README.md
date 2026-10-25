@@ -119,5 +119,6 @@ native plugin structure:
 - [Geek Almanac](https://github.com/nbbou81000/Geek-almanac) by [@nbbou81000](https://github.com/nbbou81000)
 - [Patent Drawings](https://github.com/nbbou81000/trmnl-patents) by [@nbbou81000](https://github.com/nbbou81000)
 - [Ciné Poster](https://github.com/nbbou81000/trmnl-cine-poster) by [@nbbou81000](https://github.com/nbbou81000)
+- [Rolling Month Calendar](https://github.com/BartSchuurmans/trmnl-rolling-month-calendar) by [@BartSchuurmans](https://github.com/BartSchuurmans)
 
 to be featured here, add `trmnl` topic to your repo, then open a PR or join the developer-only Discord server (link inside TRMNL UI).
